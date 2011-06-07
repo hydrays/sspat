@@ -1,6 +1,7 @@
 RM := rm -rf
 OUTPUT_FILE := run
 
+FC = gfortran -fdefault-real-8 -openmp
 OBJS += \
 ../../lib/nrtype.o \
 ../../lib/random.o \
@@ -11,7 +12,7 @@ OBJS += \
 %.o: ./%.f90
 	@echo 'Building file: $<'
 	@echo 'Invoking Fortran Compiler'
-	ifort -g -O0 -c -r8 -o "$@" "$<"
+	$(FC) -g -O0 -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -26,7 +27,7 @@ main: $(OBJS) $(USER_OBJS)
 	@echo 'Output file name:'
 	@echo $(OUTPUT_FILE)
 	@echo 'Invoking Fortran Linker'
-	ifort -r8 -o $(OUTPUT_FILE) $(OBJS)
+	$(FC) -o $(OUTPUT_FILE) $(OBJS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

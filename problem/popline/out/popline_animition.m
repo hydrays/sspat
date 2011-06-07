@@ -1,6 +1,6 @@
-ms = 6;
+ms = 1;
 lw = 2;
-for index = 10:999
+for index = 0:999
 s1 = ['0000000' num2str(index)];
 s = s1((length(s1)-4):length(s1));
 s2 = s1((length(s1)-4):length(s1));

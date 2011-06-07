@@ -1,6 +1,6 @@
 ms = 6;
 lw = 2;
-for index = 100:200
+for index = 20:999
 s1 = ['0000000' num2str(index)];
 s = s1((length(s1)-4):length(s1));
 s2 = s1((length(s1)-4):length(s1));
@@ -34,7 +34,7 @@ pause(0.1)
     s1 = ['0000000' num2str(index)];
     s = s1((length(s1)-4):length(s1));
     s
-%eval(['print(''-dpng'',''slice',s,''');'])
+eval(['print(''-dpng'',''slice',s,''');'])
 %eval(['print(''-depsc'',''slice',s,''');'])
 clf
 end

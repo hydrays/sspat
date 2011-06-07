@@ -1,5 +1,5 @@
 RM := rm -rf
-OUTPUT_FILE := popline
+OUTPUT_FILE := run
 
 OBJS += \
 ../../lib/nrtype.o \

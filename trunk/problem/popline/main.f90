@@ -140,19 +140,20 @@ subroutine cell_dd(cmat)
 
   integer, intent(inout) :: cmat(0:L+1,H)
   integer i, j
-  real u1
+  real u
   
   call getTGFbeta(cmat)
   
+  !$omp parallel private(u)
   do i = 1, L
      do j = 1, H
-        call ran2(u1)
-        if ( u1 < delta_t*v ) then
+        call ran2(u)
+        if ( u < delta_t*v ) then
            call cell_event(cmat, i, j)
         end if
      end do
   end do
-
+  !$omp end parallel
 end subroutine cell_dd
 
 subroutine cell_stat(cmat, t)

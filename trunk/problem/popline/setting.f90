@@ -1,9 +1,9 @@
 module setting
-  integer, parameter :: L = 200
+  integer, parameter :: L = 600
   integer, parameter :: H = 100
-  integer, parameter :: b = 5
+  integer, parameter :: b = 10
   real, parameter :: delta_t = 0.001
-  real, parameter :: tend = 5000.0
+  real, parameter :: tend = 15.0
   real, parameter :: p1 = 0.4
   real, parameter :: v = 1.0
   real, parameter :: D = 10.0

@@ -139,89 +139,16 @@ subroutine cell_dd(cmat)
   implicit none
 
   integer, intent(inout) :: cmat(0:L+1,H)
-
-  integer i, j, k
-  real temp_num
-
-  real u1, u2, u3
-
-  p0 = 0.
-  TGFbeta = 0.
-  ! get TGFbeta
-  do i = 1, L
-     temp_num = 0.
-     do j = 1, H
-        if ( cmat(i,j) .eq. 3 ) then
-           temp_num = temp_num + 1.
-        end if
-     end do
-     if (temp_num > 0) then
-        do k = 0, b-1
-           if ( k .eq. 0) then
-              TGFbeta(i) = TGFbeta(i) + temp_num
-           else
-              TGFbeta(i+k) = TGFbeta(i+k) + temp_num*(1.0 - real(k)/b)
-              TGFbeta(i-k) = TGFbeta(i-k) + temp_num*(1.0 - real(k)/b)
-           end if
-        end do
-     end if
-  end do
-  do k = 1, b
-     TGFbeta(k) = TGFbeta(k) + TGFbeta(L+k)
-     TGFbeta(L-k+1) = TGFbeta(L-k+1) + TGFbeta(1-k)
-  end do
-
-  do i = 1, L
-     p0(i) = 1.0 / (1.0 + 0.01*TGFbeta(i))
-  end do
-  p1 = 0.4
-
+  integer i, j
+  real u1
+  
+  call getTGFbeta(cmat)
+  
   do i = 1, L
      do j = 1, H
-        if (cmat(i,j) .eq. 1 ) then
-           call ran2(u1)
-           if ( u1 < delta_t*v ) then
-              ! division
-              do k=H, j+2, -1
-                 cmat(i, k) = cmat(i, k-1)
-              end do
-              call ran2(u2)
-              if ( u2 < p0(i) ) then
-                 ! SC -> 2SC
-                 cmat(i, j+1) = 1
-              else
-                 ! SC -> 2TAC
-                 cmat(i, j) = 2
-                 cmat(i, j+1) = 2
-              end if
-           end if
-        else if ( cmat(i,j) .eq. 2 ) then
-           call ran2(u1)
-           if ( u1 < delta_t*v ) then
-              ! division
-              do k=H, j+2, -1
-                 cmat(i, k) = cmat(i, k-1)
-              end do
-              call ran2(u2)
-              if ( u2 < p1(i) ) then
-                 ! TAC -> 2TAC
-                 cmat(i, j+1) = 2
-              else
-                 ! SC -> 2TAC
-                 cmat(i, j) = 3
-                 cmat(i, j+1) = 3
-              end if
-           end if
-        else if ( cmat(i,j) .eq. 3 ) then
-           call ran2(u1)
-           if ( u1 < delta_t*v ) then
-              ! death
-              do k=j, H-1
-                 cmat(i, k) = cmat(i, k+1)
-              end do
-           end if
-        else
-           ! do nothing
+        call ran2(u1)
+        if ( u1 < delta_t*v ) then
+           call cell_event(cmat, i, j)
         end if
      end do
   end do

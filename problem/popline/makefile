@@ -1,7 +1,9 @@
 RM := rm -rf
 OUTPUT_FILE := run
 
-FC = gfortran -fdefault-real-8 -openmp
+#FC = gfortran -fdefault-real-8
+FC = ifort -r8
+# -openmp
 OBJS += \
 ../../lib/nrtype.o \
 ../../lib/random.o \

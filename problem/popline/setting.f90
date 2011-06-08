@@ -1,12 +1,12 @@
 module setting
-  integer, parameter :: L = 600
+  integer, parameter :: L = 400
   integer, parameter :: H = 100
-  integer, parameter :: b = 10
+  integer, parameter :: b = 8
   real, parameter :: delta_t = 0.001
-  real, parameter :: tend = 15.0
-  real, parameter :: p1 = 0.4
+  real, parameter :: tend = 5000.0
+  real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: D = 10.0
+  real, parameter :: D = 1.0
   real p0
   real TGFbeta(1-b:L+b)
 
@@ -40,7 +40,7 @@ contains
     integer k
     real u, p0
     if ( cmat(i,j) .eq. 1 ) then
-       p0 = 0.2 + (0.8-0.2) / (1.0 + 0.01*TGFbeta(i))
+       p0 = 0.2 + (0.8 - 0.2) / (1.0 + 0.01*TGFbeta(i))
        ! division
        do k=H, j+2, -1
           cmat(i, k) = cmat(i, k-1)

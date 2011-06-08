@@ -28,19 +28,19 @@ axis equal
 shading flat
 %Frames(:,i)=getframe;
 % hold on;
-% for i = 1:L
-%     for j = 1:D
-%         if (popline(i, j) == 1)
-%             plot(i, j, 'ko', 'MarkerFaceColor', 'r', 'markersize', ms)
-%         elseif (popline(i,j) == 2)
-%             plot(i, j, 'ko', 'MarkerFaceColor', 'b', 'markersize', ms)
-%         elseif (popline(i,j) == 3)
-%             plot(i, j, 'ko', 'MarkerFaceColor', 'g', 'markersize', ms)
-%         elseif (popline(i,j) == 4)
-%             plot(i, j, 'ko', 'MarkerFaceColor', 'k', 'markersize', ms)            
-%         end
-%     end
-% end
+for i = 1:L
+    for j = 1:D
+        if (popline(i, j) == 1)
+            plot(i, j, 'ko', 'MarkerFaceColor', 'r', 'markersize', ms)
+        elseif (popline(i,j) == 2)
+            plot(i, j, 'ko', 'MarkerFaceColor', 'b', 'markersize', ms)
+        elseif (popline(i,j) == 3)
+            plot(i, j, 'ko', 'MarkerFaceColor', 'g', 'markersize', ms)
+        elseif (popline(i,j) == 4)
+            plot(i, j, 'ko', 'MarkerFaceColor', 'k', 'markersize', ms)            
+        end
+    end
+end
 % plot(1:L, D/2)
 % plot(1:L, D*popline(1:L, D+1),'m', 'linewidth', lw)
 % plot(1:L, 0.1*popline(1:L, D+2), 'g', 'linewidth', lw)

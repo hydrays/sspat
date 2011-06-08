@@ -8,7 +8,7 @@ module paras
   real(kind=8) die_time, born_time
   real(kind=8) born_ruler
   real(kind=8) p(NSpec), v(NSpec)
-  real(kind=8), parameter :: tend=2000
+  real(kind=8), parameter :: tend=1000
   real(kind=8), parameter :: L1=2000
   real(kind=8), parameter :: k1=0.8
   real(kind=8), parameter :: k2=8.0
@@ -23,9 +23,9 @@ contains
   subroutine getp
     implicit none    
     p(1) = 1.0/(1.01 + k1*real(num_of_dc)/real(L1))
-    p(2) = 0.4
+    p(2) = 0.45
     p(3) = 0.0
-    p(4) = 1.0
+    p(4) = 0.94
     p(5) = 0.0
   end subroutine getp
 

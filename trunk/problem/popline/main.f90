@@ -11,12 +11,6 @@ program main
   call ran_seed(sequence=1234)
   allocate(cmat(0:L+1, H))
 
-  ! 0 --- empty
-  ! 1 --- stem cell
-  ! 2 --- TAC
-  ! 3 --- TDC
-  ! 4 --- MC
-  ! 5 --- DMC
   cmat = 0
   cmat(1:L, 1) = 1
   cmat(1:L, 2:3) = 2
@@ -24,7 +18,7 @@ program main
 
   t = 0.0
   tp = 0.0
-  tm = 500.0
+  tm = 1000.0
   output_index = 0
   do while (t < tend)
      if (t .ge. tp) then
@@ -32,16 +26,13 @@ program main
         call cell_stat(cmat, t)
         output_index = output_index + 1
         tp = tp + 5.0
-!        write(*,'(50(I1))'), cmat(0,:)
-!        write(*,'(50(I1))'), cmat(L,:)
-!        print *, t, '==========================================='
-!        write(*,'(50(I1))'), cmat(1,:)
-!        write(*,'(50(I1))'), cmat(2,:)
      end if
-!!$     if (t .ge. tm) then
-!!$        cmat(150:200, 1:10) = 4
-!!$        tm = tm + 6000.0
-!!$     end if
+
+     if (t .ge. tm) then
+        cmat(150:250, :) = 0
+        tm = tm + 6000.0
+     end if
+
      cmat(0, :) = cmat(L, :)
      cmat(L+1, :) = cmat(1, :)
      call cell_dd(cmat)
@@ -76,7 +67,7 @@ subroutine cell_mm(cmat)
      end do
      if ( pack_num(i) > 1 ) then
         do k = pack_num(i), 2, -1
-           if ( cmat(i,k) .eq. 1 .or. cmat(i,k).eq.4 ) then
+           if ( cmat(i,k) .eq. 1 ) then
               temp = cmat(i,k-1)
               cmat(i,k-1) = cmat(i,k)
               cmat(i,k) = temp

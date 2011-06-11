@@ -10,23 +10,32 @@ program ssa
   real(kind=8) delta_t, t, tp, td
   integer(I4B) is_nag
   integer(I4B) i, j, k
+  real(kind=8) pm
+  real(kind=8) xbar(NSpec), tbar
 
   call ran_seed(sequence=1234)
 
-  te = 2000
-  do i = 1, Nsample
+  te = 20000
+  do pm = 0.0, 1.0, 0.01
      x = xinit
      t = 0.0
      tp = 1.0
-     td = 0.0
+     td = 200.0
+     xbar = 0.0
+     tbar = 0.0
      do while(.true.)
-        call getrate(x, a)
+        call getrate(x, a, pm)
         cuma = a
         do j=2, NReac
            cuma(j) = cuma(j-1) + a(j)
         end do
         call expdev(delta_t)
-        t = t + delta_t/cuma(NReac)
+        delta_t = delta_t/cuma(NReac)
+        t = t + delta_t
+        if ( t > 400 ) then
+           xbar = xbar + x*delta_t
+           tbar = tbar + delta_t
+        end if
         if (t > te) then
            exit
         end if
@@ -42,19 +51,19 @@ program ssa
            print *, 'nag'
            pause
         end if
-        if(t > tp) then
-           write (*, '(F10.2, 7F10.2, 2E10.2)'), t, x, p0, sum(x), ap, v0
-!           print *, 'birth', sum(a(1:4))
-!           print *, 'death', sum(a(5:8))
-           tp =  tp + 1.0
-           !read(*,*)
-        end if
+!!$        if(t > tp) then
+!!$           write (*, '(F10.2, 7F10.2, 2E10.2)'), t, x, p0, sum(x), ap, v0
+!!$           tp =  tp + 1.0
+!!$        end if
         if(t > td) then
            if (x(4).eq.0) x(4) = 1
            td =  td + 200.0
         !        read(*,*)
         end if
      end do
+     xbar = xbar / tbar
+     write (*, '(7F10.2)'), pm, xbar, tbar
+     !read(*,*)
   end do
 end program ssa
 

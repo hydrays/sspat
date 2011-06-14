@@ -13,14 +13,14 @@ program ssa
   real(kind=8) pm
   real(kind=8) xbar(NSpec), tbar
 
-  call ran_seed(sequence=1234)
+  call ran_seed(sequence=1235)
 
-  te = 20000
-  do pm = 0.0, 1.0, 0.01
+  te = 100000.0
+  do pm = 0.0, 1.0, 0.001
      x = xinit
      t = 0.0
      tp = 1.0
-     td = 200.0
+     td = 400.0
      xbar = 0.0
      tbar = 0.0
      do while(.true.)
@@ -32,7 +32,7 @@ program ssa
         call expdev(delta_t)
         delta_t = delta_t/cuma(NReac)
         t = t + delta_t
-        if ( t > 400 ) then
+        if ( t > 1000 ) then
            xbar = xbar + x*delta_t
            tbar = tbar + delta_t
         end if
@@ -56,13 +56,13 @@ program ssa
 !!$           tp =  tp + 1.0
 !!$        end if
         if(t > td) then
-           if (x(4).eq.0) x(4) = 1
-           td =  td + 200.0
+           if (x(4).eq.0) x(4) = 20
+           td =  td + 400.0
         !        read(*,*)
         end if
      end do
      xbar = xbar / tbar
-     write (*, '(7F10.2)'), pm, xbar, tbar
+     write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
      !read(*,*)
   end do
 end program ssa

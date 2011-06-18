@@ -2,13 +2,20 @@ module paras
   use nrtype
 
   implicit none
-  integer(I4B), parameter :: Nsample=100000
-  integer(I4B), parameter :: N=10000
-  real(kind=8), parameter :: mu0=1e-8
-  integer(I4B), parameter :: m=1
+  integer(I4B), parameter :: Nsample=100
+  integer(I4B), parameter :: N=1000
+  real(kind=8), parameter :: mu0=1e-3
+  integer(I4B), parameter :: m=4
+  integer(I4B), parameter :: mplusone=m+1
+  integer(I4B), parameter :: msminusone=mplusone*mplusone-1  
+  integer(I4B), parameter :: ms=mplusone*mplusone
   real(kind=8), parameter :: delta_s = 0.01
   real(kind=8), parameter :: delta_mu = 0.0
-  real(kind=8), parameter :: delta_t_coarse = 0.02
+
+  integer(I4B) nu(0:m, 0:msminusone)
+
+  integer(I4B), parameter :: MSN=1
+  real(kind=8), parameter :: null_a=50.0*MSN
   integer(I4B), parameter :: Nc=10
 
 contains
@@ -16,7 +23,7 @@ contains
   subroutine getrate(x, s, mu, a)
     implicit none
     integer(I4B), intent(in) :: x(0:m)
-    real(kind=8), intent(out) :: a(0:m, 0:m)
+    real(kind=8), intent(out) :: a(0:msminusone)
     real(kind=8), intent(in) :: s(0:m)
     real(kind=8), intent(in) :: mu(0:m)
     integer(I4B) i, j
@@ -26,15 +33,33 @@ contains
     do i = 0, m
        do j = 0, m
           if (i .eq. j) then ! mutation rate for i
-             a(i, j) = mu(i) * x(i)
+             a(i*(mplusone) + j) = mu(i) * x(i)
           else ! i-type die and j-type born
-             a(i, j) = x(i) * (sx(j)/sum_sx)
+             a(i*(mplusone) + j) = x(i) * (sx(j)/sum_sx)
           end if
        end do
 
     end do
   end subroutine getrate
 
+  subroutine makenu(nu)
+    implicit none
+    integer(I4B) nu(0:m, 0:msminusone)
+    integer(I4B) i, j
+    nu = 0
+    do i = 0, m
+       do j = 0, m
+          if (i .eq. j) then ! mutation rate for i
+             nu(i, i*(mplusone) + j) = -1
+             nu(i+1, i*(mplusone) + j) = 1
+          else ! i-type die and j-type born
+             nu(i, i*(mplusone) + j) = -1
+             nu(j, i*(mplusone) + j) = 1
+          end if
+       end do
+    end do
+  end subroutine makenu
+  
   subroutine makes(s, ds)
     implicit none
     real(kind=8), intent(out) :: s(0:m)    
@@ -56,6 +81,23 @@ contains
     end do
   end subroutine makemu
 
+  subroutine makermax(x, rmax)
+    implicit none
+    integer(I4B), intent(in) :: x(0:m)
+    integer(I4B), intent(out) :: rmax(0:msminusone)
+    integer(I4B) i, j
+    rmax = 0
+    do i = 0, m
+       do j = 0, m
+          if (i .eq. j) then ! mutation rate for i
+             rmax(i*(mplusone) + j) = x(i)
+          else ! i-type die and j-type born
+             rmax(i*(mplusone) + j) = x(i)
+          end if
+       end do
+    end do
+  end subroutine makermax
+
   subroutine checkx(x, is_nag)
     implicit none
     integer(I4B), intent(in) :: x(0:m)
@@ -68,16 +110,16 @@ contains
     end do
   end subroutine checkx
 
-  subroutine partition(x, cmask)
+  subroutine partition(x, critical_index)
     implicit none
     integer(I4B), intent(in) :: x(0:m)
-    logical, intent(out) :: cmask(0:m, 0:m)
+    integer(I4B), intent(out) :: critical_index(0:msminusone)
     integer(I4B) i,j
-    cmask = .true.
+    critical_index = 1
     do i = 0, m
        do j = 0, m
           if ( (x(i)>Nc) .and. (x(j)>Nc) .and. (i .ne. j) ) then
-             cmask(i, j) = .false.
+             critical_index(i*(mplusone) + j) = 0
           end if
        end do
     end do

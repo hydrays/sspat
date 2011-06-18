@@ -27,7 +27,7 @@ program ssa
 
   call ran_seed(sequence=1234)
   call makemu(mu)
-  call makes(s)
+  call makes(s, delta_s)
   call makenu(nu)
   do i = 1, NSample
      x=0
@@ -42,7 +42,8 @@ program ssa
            cuma(j) = cuma(j-1) + a(j)
         end do
         call expdev(tau)
-        t = t + tau/cuma(msminusone)
+        tau = tau/cuma(msminusone)
+        t = t + tau
         call ran1(u)
         u = u*cuma(msminusone)
         j = 0
@@ -50,9 +51,11 @@ program ssa
            j = j+1
         end do
         x = x + nu(:,j)
+        write (*, forstr1), i, tau, x
+        write (11, forstr1), i, tau, x
      end do
-     write (*, forstr1), i, t, x
-     write (11, forstr1), i, t, x
+!     write (*, forstr1), i, t, x
+!     write (11, forstr1), i, t, x
   end do
   close(unit=11)
 end program ssa

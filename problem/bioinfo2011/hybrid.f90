@@ -1,0 +1,111 @@
+program moran
+  use paras
+  use random
+  use nrtype
+  implicit none
+
+  integer x(0:m)
+  integer(I4B) i, j, k, is_nag
+  real(kind=8) s(0:m)
+  real(kind=8) mu(0:m)
+  real(kind=8) a(0:m, 0:m)
+  integer(I4B) r
+  real(kind=8) tau, t, u, sum_a, dte, pt, suma_c, dt
+  real(kind=8), parameter :: EPS = 1e-20, epsilon = 0.1
+  logical cmask(0:m, 0:m)
+
+  character(len=50) :: filename
+  integer(I4B) s_index
+  character(len=50) :: forstr1
+
+  write(forstr1, '(A, I2.2, A)'), '(I6, F18.4, ', m+1, 'I12)'
+  write(filename, '(A, I1, A, I1, A, I2.2, A, I1)'), &
+       'data', int(log10(real(Nsample))), '_hybrid_N', &
+       nint(log10(real(N))), 'm', m, &
+       'mu', -nint(log10(mu0))
+  filename=adjustl(filename)
+  filename=trim(filename)
+  print *, filename
+  open (unit = 11, file=filename, action="write")
+
+  call ran_seed(sequence=1234)
+
+  call makemu(mu)
+  call makes(s, delta_s)
+  do k = 1, NSample
+     t = 0.0
+     pt = 0
+     x=0
+     x(0)=N
+     cmask = .true.
+     main_loop: do while (x(m).eq.0)
+        call ran1(u)
+        sum_a = log(u)
+        wait_cevent : do while (sum_a < -EPS)
+           call getrate(x, s, mu, a)
+           call partition(x, cmask)
+           suma_c = sum(a, cmask)
+!                      print *, 'x', x
+!                      print *, 'a', a
+!                      print *, 'cmask', cmask
+!                      print *, 'suma_c', suma_c
+!                      print *, 't', t
+!                      print *, 'sum_a', sum_a
+!           read(*, *)
+
+           dte = - sum_a / suma_c
+           dt = min(dte, delta_t_coarse)
+           do i = 0, m
+              do j=0, m
+                 if (.not.cmask(i, j)) then
+                    r = poidev( a(i, j)*dt )
+                    if (i.eq.j) then
+                       x(i) = x(i) - r
+                       x(i+1) = x(i+1) + r
+                       print *, 'mutation as coarse?'
+                       read(*, *)
+                    else
+                       x(i) = x(i) - r
+                       x(j) = x(j) + r
+                    end if
+                 end if
+              end do
+           end do
+           t = t + dt
+!           if (t > pt*1.0) then
+!              print *, t, x
+!              pt = pt + 1
+!           end if
+!           write(*, '(f12.6)'), dt
+!           write(11, '(f12.6)'), dt
+           sum_a = sum_a + suma_c*dt
+        end do wait_cevent
+        call ran1(u)
+        u = suma_c*u
+        ssa_select: do i = 0, m
+           do j = 0, m
+              if ( cmask(i, j) ) then
+                 u = u - a(i, j)
+                 if (u < 0) then
+!                    print *, i, j, u
+!                    read(*, *)
+                    if (i.eq.j) then
+                       x(i) = x(i) - 1
+                       x(i+1) = x(i+1) + 1
+                    else
+                       x(i) = x(i) - 1
+                       x(j) = x(j) + 1
+                    end if
+                    exit ssa_select
+                 end if
+              end if
+           end do
+        end do ssa_select
+        !        print *, 'SSA', x
+     end do main_loop
+     write (*, forstr1), k, t, x
+     write (11, forstr1), k, t, x
+!     read(*, *)
+  end do
+  close(unit=11)
+end program moran

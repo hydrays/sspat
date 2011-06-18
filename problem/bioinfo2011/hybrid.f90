@@ -10,7 +10,7 @@ program moran
   real(kind=8) mu(0:m)
   real(kind=8) a(0:m, 0:m)
   integer(I4B) r
-  real(kind=8) tau, t, u, sum_a, dte, pt, suma_c, dt
+  real(kind=8) tau, t, u, sum_s, dte, pt, suma_c, dt
   real(kind=8), parameter :: EPS = 1e-20, epsilon = 0.1
   logical cmask(0:m, 0:m)
 
@@ -39,73 +39,73 @@ program moran
      x(0)=N
      cmask = .true.
      main_loop: do while (x(m).eq.0)
-        call ran1(u)
-        sum_a = log(u)
-        wait_cevent : do while (sum_a < -EPS)
+        sum_s = 0
+        wait_cevent : do while (.true.)
            call getrate(x, s, mu, a)
            call partition(x, cmask)
            suma_c = sum(a, cmask)
-!                      print *, 'x', x
-!                      print *, 'a', a
-!                      print *, 'cmask', cmask
-!                      print *, 'suma_c', suma_c
-!                      print *, 't', t
-!                      print *, 'sum_a', sum_a
-!           read(*, *)
-
-           dte = - sum_a / suma_c
-           dt = min(dte, delta_t_coarse)
-           do i = 0, m
-              do j=0, m
-                 if (.not.cmask(i, j)) then
-                    r = poidev( a(i, j)*dt )
-                    if (i.eq.j) then
-                       x(i) = x(i) - r
-                       x(i+1) = x(i+1) + r
-                       print *, 'mutation as coarse?'
-                       read(*, *)
-                    else
-                       x(i) = x(i) - r
-                       x(j) = x(j) + r
+           call expdev(u)
+           dte = u / suma_c
+           sum_s = sum_s + dte
+           if (sum_s > delta_t_coarse) then
+              dt = delta_t_coarse
+              do i = 0, m
+                 do j=0, m
+                    if (.not.cmask(i, j)) then
+                       r = poidev( a(i, j)*dt )
+                       if (i.eq.j) then
+                          x(i) = x(i) - r
+                          x(i+1) = x(i+1) + r
+                          print *, 'mutation as coarse?'
+                          read(*, *)
+                       else
+                          x(i) = x(i) - r
+                          x(j) = x(j) + r
+                       end if
                     end if
-                 end if
+                 end do
               end do
-           end do
-           t = t + dt
-!           if (t > pt*1.0) then
-!              print *, t, x
-!              pt = pt + 1
-!           end if
-!           write(*, '(f12.6)'), dt
-!           write(11, '(f12.6)'), dt
-           sum_a = sum_a + suma_c*dt
-        end do wait_cevent
-        call ran1(u)
-        u = suma_c*u
-        ssa_select: do i = 0, m
-           do j = 0, m
-              if ( cmask(i, j) ) then
-                 u = u - a(i, j)
-                 if (u < 0) then
-!                    print *, i, j, u
-!                    read(*, *)
-                    if (i.eq.j) then
-                       x(i) = x(i) - 1
-                       x(i+1) = x(i+1) + 1
-                    else
-                       x(i) = x(i) - 1
-                       x(j) = x(j) + 1
+              t = t + dt
+              exit wait_cevent
+           else 
+              call ran1(u)
+              u = suma_c*u
+              ssa_select: do i = 0, m
+                 do j = 0, m
+                    if ( cmask(i, j) ) then
+                       u = u - a(i, j)
+                       if (u < 0) then
+                          if (i.eq.j) then
+                             x(i) = x(i) - 1
+                             x(i+1) = x(i+1) + 1
+                          else
+                             x(i) = x(i) - 1
+                             x(j) = x(j) + 1
+                          end if
+                          if (x(m).ne.0) then
+                             exit main_loop
+                          end if
+                          exit ssa_select
+                       end if
                     end if
-                    exit ssa_select
-                 end if
-              end if
-           end do
-        end do ssa_select
-        !        print *, 'SSA', x
+                 end do
+              end do ssa_select
+           end if
+        end do wait_cevent
+!        if ( k.eq.109 .and. t> 6000) then
+!           print *, t, x
+!       end if
+       ! print *, t, dt, x 
+       ! write(11, '(f12.6)'), dt
      end do main_loop
+     if (x(m).eq.2) then
+        print *, cmask
+        print *, t
+        read(*,*)
+     end if
      write (*, forstr1), k, t, x
      write (11, forstr1), k, t, x
-!     read(*, *)
+     !read(*, *)
   end do
   close(unit=11)
 end program moran

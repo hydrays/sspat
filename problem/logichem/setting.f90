@@ -29,7 +29,7 @@ module chem_data
   integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=15
-  real(kind=8) ap, p0, p1, v0
+  real(kind=8) ap, p0, p1, v0, symp
   real(kind=8) kappa, k2
   real(kind=8), parameter :: L = 2000
 
@@ -68,19 +68,21 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    kappa = 0.8
+    kappa = 0.6
     k2 = 4.0
-    p1 = 0.45
-    p0 = 1.0/(1.01+kappa*(x(3)+x(5))/L)
+    p1 = 0.4
+    p0 = 1.0/(1.01 + kappa*(x(3)+x(5))/L)
+    !p0 = exp(-kappa*(x(3)+x(5))/L) - 0.01
     v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
+    symp = 1.0/(1.0 + (5.0*kappa*(x(3)+x(5))/L)**2)
     if (sum(x) > L) then
        ap = 0.01*(sum(x) - L)
     else
        ap = 0.0
     end if
-    a(1) = 1.0*v0*x(1)*p0
-    a(2) = 0.0*v0*x(1)
-    a(3) = 1.0*v0*x(1)*(1.0-p0)
+    a(1) = symp*v0*x(1)*p0
+    a(2) = (1.0 - symp)*v0*x(1)
+    a(3) = symp*v0*x(1)*(1.0-p0)
     a(4) = x(2)*p1
     a(5) = 0.0*x(2)
     a(6) = x(2)*(1.0-p1)

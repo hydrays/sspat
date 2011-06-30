@@ -61,3 +61,20 @@ legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % ylabel('MCs ratio','fontsize', 18)
 % legend('sto', 'det', 'Location', 'northwest')
 % print('-depsc','fig_pm.eps')
+
+% ===========
+% script for sym and asym division
+% ===========
+% load tr
+% tr = tr;
+% plot(tr(:,1), tr(:,2), 'r')
+% %xlim([0, 600])
+% hold on
+% plot(tr(:,1), tr(:,3), 'm')
+% plot(tr(:,1), tr(:,4), 'g')
+% plot(tr(:,1), tr(:,5), 'k')
+% plot(tr(:,1), tr(:,8), 'b')
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC', 'Total')
+% print('-depsc','asym.eps')

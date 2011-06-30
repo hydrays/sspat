@@ -15,8 +15,8 @@ program ssa
 
   call ran_seed(sequence=1235)
 
-  te = 2000.0
-  do pm = 1.0, 1.0, 0.001
+  te = 10000.0
+  do pm = 0.0, 1.0, 0.01
      x = xinit
      t = 0.0
      tp = 1.0
@@ -51,18 +51,18 @@ program ssa
            print *, 'nag'
            pause
         end if
-        if(t > tp) then
-           write (*, '(F10.2, 7F10.2, 3E10.2)'), t, x, p0, sum(x), ap, v0, symp
-           tp =  tp + 1.0
-        end if
+        !if(t > tp) then
+        !   write (*, '(F10.2, 7F10.2, 3E10.2)'), t, x, p0, sum(x), ap, v0, symp
+        !   tp =  tp + 1.0
+        !end if
         if(t > td) then
            if (x(4).eq.0) x(4) = 20
            td =  td + 400.0
         !        read(*,*)
         end if
      end do
-!     xbar = xbar / tbar
-!     write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
+     xbar = xbar / tbar
+     write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
      !read(*,*)
   end do
 end program ssa

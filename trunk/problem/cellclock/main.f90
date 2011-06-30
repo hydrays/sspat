@@ -42,6 +42,7 @@ program ssa
      call getp
      call getv
      call get_lambda(num, lambda)
+
      born_ruler = 0.0
      do i = 1, num
         itype = pool(i)%type
@@ -90,6 +91,7 @@ program ssa
            pool(num) = pool(born_index)
         end if
      end if
+
      if (t > tprint) then
         !call output_to_file(pool_old, num_old, index, t)
         index = index + 1

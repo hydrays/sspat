@@ -25,7 +25,7 @@ contains
     p(1) = 1.0/(1.01 + k1*real(num_of_dc)/real(L1))
     p(2) = 0.45
     p(3) = 0.0
-    p(4) = 0.94
+    p(4) = 1.0
     p(5) = 0.0
   end subroutine getp
 
@@ -45,6 +45,7 @@ contains
     
     if (num > L1) then
        lambda = lambda0*exp(-0.01*(num - L1))
+       !lambda = lambda0/(1.0+0.1*(num - L1))
     else
        lambda = lambda0
     end if

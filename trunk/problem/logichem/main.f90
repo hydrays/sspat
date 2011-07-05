@@ -15,15 +15,15 @@ program ssa
 
   call ran_seed(sequence=1235)
 
-  te = 10000.0
-  do pm = 0.0, 1.0, 0.01
+  te = 100000.0
+  do pm = 1.0, 1.0, 0.01
      x = xinit
      t = 0.0
      tp = 1.0
      td = 400.0
      xbar = 0.0
      tbar = 0.0
-     do while(.true.)
+     do while(x(4).eq.0)
         call getrate(x, a, pm)
         cuma = a
         do j=2, NReac
@@ -51,20 +51,22 @@ program ssa
            print *, 'nag'
            pause
         end if
-        !if(t > tp) then
-        !   write (*, '(F10.2, 7F10.2, 3E10.2)'), t, x, p0, sum(x), ap, v0, symp
-        !   tp =  tp + 1.0
-        !end if
+        if(t > tp) then
+           !write (*, '(F10.2, 7F10.2, 3E10.2)'), t, x, p0, sum(x), ap, v0, symp
+           tp =  tp + 1.0
+!           if (t > 400) read(*,*)
+        end if
         if(t > td) then
-           if (x(4).eq.0) x(4) = 20
+           !if (x(4).eq.0) x(4) = 1
            td =  td + 400.0
         !        read(*,*)
         end if
      end do
      xbar = xbar / tbar
-     write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
+     !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
      !read(*,*)
   end do
+  write (*, '(F10.2, 7F10.2, 3E10.2)'), t, x, sum(x)
 end program ssa
 
 subroutine checkx(x, is_nag)

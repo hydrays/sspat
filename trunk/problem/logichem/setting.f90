@@ -22,20 +22,23 @@
 !!$  13: TC -> 0
 !!$  14: MC -> 0
 !!$  15: TMC -> 0
+!!$  16: SC -> MC
+!!$  17: TAC -> MC
 
 module chem_data  
   use nrtype
   implicit none
   integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
-  integer(I4B), parameter :: NReac=15
+  integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, symp, symp1
   real(kind=8) kappa, k2
   real(kind=8), parameter :: L = 2000
+  real(kind=8), parameter :: mu = 0.000001
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       10, & !SC
-       00, & !TA
+       00, & !SC
+       10, & !TA
        00, & !TC
        00, & !MC
        00 & !TMC
@@ -58,7 +61,9 @@ module chem_data
        (/00, -1, 00, 00, 00/), & !12
        (/00, 00, -1, 00, 00/), & !13
        (/00, 00, 00, -1, 00/), & !14
-       (/00, 00, 00, 00, -1/) & !15
+       (/00, 00, 00, 00, -1/), & !15
+       (/-1, 00, 00, 01, 00/), & !16
+       (/00, -1, 00, 01, 00/) & !17
        /), shape = (/NSpec, NReac/) &
        )
 
@@ -68,10 +73,11 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    kappa = 0.8
+    kappa = 0.9
     k2 = 4.0
-    p1 = 0.5
+    p1 = 0.4
     p0 = 1.0/(1.01 + kappa*(x(3)+x(5))/L)
+    p1 = 1.0/(1.01 + kappa*(x(3)+x(5))/L)
     v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
     symp = 1.0!/(1.0 + (5.0*kappa*(x(3)+x(5))/L)**2)
     symp1 = 1.0!symp
@@ -99,6 +105,9 @@ contains
 
     a(14) = ap*x(4)
     a(15) = ap*x(5)
+
+    a(16) = mu*v0*x(1)
+    a(17) = mu*x(2)
 
   end subroutine getrate
 

@@ -9,21 +9,23 @@ program ssa
   real(kind=8) a(NReac), cuma(NReac), u
   real(kind=8) delta_t, t, tp, td
   integer(I4B) is_nag
-  integer(I4B) i, j, k
-  real(kind=8) pm
+  integer(I4B) i, j, k, index
+  real(kind=8) pm, N_mutation
   real(kind=8) xbar(NSpec), tbar
 
-  call ran_seed(sequence=1235)
+  call ran_seed(sequence=1234)
 
-  te = 100000.0
-  do pm = 1.0, 1.0, 0.01
+  te = 800.0
+  do pm = 0.5, 0.7, 0.02
+     N_mutation = 0.0
+  do index = 1.0, NSample
      x = xinit
      t = 0.0
      tp = 1.0
      td = 400.0
      xbar = 0.0
      tbar = 0.0
-     do while(x(4).eq.0)
+     do while(t < te)
         call getrate(x, a, pm)
         cuma = a
         do j=2, NReac
@@ -35,9 +37,6 @@ program ssa
         if ( t > 1000 ) then
            xbar = xbar + x*delta_t
            tbar = tbar + delta_t
-        end if
-        if (t > te) then
-           exit
         end if
         call ran2(u)
         u = cuma(NReac)*u
@@ -52,21 +51,26 @@ program ssa
            pause
         end if
         if(t > tp) then
-           !write (*, '(F10.2, 7F10.2, 3E10.2)'), t, x, p0, sum(x), ap, v0, symp
+           !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp, p1
            tp =  tp + 1.0
 !           if (t > 400) read(*,*)
         end if
         if(t > td) then
-           !if (x(4).eq.0) x(4) = 1
-           td =  td + 400.0
-        !        read(*,*)
+           if (x(4).eq.0) x(4) = 1
+           td =  td + 400000.0
+           !read(*,*)
         end if
      end do
      xbar = xbar / tbar
+     if (x(4).eq.0) then
+        N_mutation = N_mutation + 1
+     end if
+     !write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
      !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
      !read(*,*)
   end do
-  write (*, '(F10.2, 7F10.2, 3E10.2)'), t, x, sum(x)
+  write (*, '(2F10.2)'), pm, N_mutation
+end do
 end program ssa
 
 subroutine checkx(x, is_nag)

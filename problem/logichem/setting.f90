@@ -28,7 +28,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1
+  integer(I4B) :: NSample = 10000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, symp, symp1
@@ -37,9 +37,9 @@ module chem_data
   real(kind=8), parameter :: mu = 0.000001
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       00, & !SC
-       10, & !TA
-       00, & !TC
+       100, & !SC
+       200, & !TA
+       1400, & !TC
        00, & !MC
        00 & !TMC
        /)
@@ -62,7 +62,7 @@ module chem_data
        (/00, 00, -1, 00, 00/), & !13
        (/00, 00, 00, -1, 00/), & !14
        (/00, 00, 00, 00, -1/), & !15
-       (/-1, 00, 00, 01, 00/), & !16
+       (/-1, 00, 00, 00, 01/), & !16
        (/00, -1, 00, 01, 00/) & !17
        /), shape = (/NSpec, NReac/) &
        )
@@ -73,12 +73,14 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    kappa = 0.9
+    kappa = 0.8
     k2 = 4.0
     p1 = 0.4
     p0 = 1.0/(1.01 + kappa*(x(3)+x(5))/L)
-    p1 = 1.0/(1.01 + kappa*(x(3)+x(5))/L)
+    !p1 = 0.5/(1.01 + 0.5*kappa*(x(3)+x(5))/L)
     v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
+    !p0 = 1.0/(1.01 + kappa*(1450)/L)
+    !v0 = 2.5/(1.0 + k2*(1450.0)/L)
     symp = 1.0!/(1.0 + (5.0*kappa*(x(3)+x(5))/L)**2)
     symp1 = 1.0!symp
     if (sum(x) > L) then
@@ -106,8 +108,8 @@ contains
     a(14) = ap*x(4)
     a(15) = ap*x(5)
 
-    a(16) = mu*v0*x(1)
-    a(17) = mu*x(2)
+    a(16) = 0.0*mu*v0*x(1)
+    a(17) = 0.0*mu*x(2)
 
   end subroutine getrate
 

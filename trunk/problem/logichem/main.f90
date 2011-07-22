@@ -14,15 +14,14 @@ program ssa
   real(kind=8) xbar(NSpec), tbar
 
   call ran_seed(sequence=1234)
-
-  te = 800.0
-  do pm = 0.5, 0.7, 0.02
-     N_mutation = 0.0
+  te = 1000.0
+  pm = 1.0
   do index = 1.0, NSample
+     N_mutation = 0.0
      x = xinit
      t = 0.0
      tp = 1.0
-     td = 400.0
+     td = 50.0
      xbar = 0.0
      tbar = 0.0
      do while(t < te)
@@ -50,27 +49,25 @@ program ssa
            print *, 'nag'
            pause
         end if
+        if(t > td) then
+           if (x(4).eq.0) x(3) = 50
+           td =  td + 100.0
+           !read(*,*)
+        end if
         if(t > tp) then
-           !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp, p1
+           write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp
            tp =  tp + 1.0
 !           if (t > 400) read(*,*)
         end if
-        if(t > td) then
-           if (x(4).eq.0) x(4) = 1
-           td =  td + 400000.0
-           !read(*,*)
-        end if
      end do
      xbar = xbar / tbar
-     if (x(4).eq.0) then
-        N_mutation = N_mutation + 1
-     end if
+     !if (x(4).eq.0) then
+     !   N_mutation = N_mutation + 1
+     !end if
      !write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
      !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
      !read(*,*)
   end do
-  write (*, '(2F10.2)'), pm, N_mutation
-end do
 end program ssa
 
 subroutine checkx(x, is_nag)

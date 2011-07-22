@@ -28,21 +28,29 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 10000
+  integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, symp, symp1
-  real(kind=8) kappa, k2
-  real(kind=8), parameter :: L = 2000
+  real(kind=8) k1, k2, k3
+  real(kind=8), parameter :: L = 500
   real(kind=8), parameter :: mu = 0.000001
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       100, & !SC
-       200, & !TA
-       1400, & !TC
+       50, & !SC
+       100, & !TA
+       350, & !TC
        00, & !MC
        00 & !TMC
        /)
+
+!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
+!!$       100, & !SC
+!!$       300, & !TA
+!!$       1600, & !TC
+!!$       00, & !MC
+!!$       00 & !TMC
+!!$       /)
 
   integer(I4B), parameter, dimension(NSpec,NReac) :: nu = reshape( &
        ! 1   2   3   4   5
@@ -73,18 +81,21 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    kappa = 0.8
+    k1 = 0.6
     k2 = 4.0
+    k3 = 3.0
     p1 = 0.4
-    p0 = 1.0/(1.01 + kappa*(x(3)+x(5))/L)
-    !p1 = 0.5/(1.01 + 0.5*kappa*(x(3)+x(5))/L)
+    p0 = 1.0/(1.0 + k1*(x(3)+x(5))/L)
+    !v0 = 1.0
     v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
     !p0 = 1.0/(1.01 + kappa*(1450)/L)
     !v0 = 2.5/(1.0 + k2*(1450.0)/L)
-    symp = 1.0!/(1.0 + (5.0*kappa*(x(3)+x(5))/L)**2)
+    !p0 = 0.99*exp(-kappa*(x(3)+x(5))/L)
+    symp = 1.0/(1.0 + (k3*(x(3)+x(5))/L)**2)
+    !symp = 1.0/(1.0 + (k3*(x(3)+x(5))/L))
     symp1 = 1.0!symp
     if (sum(x) > L) then
-       ap = 0.01*(sum(x) - L)
+       ap = 0.04*(sum(x) - L)
     else
        ap = 0.0
     end if
@@ -98,8 +109,8 @@ contains
     a(7) = x(4)*pm
     a(8) = x(4)*(1.0-pm)
 
-    a(9) = 0.1*x(3)
-    a(10) = 0.1*x(5)
+    a(9) = 0.2*x(3)
+    a(10) = 0.2*x(5)
 
     a(11) = ap*x(1)
     a(12) = ap*x(2)

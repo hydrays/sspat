@@ -50,7 +50,7 @@ program ssa
            pause
         end if
         if(t > td) then
-           if (x(4).eq.0) x(3) = 50
+           if (x(4).eq.0) x(4) = 1
            td =  td + 100.0
            !read(*,*)
         end if

@@ -16,25 +16,34 @@
 % %set(get(h,'axis'),'FontSize',24)
 % print('-depsc','fig_logi_1f_k085.eps')
 
-% % ===========
-% % script for 2 feedback, woundhealing
-% % ===========
-% load tr
-% tr = tr;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-% xlim([0, 200])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-% %plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% %plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC')
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_2f_woundhealing.eps')
-
+% ===========
+% script for 2 feedback, woundhealing
+% ===========
+load tr
+tr = tr;
+h = plot(tr(:,1), tr(:,2), '-r','linewidth', 2)
+xlim([0, 200])
+hold on
+plot(tr(:,1), tr(:,3), '-b','linewidth', 2)
+plot(tr(:,1), tr(:,4), '-g','linewidth', 2)
+%plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+%plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC')
+ylim([0, 600])
+%set(get(h,'axis'),'FontSize',24)
+print('-depsc','fig_logi_2f_woundhealing.eps')
+figure
+plot(tr(:,1), tr(:,7), '-r','linewidth', 2)
+hold on
+xlim([0, 200])
+plot(tr(:,1), tr(:,10), '-g','linewidth', 1.5)
+%plot(tr(:,1), tr(:,11), '-b','linewidth', 1.1)
+legend('p_0','v_0')
+xlabel('t','fontsize', 18);
+ylabel('Stem cell property','fontsize', 18)
+print('-depsc','fig_logi_2f_woundhealing_supp.eps')
 
 % % ===========
 % % script for 2 feedback, self-recovery
@@ -56,34 +65,34 @@
 % print('-depsc','fig_logi_2f_selfrecover.eps')
 
 
-% ===========
-% script for 3 feedback, woundhealing
-% ===========
-load tr
-tr = tr;
-h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-xlim([0, 200])
-hold on
-plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-%plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-%plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC')
-ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_3f_woundhealing.eps')
-figure
-plot(tr(:,1), tr(:,7), '-r','linewidth', 1.1)
-hold on
-xlim([0, 200])
-plot(tr(:,1), tr(:,10), '-g','linewidth', 1.1)
-plot(tr(:,1), tr(:,11), '-b','linewidth', 1.1)
-legend('p_0','v_0', 'p_{sym}')
-xlabel('t','fontsize', 18);
-ylabel('Stem cell property','fontsize', 18)
-print('-depsc','fig_logi_3f_woundhealing_supp.eps')
+% % ===========
+% % script for 3 feedback, woundhealing
+% % ===========
+% load tr
+% tr = tr;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+% xlim([0, 200])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 2)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 2)
+% %plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+% %plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC')
+% ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_3f_woundhealing.eps')
+% figure
+% plot(tr(:,1), tr(:,7), '-r','linewidth', 2)
+% hold on
+% xlim([0, 200])
+% plot(tr(:,1), tr(:,10), '-g','linewidth', 2)
+% plot(tr(:,1), tr(:,11), '-b','linewidth', 2)
+% legend('p_0','v_0', 'p_{sym}')
+% xlabel('t','fontsize', 18);
+% ylabel('Stem cell property','fontsize', 18)
+% print('-depsc','fig_logi_3f_woundhealing_supp.eps')
 
 % 
 % % ===========

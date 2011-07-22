@@ -45,24 +45,24 @@
 % ylabel('Stem cell property','fontsize', 18)
 % print('-depsc','fig_logi_2f_woundhealing_supp.eps')
 
-% ===========
-% script for 2 feedback, self-recovery
-% ===========
-load tr
-tr = tr;
-h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-%xlim([0, 250])
-hold on
-plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC', 'total')
-ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_2f_selfrecover.eps')
+% % ===========
+% % script for 2 feedback, self-recovery
+% % ===========
+% load tr
+% tr = tr;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+% %xlim([0, 250])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+% plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC', 'total')
+% ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_2f_selfrecover.eps')
 
 
 % % ===========
@@ -94,25 +94,25 @@ print('-depsc','fig_logi_2f_selfrecover.eps')
 % ylabel('Stem cell property','fontsize', 18)
 % print('-depsc','fig_logi_3f_woundhealing_supp.eps')
 
-% 
-% % ===========
-% % script for 3 feedback, self-recovery
-% % ===========
-% load tr
-% tr = tr;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-% xlim([0, 250])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'total')
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_3f_selfrecover.eps')
+
+% ===========
+% script for 3 feedback, self-recovery
+% ===========
+load tr
+tr = tr;
+h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+xlim([0, 250])
+hold on
+plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC', 'MC', 'total')
+ylim([0, 600])
+%set(get(h,'axis'),'FontSize',24)
+print('-depsc','fig_logi_3f_selfrecover.eps')
 
 
 % % ===========

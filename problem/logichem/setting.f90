@@ -81,9 +81,9 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    k1 = 0.9
+    k1 = 0.6
     k2 = 4.0
-    !k3 = 3.0
+    k3 = 3.0
     p1 = 0.4
     p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
     !v0 = 1.0
@@ -91,7 +91,7 @@ contains
     !p0 = 1.0/(1.01 + kappa*(1450)/L)
     !v0 = 2.5/(1.0 + k2*(1450.0)/L)
     !p0 = 0.99*exp(-kappa*(x(3)+x(5))/L)
-    symp = 1.0!/(1.0 + (k3*(x(3)+x(5))/L)**2)
+    symp = 1.0/(1.0 + (k3*(x(3)+x(5))/L)**2)
     symp1 = 1.0!symp
     if (sum(x) > L) then
        ap = 0.04*(sum(x) - L)

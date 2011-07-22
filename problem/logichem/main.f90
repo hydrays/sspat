@@ -14,7 +14,7 @@ program ssa
   real(kind=8) xbar(NSpec), tbar
 
   call ran_seed(sequence=1234)
-  te = 1000.0
+  te = 1000000.0
   pm = 1.0
   do index = 1.0, NSample
      N_mutation = 0.0
@@ -24,7 +24,8 @@ program ssa
      td = 50.0
      xbar = 0.0
      tbar = 0.0
-     do while(t < te)
+     !do while(t < te)
+     do while(x(5) .eq. 0.0)
         call getrate(x, a, pm)
         cuma = a
         do j=2, NReac
@@ -49,22 +50,21 @@ program ssa
            print *, 'nag'
            pause
         end if
-        if(t > td) then
-           if (x(4).eq.0) x(4) = 1
-           td =  td + 100.0
+        !if(t > td) then
+           !if (x(4).eq.0) x(4) = 1
+           !td =  td + 100.0
            !read(*,*)
-        end if
+        !end if
         if(t > tp) then
            write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp
            tp =  tp + 1.0
-!           if (t > 400) read(*,*)
         end if
      end do
      xbar = xbar / tbar
-     !if (x(4).eq.0) then
-     !   N_mutation = N_mutation + 1
-     !end if
-     !write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
+     if (x(4).eq.0) then
+        N_mutation = N_mutation + 1
+     end if
+     write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
      !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
      !read(*,*)
   end do

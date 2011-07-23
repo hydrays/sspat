@@ -13,7 +13,8 @@ program ssa
   real(kind=8) pm, N_mutation
   real(kind=8) xbar(NSpec), tbar
 
-  call ran_seed(sequence=12341)
+  !call ran_seed(sequence=12351)
+  call ran_seed(sequence=1234)
   te = 1000.0
   pm = 1.0
   do index = 1.0, NSample
@@ -50,7 +51,7 @@ program ssa
            pause
         end if
         if(t > td) then
-           if (x(4).eq.0) x(3) = 50
+           if (x(4).eq.0) x(4) = 1
            td =  td + 100.0
            !read(*,*)
         end if

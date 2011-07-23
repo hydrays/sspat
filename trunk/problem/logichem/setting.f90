@@ -28,13 +28,13 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1
+  integer(I4B) :: NSample = 1000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, symp, symp1
   real(kind=8) k1, k2, k3
   real(kind=8), parameter :: L = 500
-  real(kind=8), parameter :: mu = 0.000001
+  real(kind=8), parameter :: mu = 0.00001
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
        50, & !SC
@@ -118,8 +118,8 @@ contains
     a(14) = ap*x(4)
     a(15) = ap*x(5)
 
-    a(16) = 0.0*mu*v0*x(1)
-    a(17) = 0.0*mu*x(2)
+    a(16) = mu*v0*x(1)
+    a(17) = mu*x(2)
 
   end subroutine getrate
 

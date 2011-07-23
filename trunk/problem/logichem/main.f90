@@ -13,7 +13,7 @@ program ssa
   real(kind=8) pm, N_mutation
   real(kind=8) xbar(NSpec), tbar
 
-  call ran_seed(sequence=1234)
+  call ran_seed(sequence=12341)
   te = 10000000.0
   pm = 1.0
   N_mutation = 0.0

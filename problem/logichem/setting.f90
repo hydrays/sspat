@@ -81,7 +81,7 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    k1 = 0.6
+    k1 = 0.65
     k2 = 4.0
     k3 = 3.0
     p1 = 0.4

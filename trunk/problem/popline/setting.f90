@@ -1,5 +1,5 @@
 module setting
-  integer, parameter :: L = 800
+  integer, parameter :: L = 200
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
   real, parameter :: delta_t = 0.001

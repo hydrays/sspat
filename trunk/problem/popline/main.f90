@@ -28,7 +28,7 @@ program main
         call output_to_file(cmat, output_index)
         call cell_stat(cmat, t)
         output_index = output_index + 1
-        tp = tp + 10.0
+        tp = tp + 1.0
      end if
 
 !!$     if (t .ge. tm) then

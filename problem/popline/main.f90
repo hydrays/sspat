@@ -8,6 +8,8 @@ program main
   integer output_index, i
   type(cell), allocatable :: cmat(:,:)
 
+  open (unit = 100, file='./out/logfile', action="write")
+
   call ran_seed(sequence=1234)
   allocate(cmat(0:L+1, H))
 
@@ -21,7 +23,7 @@ program main
 
   t = 0.0
   tp = 0.0
-  tm = 1000.0
+  tm = 100.0
   output_index = 0
   do while (t < tend)
      if (t .ge. tp) then
@@ -31,10 +33,10 @@ program main
         tp = tp + 1.0
      end if
 
-!!$     if (t .ge. tm) then
-!!$        cmat(150:250, :)%type = 0
-!!$        tm = tm + 6000.0
-!!$     end if
+     if (t .ge. tm) then
+        cmat(100:105, 1:10)%type = 4
+        tm = tm + 6000.0
+     end if
 
      cmat(0, :) = cmat(L, :)
      cmat(L+1, :) = cmat(1, :)
@@ -49,6 +51,8 @@ program main
   end do
 
   deallocate(cmat)
+  close(unit=100)
+
 end program main
 
 subroutine cell_mm(cmat)
@@ -71,15 +75,15 @@ subroutine cell_mm(cmat)
            pack_num(i) = pack_num(i) + 1
         end if
      end do
-     if ( pack_num(i) > 1 ) then
-        do k = pack_num(i), 2, -1
-           if ( cmat(i,k)%type .eq. 1 ) then
-              temp = cmat(i,k-1)
-              cmat(i,k-1) = cmat(i,k)
-              cmat(i,k) = temp
-           end if
-        end do
-     end if
+!!$     if ( pack_num(i) > 1 ) then
+!!$        do k = pack_num(i), 2, -1
+!!$           if ( cmat(i,k)%type .eq. 1 .or. cmat(i,k)%type.eq.4 ) then
+!!$              temp = cmat(i,k-1)
+!!$              cmat(i,k-1) = cmat(i,k)
+!!$              cmat(i,k) = temp
+!!$           end if
+!!$        end do
+!!$     end if
   end do
   cmat(L+1, :) = cmat(1, :)
   cmat(0, :) = cmat(L, :)
@@ -182,6 +186,8 @@ subroutine cell_stat(cmat, t)
   end do
   
   write(*, '(5(F10.2))'), t, real(num_sc)/L, &
+       real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
+  write(100, '(5(F10.2))'), t, real(num_sc)/L, &
        real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
 end subroutine cell_stat
 

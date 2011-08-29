@@ -1,9 +1,9 @@
 module setting
   integer, parameter :: L = 200
   integer, parameter :: H = 200
-  real, parameter :: b = 10.0
+  real, parameter :: b = 8.0
   real, parameter :: delta_t = 0.001
-  real, parameter :: tend = 10000.0
+  real, parameter :: tend = 100000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0
@@ -58,7 +58,7 @@ contains
        !p0 = cmat(i,j)%gene1 + (1.0 - 2*cmat(i,j)%gene1) &
        !     / (1.0 + 0.01*TGFbeta(i))
 
-       p0 = 0.4 + 0.2 / (1.0 + 0.01*TGFbeta(i))
+       p0 = 0.3 + 0.4 / (1.0 + 0.01*TGFbeta(i))
 
        ! division
        do k=H, j+2, -1
@@ -126,7 +126,7 @@ contains
              temp_num = temp_num + 1.
           end if
        end do
-       temp_num = 10.0*temp_num / b
+       !temp_num = 10.0*temp_num / b
        if (temp_num > 0) then
         do k = 0, b-1
            if ( k .eq. 0) then

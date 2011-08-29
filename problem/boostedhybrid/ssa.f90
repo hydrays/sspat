@@ -17,7 +17,7 @@ program ssa
      x = xinit
      t = 0.0
      tp = 1.0
-     do while(.true.)
+     do while( .true. )
         call getrate(x, a)
         cuma = a
         do j=2, NReac
@@ -26,7 +26,7 @@ program ssa
         call expdev(dt)
         t = t + dt/cuma(NReac)
         if (t > tend) then
-           return
+           exit
         end if
         call ran2(u)
         u = cuma(NReac)*u
@@ -43,10 +43,10 @@ program ssa
         !if(t > tp) then
         !   write (*, *), t, x
         !   tp =  tp + 1.0
-           !read(*,*)
+          !read(*,*)
         !end if
      end do
-     write(*, '(I6, 5(f8.1))'), k, x
+     write(*, '(I6, 10(f8.1))'), k, x
   end do
 end program ssa
 

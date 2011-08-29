@@ -12,7 +12,7 @@ module chem_data
   use nrtype
   implicit none
   real(kind=8), parameter :: end_time = 100.0
-  integer(I4B) :: NSample = 1
+  integer(I4B) :: NSample = 1000000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=7
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
@@ -25,8 +25,8 @@ module chem_data
   real(kind=8), parameter :: c(NReac)=(/ &
        10.0, & !1
        10.0, & !2
-       0.2, & !3
-       0.1, & !4
+       1.0, & !3
+       0.2, & !4
        0.05, & !5
        1.0, & !6
        1.0 & !7

@@ -14,7 +14,7 @@ FC = gfortran
 #SYSTEM := fge_modified
 #SYSTEM := 0091
 SYSTEM := system1
-METHOD := ssa
+#SYSTEM := system3
 
 SSA_OBJS += \
 ../../lib/nrtype.o \
@@ -26,7 +26,7 @@ HYBRID_OBJS += \
 ../../lib/nrtype.o \
 ../../lib/random.o \
 ./systems/$(SYSTEM).o \
-./ssa.o 
+./hybrid.o 
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ./%.f90

@@ -2,7 +2,6 @@ program boosting
   use chem_data
   use random
   use nrtype
-!  use solver
   implicit none
 
   real(kind=8) x(NSpec), x_flux(NSpec), dx(NSpec), mx(NReac), x_up(NSpec), x_down(NSpec)
@@ -94,8 +93,7 @@ program boosting
               pt = pt + 1
            end if
            if (t>end_time) then
-              write(*, '(3(f20.5), 5(f8.1), 7(e12.4))'), t, mt, load, x, kappa
-!              pause
+              write(*, '(3(f20.5), 7(f8.1), 10(e12.4))'), t, mt, load, x, kappa
               exit main_loop
            end if
            if (t > ct) then
@@ -149,7 +147,7 @@ program boosting
                     exit loop_partition
                  end if
               end do loop_partition
-              if(rmask(aorder(NReac)) .or. a_bar(aorder(j))<0.1) then
+              if(rmask(aorder(NReac)) .or. a_bar(aorder(j))<0.001) then
 !                 mt2 = 1.1*mt2
                  mt = mt2
 !                 print *, 'no scale seperation'
@@ -163,7 +161,6 @@ program boosting
                     RECORD_FLAG = .FALSE.
                     mt2 = mt
 !                    print *, 'check rmask', t, rmask
-!                    pause
                  else
                     RECORD_FLAG = .true.
                     if (all(rmask.eqv.rmask_old)) then
@@ -180,7 +177,7 @@ program boosting
               end if
 !! --- reset all variables before exit --- !!
 !              if (kappa(6).ne. kappa(5)) then
-              write(*, '(3(f20.5), 5(f8.1), 7(e12.4))'), t, mt, load, x, kappa
+!              write(*, '(3(f20.5), 5(f8.1), 7(e12.4))'), t, mt, load, x, kappa
 !              write(*, '(A, 73(f16.4))'), 'a_bar', a_bar
 !              write(*, '(A, 73(f16.4))'), 'A_bar', a_bar(aorder)
 !              write(*, '(A, 16(I12))'), 'x', x
@@ -189,7 +186,6 @@ program boosting
 !              write(*, '(A, 50(I6))'), 'order', aorder
 !              print *, 'rmask', rmask
 !              print *, 'cmask', cmask
-!              pause
 !           end if
               ct = t + mt
               x_flux = 0

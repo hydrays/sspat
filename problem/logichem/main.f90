@@ -14,60 +14,53 @@ program ssa
   real(kind=8) xbar(NSpec), tbar
 
   call ran_seed(sequence=1234)
-  te = 10000000.0
-  pm = 1.0
-  N_mutation = 0.0
-  do index = 1.0, NSample
-     x = xinit
-     t = 0.0
-     tp = 1.0
-     td = 50.0
+  te = 1000.0
+  do pm = 0.0, 0.5, 0.01
      xbar = 0.0
-     tbar = 0.0
-     !do while(t < te)
-     do while(x(5) .eq. 0.0 .and. x(1) .ge. 1.0)
-        call getrate(x, a, pm)
-        cuma = a
-        do j=2, NReac
-           cuma(j) = cuma(j-1) + a(j)
-        end do
-        call expdev(delta_t)
-        delta_t = delta_t/cuma(NReac)
-        t = t + delta_t
-        if ( t > 1000 ) then
-           xbar = xbar + x*delta_t
-           tbar = tbar + delta_t
+     do index = 1.0, NSample
+        x = xinit
+        t = 0.0
+        tp = 1.0
+        td = 200.0
+        tbar = 0.0
+        do while(t < te)
+           call getrate(x, a, pm)
+           cuma = a
+           do j=2, NReac
+              cuma(j) = cuma(j-1) + a(j)
+           end do
+           call expdev(delta_t)
+           delta_t = delta_t/cuma(NReac)
+           t = t + delta_t
+           call ran2(u)
+           u = cuma(NReac)*u
+           j = 1
+           do while (cuma(j) .le. u)
+              j = j+1
+           end do
+           x = x + nu(:, j)
+           call checkx(x, is_nag)
+           if (is_nag .eq. 1) then
+              print *, 'nag'
+              pause
+           end if
+        if(t > td) then
+           if (x(4).eq.0) x(4) = 10
+           td =  td + 20000.0
         end if
-        call ran2(u)
-        u = cuma(NReac)*u
-        j = 1
-        do while (cuma(j) .le. u)
-           j = j+1
-        end do
-        x = x + nu(:, j)
-        call checkx(x, is_nag)
-        if (is_nag .eq. 1) then
-           print *, 'nag'
-           pause
-        end if
-!!$        if(t > td) then
-!!$           if (x(4).eq.0) x(4) = 1
-!!$           td =  td + 200.0
-!!$        end if
 !!$        if(t > tp) then
 !!$           write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp
 !!$           tp =  tp + 1.0
 !!$        end if
+        end do
+        xbar = xbar + x
+        !if (x(5).ne.0) then 
+        !   print *, x
+        !   read(*,*)
+        !end if
      end do
-     xbar = xbar / tbar
-     if (x(1) < 1.0) then
-        !print *, 'take over'
-        N_mutation = N_mutation + 1
-        !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp
-     end if
-     write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
-     !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
-     !read(*,*)
+     xbar = xbar / NSample
+     write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
   end do
 end program ssa
 

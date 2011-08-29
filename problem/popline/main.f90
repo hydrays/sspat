@@ -10,7 +10,7 @@ program main
 
   open (unit = 100, file='./out/logfile', action="write")
 
-  call ran_seed(sequence=1234)
+  call ran_seed(sequence=12345)
   allocate(cmat(0:L+1, H))
 
   cmat(1:L, 1)%type = 1
@@ -30,12 +30,12 @@ program main
         call output_to_file(cmat, output_index)
         call cell_stat(cmat, t)
         output_index = output_index + 1
-        tp = tp + 1.0
+        tp = tp + 5.0
      end if
 
      if (t .ge. tm) then
         cmat(100:105, 1:10)%type = 4
-        tm = tm + 6000.0
+        tm = tm + 600000.0
      end if
 
      cmat(0, :) = cmat(L, :)
@@ -75,15 +75,15 @@ subroutine cell_mm(cmat)
            pack_num(i) = pack_num(i) + 1
         end if
      end do
-!!$     if ( pack_num(i) > 1 ) then
-!!$        do k = pack_num(i), 2, -1
-!!$           if ( cmat(i,k)%type .eq. 1 .or. cmat(i,k)%type.eq.4 ) then
-!!$              temp = cmat(i,k-1)
-!!$              cmat(i,k-1) = cmat(i,k)
-!!$              cmat(i,k) = temp
-!!$           end if
-!!$        end do
-!!$     end if
+     if ( pack_num(i) > 1 ) then
+        do k = pack_num(i), 2, -1
+           if ( cmat(i,k)%type .eq. 1 .or. cmat(i,k)%type.eq.4 ) then
+              temp = cmat(i,k-1)
+              cmat(i,k-1) = cmat(i,k)
+              cmat(i,k) = temp
+           end if
+        end do
+     end if
   end do
   cmat(L+1, :) = cmat(1, :)
   cmat(0, :) = cmat(L, :)

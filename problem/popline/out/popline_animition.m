@@ -8,7 +8,7 @@ mycmap = [1     1    1
 colormap(mycmap)
 
 j = 1;
-for index =101:1:1100
+for index =0:1:3000
 clf
 s1 = ['0000000' num2str(index)];
 s = s1((length(s1)-4):length(s1));
@@ -39,7 +39,7 @@ shading flat
 eval(['print(''-dpng'',''slice',s,''');'])
 % eval(['print(''-depsc'',''select',s,''');'])
 % genemean(j) = mean(popgene(:,2));
-% pause(1.1)
+% pause(0.5)
 j = j + 1;
 end
 

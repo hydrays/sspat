@@ -10,7 +10,7 @@ module paras
   real(kind=8) p(NSpec), v(NSpec)
   real(kind=8), parameter :: tend=1000
   real(kind=8), parameter :: L1=2000
-  real(kind=8), parameter :: k1=0.8
+  real(kind=8), parameter :: k1=0.9
   real(kind=8), parameter :: k2=8.0
   
   type cell
@@ -23,9 +23,9 @@ contains
   subroutine getp
     implicit none    
     p(1) = 1.0/(1.01 + k1*real(num_of_dc)/real(L1))
-    p(2) = 0.45
+    p(2) = 0.55
     p(3) = 0.0
-    p(4) = 1.0
+    p(4) = 0.6
     p(5) = 0.0
   end subroutine getp
 
@@ -123,13 +123,13 @@ contains
 !!$    end do
 
     num = 2000
-    pool(1:100)%type = 1
+    pool(1:100)%type = 2
     pool(1:100)%clock = lifespan(1)
     pool(101:500)%type = 2
     pool(101:500)%clock = lifespan(2)
     pool(501:1990)%type = 3
     pool(501:1990)%clock = lifespan(3)
-    pool(1991:2000)%type = 4
+    pool(1991:2000)%type = 3
     pool(1991:2000)%clock = lifespan(4)
   end subroutine pool_init
   

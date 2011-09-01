@@ -1,46 +1,46 @@
 % % ===========
 % % script for 1 feedback
 % % ===========
-% load paperresult_1f_tr_k1
-% tr = paperresult_1f_tr_k1;
+% load paperresult_1f_tr_k85
+% tr = paperresult_1f_tr_k85;
 % h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
 % %xlim([0, 600])
 % hold on
 % plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
 % plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
 % %plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
+% plot(tr(:,1), tr(:,2)+tr(:,3)+tr(:,4), '-m','linewidth', 1.1)
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'total')
 % %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_1f_k1.eps')
-% 
-% % ===========
-% % script for 1 feedback bar-plot
-% % ===========
-% mycmap = [1     0     0
-%      0     0     1
-%      0     1     0];
-% colormap(mycmap)
-% load paperresult_1f_tr_k07
-% load paperresult_1f_tr_k85
-% load paperresult_1f_tr_k1
-% tr3 = paperresult_1f_tr_k07;
-% tr2 = paperresult_1f_tr_k85;
-% tr1 = paperresult_1f_tr_k1;
-% 
-% xpmean(1,:) = mean(tr1(600:1000,2:4));
-% xpmean(2,:) = mean(tr2(600:1000,2:4));
-% xpmean(3,:) = mean(tr3(600:1000,2:4));
-% bar(xpmean,1)
-% xlabel('k_1','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC')
-% %set(get(h,'axis'),'FontSize',24)
-% set(gca,'XTickLabel',{'1', '0.85', '0.7'},'fontsize', 14);
-% box on;
-% print('-depsc','fig_logi_1f_bar.eps')
+% print('-depsc','fig_logi_1f_k85.eps')
+
+% ===========
+% script for 1 feedback bar-plot
+% ===========
+mycmap = [1     0     0
+     0     0     1
+     0     1     0];
+colormap(mycmap)
+load paperresult_1f_tr_k07
+load paperresult_1f_tr_k85
+load paperresult_1f_tr_k1
+tr3 = paperresult_1f_tr_k07;
+tr2 = paperresult_1f_tr_k85;
+tr1 = paperresult_1f_tr_k1;
+
+xpmean(1,:) = mean(tr1(600:1000,2:4));
+xpmean(2,:) = mean(tr2(600:1000,2:4));
+xpmean(3,:) = mean(tr3(600:1000,2:4));
+bar(xpmean,1)
+xlabel('k_1','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC')
+%set(get(h,'axis'),'FontSize',24)
+set(gca,'XTickLabel',{'1', '0.85', '0.7'},'fontsize', 14);
+box on;
+print('-depsc','fig_logi_1f_bar.eps')
 
 
 % % ===========
@@ -185,26 +185,26 @@
 % print('-depsc','fig_logi_2f_mutation.eps')
 
 
-
-% ===========
-% script for 3 feedback, mutation
-% ===========
-load paperresult_geneticstability_tr3f
-tr = paperresult_geneticstability_tr3f;
-h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
-%xlim([0, 250])
-hold on
-plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
-plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
-plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
-plot(tr(:,1), tr(:,6), '-k','linewidth', 1.0)
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC')
-plot(tr(length(tr),1), tr(length(tr),2), 'k*', 'markersize', 8)
-ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_3f_mutation.eps')
+% 
+% % ===========
+% % script for 3 feedback, mutation
+% % ===========
+% load paperresult_geneticstability_tr3f
+% tr = paperresult_geneticstability_tr3f;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
+% %xlim([0, 250])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
+% plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
+% plot(tr(:,1), tr(:,6), '-k','linewidth', 1.0)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC')
+% plot(tr(length(tr),1), tr(length(tr),2), 'k*', 'markersize', 8)
+% ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_3f_mutation.eps')
 
 
 % % ===========

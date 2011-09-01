@@ -28,7 +28,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1000
+  integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, symp, symp1
@@ -81,13 +81,14 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    k1 = 0.9
-    k2 = 4.0
-    k3 = 3.0
+    k1 = 0.7
+    !k2 = 4.0
+    !k3 = 3.0
     p1 = 0.4
-    p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
-    !v0 = 1.0
-    v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
+    p0 = 1.0/(1.0 + k1*(x(3)+x(5))/L)
+    !p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
+    v0 = 1.0
+    !v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
     !p0 = 1.0/(1.01 + kappa*(1450)/L)
     !v0 = 2.5/(1.0 + k2*(1450.0)/L)
     symp = 1.0!/(1.0 + (k3*(x(3)+x(5))/L)**2)

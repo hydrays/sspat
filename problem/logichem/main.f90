@@ -54,8 +54,8 @@ program ssa
            !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp
            tp =  tp + 1.0
         end if
-        if (x(1) + x(2) + x(3) .eq. 0.0) then 
-           if (x(4) .eq. 0) then
+        if ( (x(1) + x(2) + x(3)) .eq. 0.0) then 
+           if ( (x(4) + x(5)).eq. 0) then
               N_mutation = N_mutation + 1
            end if
            exit main_loop
@@ -63,7 +63,7 @@ program ssa
      end do main_loop
      xbar = xbar + x
   !end do
-  write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
+  write (*, '(F10.2, 7F10.2)'), t, x!, sum(x), N_mutation
   !xbar = xbar / NSample
   !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
   end do

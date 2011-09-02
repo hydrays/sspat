@@ -51,7 +51,7 @@ program ssa
 !!$           td =  td + 20000.0
 !!$        end if
         if(t > tp) then
-           !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp
+           write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp
            tp =  tp + 1.0
         end if
         if (x(1) + x(2) + x(3) .eq. 0.0) then 

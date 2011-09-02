@@ -13,19 +13,19 @@ program ssa
   real(kind=8) pm, N_mutation
   real(kind=8) xbar(NSpec), tbar
 
-  call ran_seed(sequence=123415)
-  te = 1000.0
-  !do pm = 1.0, 1.0, 0.01
-  !   xbar = 0.0
+  call ran_seed(sequence=1234)
+  te = 10000000.0
   pm = 1.0
+  N_mutation = 0.0
   do index = 1.0, NSample
      x = xinit
      t = 0.0
      tp = 1.0
-     td = 200.0
+     td = 50.0
+     xbar = 0.0
      tbar = 0.0
      !do while(t < te)
-     main_loop: do while(.true.)
+     do while(x(5) .eq. 0.0 .and. x(1) .ge. 1.0)
         call getrate(x, a, pm)
         cuma = a
         do j=2, NReac
@@ -34,6 +34,10 @@ program ssa
         call expdev(delta_t)
         delta_t = delta_t/cuma(NReac)
         t = t + delta_t
+        if ( t > 1000 ) then
+           xbar = xbar + x*delta_t
+           tbar = tbar + delta_t
+        end if
         call ran2(u)
         u = cuma(NReac)*u
         j = 1
@@ -47,39 +51,37 @@ program ssa
            pause
         end if
 !!$        if(t > td) then
-!!$           if (x(4).eq.0) x(4) = 10
-!!$           td =  td + 20000.0
+!!$           if (x(4).eq.0) x(4) = 1
+!!$           td =  td + 200.0
 !!$        end if
-        if(t > tp) then
-           !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp
-           tp =  tp + 1.0
-        end if
-        if ( (x(1) + x(2) + x(3)) .eq. 0.0) then 
-           if ( (x(4) + x(5)).eq. 0) then
-              N_mutation = N_mutation + 1
-           end if
-           exit main_loop
-        end if
-     end do main_loop
-     xbar = xbar + x
-  !end do
-  write (*, '(F10.2, 7F10.2)'), t, x!, sum(x), N_mutation
-  !xbar = xbar / NSample
-  !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
+!!$        if(t > tp) then
+!!$           write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp
+!!$           tp =  tp + 1.0
+!!$        end if
+     end do
+     xbar = xbar / tbar
+     if (x(1) < 1.0) then
+        !print *, 'take over'
+        N_mutation = N_mutation + 1
+        !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x, p0, sum(x), ap, v0, symp
+     end if
+     write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
+     !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
+     !read(*,*)
   end do
 end program ssa
 
 subroutine checkx(x, is_nag)
-use chem_data
-use nrtype
-implicit none
-integer(I4B), intent(inout) :: x(NSpec)
-integer(I4B),  intent(out) :: is_nag
-is_nag = 0
-if(any(x < 0) ) then
-  is_nag = 1
-  print *, x
-  print *, 'nag!'
-end if
+  use chem_data
+  use nrtype
+  implicit none
+  integer(I4B), intent(inout) :: x(NSpec)
+  integer(I4B),  intent(out) :: is_nag
+  is_nag = 0
+  if(any(x < 0) ) then
+     is_nag = 1
+     print *, x
+     print *, 'nag!'
+  end if
 end subroutine checkx
 

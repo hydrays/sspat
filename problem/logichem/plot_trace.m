@@ -1,8 +1,8 @@
 % % ===========
 % % script for 1 feedback
 % % ===========
-% load paperresult_1f_tr_k1
-% tr = paperresult_1f_tr_k1;
+% load tr
+% tr = tr;
 % h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
 % %xlim([0, 600])
 % hold on
@@ -14,34 +14,7 @@
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'total')
 % %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_1f_k1.eps')
-% 
-% % ===========
-% % script for 1 feedback bar-plot
-% % ===========
-% mycmap = [1     0     0
-%      0     0     1
-%      0     1     0];
-% colormap(mycmap)
-% load paperresult_1f_tr_k07
-% load paperresult_1f_tr_k85
-% load paperresult_1f_tr_k1
-% tr3 = paperresult_1f_tr_k07;
-% tr2 = paperresult_1f_tr_k85;
-% tr1 = paperresult_1f_tr_k1;
-% 
-% xpmean(1,:) = mean(tr1(600:1000,2:4));
-% xpmean(2,:) = mean(tr2(600:1000,2:4));
-% xpmean(3,:) = mean(tr3(600:1000,2:4));
-% bar(xpmean,1)
-% xlabel('k_1','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC')
-% %set(get(h,'axis'),'FontSize',24)
-% set(gca,'XTickLabel',{'1', '0.85', '0.7'},'fontsize', 14);
-% box on;
-% print('-depsc','fig_logi_1f_bar.eps')
-
+% print('-depsc','fig_logi_1f_k085.eps')
 
 % % ===========
 % % script for 2 feedback, woundhealing
@@ -122,82 +95,81 @@
 % print('-depsc','fig_logi_3f_woundhealing_supp.eps')
 
 
-% % ===========
-% % script for 3 feedback, self-recovery
-% % ===========
-% load paperresult_tr_3f_selfrecover
-% tr = paperresult_tr_3f_selfrecover;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-% xlim([0, 250])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'total')
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_3f_selfrecover.eps')
+% ===========
+% script for 3 feedback, self-recovery
+% ===========
+load paperresult_tr_3f_selfrecover
+tr = paperresult_tr_3f_selfrecover;
+h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+xlim([0, 250])
+hold on
+plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC', 'MC', 'total')
+ylim([0, 600])
+%set(get(h,'axis'),'FontSize',24)
+print('-depsc','fig_logi_3f_selfrecover.eps')
 
 
 % % ===========
 % % script for 1 feedback, mutation
 % % ===========
-% load paperresult_geneticstability_tr1f
-% tr = paperresult_geneticstability_tr1f;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
+% load paperresult_tr_1f_mutation
+% tr = paperresult_tr_1f_mutation;
+% %h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
 % %xlim([0, 250])
-% hold on
 % plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
+% hold on
 % plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
-% plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
-% plot(tr(:,1), tr(:,6), '-k','linewidth', 1.0)
+% %plot(tr(:,1), tr(:,5), 'k','linewidth', 1.0)
+% %plot(tr(:,1), tr(:,8), '-m','linewidth', 1.0)
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC','TDC', 'MC1', 'MC2',2)
+% legend('SC', 'TDC')
 % plot(tr(length(tr),1), tr(length(tr),3), 'k*', 'markersize', 8)
 % ylim([0, 600])
 % %set(get(h,'axis'),'FontSize',24)
 % print('-depsc','fig_logi_1f_mutation.eps')
 
-
-% ===========
-% script for 2 feedback, mutation
-% ===========
-load paperresult_geneticstability_tr2f_k09 
-tr = paperresult_geneticstability_tr2f_k09;
-h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
-%xlim([0, 250])
-hold on
-plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
-plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
-plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
-plot(tr(:,1), tr(:,6), '-k','linewidth', 1.0)
-%plot(tr(:,1), tr(:,8), '-m','linewidth', 1.0)
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC')
-plot(tr(length(tr),1), tr(length(tr),2), 'k*', 'markersize', 8)
-ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_2f_mutation.eps')
+% 
+% % ===========
+% % script for 2 feedback, mutation
+% % ===========
+% load paperresult_tr_2f_mutation
+% tr = paperresult_tr_2f_mutation;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
+% %xlim([0, 250])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.0)
+% %plot(tr(:,1), tr(:,8), '-m','linewidth', 1.0)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC')
+% plot(tr(length(tr),1), tr(length(tr),2), 'k*', 'markersize', 8)
+% ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_2f_mutation.eps')
 
 
 % 
 % % ===========
 % % script for 3 feedback, mutation
 % % ===========
-% load paperresult_geneticstability_tr3f
-% tr = paperresult_geneticstability_tr3f;
+% load paperresult_tr_3f_mutation
+% tr = paperresult_tr_3f_mutation;
 % h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
 % %xlim([0, 250])
 % hold on
 % plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
 % plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
-% plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
-% plot(tr(:,1), tr(:,6), '-k','linewidth', 1.0)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.0)
+% %plot(tr(:,1), tr(:,8), '-m','linewidth', 1.0)
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'MC')
@@ -270,20 +242,3 @@ print('-depsc','fig_logi_2f_mutation.eps')
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % print('-depsc','asym.eps')
-
-% % ===========
-% % script pm
-% % ===========
-% load paperresult_2f_pm
-% load paperresult_3f_pm
-% datapm1 = paperresult_2f_pm;
-% datapm2 = paperresult_3f_pm;
-% h = plot(datapm1(:,1), (datapm1(:,5)+datapm1(:,6))./datapm1(:,7), '-r*','markersize', 10, 'linewidth', 1.1)
-% hold on
-% plot(datapm2(:,1), (datapm2(:,5)+datapm2(:,6))./datapm2(:,7), '-o','markersize', 10, 'linewidth', 1.1)
-% xlabel('p_m','fontsize', 18);
-% ylabel('ratio of mutant type','fontsize',18)
-% ylim([0,1]);
-% legend('feedback on p_0, v_0', 'feedback on p_0, v_0, q_0', 2)
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_pm.eps')

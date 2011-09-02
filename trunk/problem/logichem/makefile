@@ -1,6 +1,6 @@
 RM := rm -rf
 
-OUTPUT_FILE := run
+OUTPUT_FILE := run3
 
 # add inputs and outputs from these tool invocations to the build variables 
 OBJS += \

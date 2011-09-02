@@ -13,7 +13,7 @@ program ssa
   real(kind=8) pm, N_mutation
   real(kind=8) xbar(NSpec), tbar
 
-  call ran_seed(sequence=1234)
+  call ran_seed(sequence=123415)
   te = 1000.0
   !do pm = 1.0, 1.0, 0.01
   !   xbar = 0.0
@@ -51,11 +51,11 @@ program ssa
 !!$           td =  td + 20000.0
 !!$        end if
         if(t > tp) then
-           write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp
+           !write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp
            tp =  tp + 1.0
         end if
-        if (x(1) + x(2) + x(3) .eq. 0.0) then 
-           if (x(4) .eq. 0) then
+        if ( (x(1) + x(2) + x(3)) .eq. 0.0) then 
+           if ( (x(4) + x(5)).eq. 0) then
               N_mutation = N_mutation + 1
            end if
            exit main_loop
@@ -63,7 +63,7 @@ program ssa
      end do main_loop
      xbar = xbar + x
   !end do
-  write (*, '(F10.2, 7F10.2)'), t, x, sum(x), N_mutation
+  write (*, '(F10.2, 7F10.2)'), t, x!, sum(x), N_mutation
   !xbar = xbar / NSample
   !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
   end do

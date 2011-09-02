@@ -28,13 +28,13 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1
+  integer(I4B) :: NSample = 100000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, symp, symp1
   real(kind=8) k1, k2, k3
   real(kind=8), parameter :: L = 500
-  real(kind=8), parameter :: mu = 0.000001
+  real(kind=8), parameter :: mu = 0.00001
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
        50, & !SC
@@ -81,19 +81,18 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    k1 = 0.6
-    k2 = 4.0
-    k3 = 3.0
+    k1 = 0.85
+    !k2 = 4.0
+    !k3 = 3.0
     p1 = 0.4
     p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
-    !v0 = 1.0
-    v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
+    !p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
+    v0 = 1.0
+    !v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
     !p0 = 1.0/(1.01 + kappa*(1450)/L)
     !v0 = 2.5/(1.0 + k2*(1450.0)/L)
-    !p0 = 0.99*exp(-kappa*(x(3)+x(5))/L)
-    symp = 1.0/(1.0 + (k3*(x(3)+x(5))/L)**2)
-    !symp = 1.0/(1.0 + (k3*(x(3)+x(5))/L))
-    symp1 = 1.0!symp
+    symp = 1.0!/(1.0 + (k3*(x(3)+x(5))/L)**2)
+    symp1 = 1.0
     if (sum(x) > L) then
        ap = 0.04*(sum(x) - L)
     else
@@ -119,8 +118,8 @@ contains
     a(14) = ap*x(4)
     a(15) = ap*x(5)
 
-    a(16) = 0.0*mu*v0*x(1)
-    a(17) = 0.0*mu*x(2)
+    a(16) = mu*v0*x(1)
+    a(17) = mu*x(2)
 
   end subroutine getrate
 

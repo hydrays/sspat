@@ -15,7 +15,7 @@ program ssa
 
   call ran_seed(sequence=1234)
   te = 1000.0
-  do pm = 0.5, 1.0, 0.01
+  do pm = 0.0, 1.0, 0.01
      xbar = 0.0
      do index = 1.0, NSample
         x = xinit
@@ -46,7 +46,7 @@ program ssa
            end if
         if(t > td) then
            if (x(4).eq.0) x(4) = 10
-           td =  td + 20000.0
+           td =  td + 200000.0
         end if
 !!$        if(t > tp) then
 !!$           write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp

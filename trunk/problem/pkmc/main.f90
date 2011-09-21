@@ -23,6 +23,7 @@ program main
 
   t = 0.0
   tp = 0.0
+  tm = 100000.0
   output_index = 0
   NP = 0.0
   NT = 0.0
@@ -66,8 +67,8 @@ program main
      TGFbeta(j) = TGFbeta(j) + TGFbeta(L+j)
      TGFbeta(L-j+1) = TGFbeta(L-j+1) + TGFbeta(1-j)
   end do
-  TGFbeta(1-b:0) = TGFbeta(L-b+1:L)
-  TGFbeta(L+1:L+b) = TGFbeta(1:b)
+  TGFbeta(-b:0) = TGFbeta(L-b:L)
+  TGFbeta(L+1:L+b+1) = TGFbeta(1:b+1)
 
   D_TGFbeta = 0.0
   do j = 1, 1+2*b
@@ -78,9 +79,14 @@ program main
      if (t .ge. tp) then
         call output_to_file(output_index)
         call cell_stat(t)
-        print *, t
+!        print *, t
         output_index = output_index + 1
         tp = tp + 5.0
+     end if
+
+     if (t .ge. tm) then
+        cmat(100:105, 1:10)%type = 4
+        tm = tm + 600000.0
      end if
 
      tau = 11111111111.1
@@ -105,7 +111,13 @@ program main
      call expdev(u)
      NP(k) = NP(k) + u
      t = t + tau
-     call cell_event(k)
+     do i = 1, L
+        if ( i .eq. k ) then
+           call cell_event(k)
+        elseif ( abs(i - k) > 100 ) then
+           call cell_restack(i)
+        end if
+     end do
      ! perodic boundary condition
      if ( k .eq. 1 ) then
         cmat(L, :) = cmat(0, :)
@@ -127,10 +139,10 @@ program main
         cmat(0, :) = cmat(L, :)
         npack(0) = npack(L)
      end if
-     if ( k .le. 2*b+1 ) then
+     if ( k .le. 2*b+1+1 ) then
         TGFbeta(L-b:L+b+1) = TGFbeta(-b:b+1)
      end if
-     if ( k .ge. L - 2*b ) then
+     if ( k .ge. L - 2*b-1 ) then
         TGFbeta(-b:b+1) = TGFbeta(L-b:L+b+1)
      end if
   end do

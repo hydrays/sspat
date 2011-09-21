@@ -29,9 +29,9 @@ contains
     integer i, j
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
-!    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
+    !    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
-!    open (unit = 12, file=filename2, action="write")
+    !    open (unit = 12, file=filename2, action="write")
 
     do i = 1, L+1
        do j = 1, H
@@ -48,7 +48,7 @@ contains
 !!$       end do
 !!$    end do
     close(11)
-!    close(12)
+    !    close(12)
   end subroutine output_to_file
 
   subroutine cell_event(i)
@@ -70,7 +70,7 @@ contains
        u = u - v
        if ( u < 0 ) then
           if ( cmat(i,j)%type .eq. 1 ) then
-             p0 = 0.3 + 0.4 / (1.0 + 0.01*TGFbeta(i))
+             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta(i))
              ! division
              do k=H, j+2, -1
                 cmat(i, k) = cmat(i, k-1)
@@ -145,35 +145,54 @@ contains
     end if
   end subroutine cell_event
 
-subroutine cell_stat(t)
-  implicit none
+  subroutine cell_restack(i)
+    use random
+    implicit none
+    integer, intent(in) :: i
+    integer j
+    type(cell) temp
+    do j = npack(i), 2, -1
+       if ( cmat(i,j)%type .eq. 1 ) then
+          temp = cmat(i,j-1)
+          cmat(i,j-1) = cmat(i,j)
+          cmat(i,j) = temp
+       end if
+    end do
+  end subroutine cell_restack
 
-  real, intent(in) :: t
-  integer i, j, k
-  integer num_sc, num_tac, num_tdc, num_mc
+  subroutine cell_stat(t)
+    implicit none
 
-  num_sc = 0
-  num_tac = 0
-  num_tdc = 0
-  num_mc = 0
-  do i = 1, L
-     do j = 1, H
-        if (cmat(i,j)%type.eq.1) then
-           num_sc = num_sc + 1
-        elseif (cmat(i,j)%type.eq.2) then
-           num_tac = num_tac + 1
-        elseif (cmat(i,j)%type.eq.3) then
-           num_tdc = num_tdc + 1
-        elseif (cmat(i,j)%type.eq.4) then
-           num_mc = num_mc + 1
-        end if
-     end do
-  end do
-  
-  write(*, '(5(F10.2))'), t, real(num_sc)/L, &
-       real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
-  write(100, '(5(F10.2))'), t, real(num_sc)/L, &
-       real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
-end subroutine cell_stat
+    real, intent(in) :: t
+    integer i, j, k
+    integer num_sc, num_tac, num_tdc, num_mc
+
+    num_sc = 0
+    num_tac = 0
+    num_tdc = 0
+    num_mc = 0
+    do i = 1, L
+       do j = 1, H
+          if (cmat(i,j)%type.eq.1) then
+             num_sc = num_sc + 1
+          elseif (cmat(i,j)%type.eq.2) then
+             num_tac = num_tac + 1
+          elseif (cmat(i,j)%type.eq.3) then
+             num_tdc = num_tdc + 1
+          elseif (cmat(i,j)%type.eq.4) then
+             num_mc = num_mc + 1
+          end if
+       end do
+    end do
+
+    write(*, '(5(F10.2))'), t, real(num_sc)/L, &
+         real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
+!!$  do i = -b, L+1+b
+!!$     write(*, '(F8.2)', advance="no"), TGFbeta(i)
+!!$  end do
+!!$  write(*, *)
+    write(100, '(5(F10.2))'), t, real(num_sc)/L, &
+         real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
+  end subroutine cell_stat
 
 end module setting

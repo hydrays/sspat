@@ -6,82 +6,25 @@ program main
   implicit none
 
   real t, tau, tp, tm, u
-  integer output_index, i, j, active_index, temp_num
+  integer output_index, i, j, active_index
   real tau_temp
   integer k
   open (unit = 100, file='./out/logfile', action="write")
   call ran_seed(sequence=12345)
 
-  cmat(1:L, 1)%type = 1
-  cmat(1:L, 2:3)%type = 2
-  cmat(1:L, 3:4)%type = 3
-!  cmat(1:L, 5:50)%type = 1
-  do i = 1, L
-     call ran2(u)
-     cmat(i, 1)%gene1 = 0.5*u
-  end do
+  call init_cell_pool()
 
   t = 0.0
   tp = 0.0
   tm = 100000.0
   output_index = 0
-  NP = 0.0
-  NT = 0.0
-  do i = 1, L
-     call expdev(u)
-     NP(i) = u
-  end do
-  cmat(0, :) = cmat(L, :)
-  cmat(L+1, :) = cmat(1, :)
-
-  npack = 0
-  do i = 0, L+1
-     do j = 1, H
-        if ( cmat(i,j)%type .ne. 0 ) then
-           npack(i) = npack(i) + 1
-        end if
-     end do
-  end do
-     
-  TGFbeta = 0.
-  do i = 1, L
-     temp_num = 0.
-     do j = 1, H
-        if ( cmat(i,j)%type .eq. 3 ) then
-           temp_num = temp_num + 1.
-        end if
-     end do
-     !temp_num = 10.0*temp_num / b
-     if (temp_num > 0) then
-        do j = 0, b
-           if ( j .eq. 0) then
-              TGFbeta(i) = TGFbeta(i) + temp_num
-           else
-              TGFbeta(i+j) = TGFbeta(i+j) + temp_num*exp(-real(j)/b)
-              TGFbeta(i-j) = TGFbeta(i-j) + temp_num*exp(-real(j)/b)
-           end if
-        end do
-     end if
-  end do
-  do j = 1, b
-     TGFbeta(j) = TGFbeta(j) + TGFbeta(L+j)
-     TGFbeta(L-j+1) = TGFbeta(L-j+1) + TGFbeta(1-j)
-  end do
-  TGFbeta(-b:0) = TGFbeta(L-b:L)
-  TGFbeta(L+1:L+b+1) = TGFbeta(1:b+1)
-
-  D_TGFbeta = 0.0
-  do j = 1, 1+2*b
-     D_TGFbeta(j) = exp(-real(abs(j-b-1))/b)
-  end do
-  
   do while (t < tend)
      if (t .ge. tp) then
         call output_to_file(output_index)
         call cell_stat(t)
 !        print *, t
         output_index = output_index + 1
-        tp = tp + 5.0
+        tp = tp + 1.0
      end if
 
      if (t .ge. tm) then
@@ -92,8 +35,10 @@ program main
      tau = 11111111111.1
      k = 0
      do i = 1, L
-        vr = exp(real(npack(i)-npack(i+1)))
-        vl = exp(real(npack(i)-npack(i-1)))
+        !vr = exp(real(npack(i)-npack(i+1)))
+        !vl = exp(real(npack(i)-npack(i-1)))
+        vr = max(0.0, 100.0*real(npack(i)-npack(i+1)))
+        vl = max(0.0, 100.0*real(npack(i)-npack(i-1)))
         a(i) = vr + vl + npack(i)*v
         tau_temp = ( NP(i) - NT(i) ) / a(i)
         if ( tau_temp < tau) then

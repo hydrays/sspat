@@ -1,6 +1,6 @@
 module setting
-  integer, parameter :: L = 200
-  integer, parameter :: H = 200
+  integer, parameter :: L = 60
+  integer, parameter :: H = 60
   real, parameter :: b = 8.0
   real, parameter :: delta_t = 0.001
   real, parameter :: tend = 200.0
@@ -108,94 +108,87 @@ contains
     use random
     implicit none
     integer, intent(in) :: i
-    integer j, k
+    integer j, k, m
     real u, u1, p0
+    real p_move(3)
+    type(cell) new_cell
     call ran2(u)
     u = u*a(i)
-    vr = max(0.0, 100.0*real(npack(i)-npack(i+1)))
-    vl = max(0.0, 100.0*real(npack(i)-npack(i-1)))
-!!$    print *, 'event happen at ', i
-!!$    print *, 'u', u
-!!$    print *, 'a(i)', a(i)
-!!$    print *, 'npack(i)', npack(i-1:i+1)
-!!$    print *, 'vr, vl', vr, vl
+    print *, 'event happen at ', i
+    print *, 'u', u
+    print *, 'a(i)', a(i)
+    print *, 'npack(i)', npack(i-1:i+1)
     do j = 1, npack(i)
        u = u - v
        if ( u < 0 ) then
-          if ( cmat(i,j)%type .eq. 1 ) then
-             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta(i))
-             ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
-             end do
-             call ran2(u1)
-             if ( u1 < p0 ) then
-                ! SC -> 2SC
-                cmat(i,j+1) = cmat(i,j)
-             else
-                ! SC -> 2TAC
-                cmat(i,j)%type = 2
-                cmat(i,j+1) = cmat(i,j) 
-             end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 2 ) then
-             ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
-             end do
-             call ran2(u1)
-             if ( u1 < p1 ) then
-                ! TAC -> 2TAC
-                cmat(i, j+1) = cmat(i,j)
-             else
-                ! TAC -> 2TDC
-                cmat(i, j)%type = 3
-                cmat(i, j+1) = cmat(i,j)
-                TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) + 2.0*D_TGFbeta
-             end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 3 ) then
-             ! death
+          if ( cmat(i,j)%type .eq. 3 ) then ! death
+             !print *, 'die at', i, j, cmat(i,j)%type 
+             !read(*,*)
              do k=j, H-1
                 cmat(i, k) = cmat(i, k+1)
              end do
              TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
              npack(i) = npack(i) - 1
+             return
+          else if ( cmat(i,j)%type .eq. 1 ) then
+             !print *, 'pro at', i, j, cmat(i,j)%type 
+             !read(*,*)
+             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta(i))                
+             call ran2(u1)
+             if ( u1 < p0 ) then
+                new_cell = cmat(i,j)
+             else
+                cmat(i,j)%type = 2
+                new_cell = cmat(i,j) 
+             end if
+          else if ( cmat(i,j)%type .eq. 2 ) then
+             !print *, 'pro at', i, j, cmat(i,j)%type 
+             !read(*,*)
+             call ran2(u1)
+             if ( u1 < p1 ) then
+                new_cell = cmat(i,j)
+             else
+                cmat(i,j)%type = 3
+                new_cell = cmat(i,j)
+                TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) + D_TGFbeta
+             end if
           else
-             ! do nothing
+             print *, 'error 3'
+             print *, npack(i), i, j
+             print *, cmat(i,j)%type
+             read(*,*)
           end if
+
+          p_move(1) = 1.0/(npack(i-1)+1.0)
+          p_move(2) = 0.0
+          p_move(3) = 1.0/(npack(i+1)+1.0)
+          call ran2(u1)
+          u1 = u1*sum(p_move)
+          do m = -1, 1
+             u1 = u1 - p_move(m+2)
+             if ( u1 < 0 ) then
+                !print *, 'mov to', m, new_cell%type 
+                !read(*,*)
+                if ( cmat(i+m, j)%type .eq. 0 ) then
+                   cmat(i+m, npack(i+m)+1) = new_cell                   
+                else
+                   do k=npack(i+m)+1, j+1, -1
+                      cmat(i+m, k) = cmat(i+m, k-1)
+                   end do
+                   cmat(i+m, j) = new_cell
+                   npack(i+m) = npack(i+m) + 1
+                   if ( new_cell%type .eq. 3 ) then
+                      TGFbeta(i+m-b:i+m+b) = TGFbeta(i+m-b:i+m+b) + D_TGFbeta
+                   end if
+                end if
+                return
+             end if
+          end do
           return
        end if
     end do
-    u = u - vr
-    if ( u < 0 ) then
-       if (cmat(i, npack(i))%type .eq. 3) then
-          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
-          TGFbeta(i-b+1:i+b+1) = TGFbeta(i-b+1:i+b+1) + D_TGFbeta
-       end if
-       cmat(i+1, npack(i+1)+1) = cmat(i, npack(i))  
-       cmat(i, npack(i))%type = 0
-       npack(i+1) = npack(i+1) + 1
-       npack(i) = npack(i) - 1
-       return
-    end if
-    u = u - vl
-    if ( u < 0 ) then
-       if (cmat(i, npack(i))%type .eq. 3) then
-          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
-          TGFbeta(i-b-1:i+b-1) = TGFbeta(i-b-1:i+b-1) + D_TGFbeta
-       end if
-       cmat(i-1, npack(i-1)+1) = cmat(i, npack(i))  
-       cmat(i, npack(i))%type = 0
-       npack(i-1) = npack(i-1) + 1
-       npack(i) = npack(i) - 1
-       return
-    else
-!!$       print *, 'u', u
-!!$       print *, 'vl', vl
-       write(*,*) 'error 2'
-       read(*,*)
-    end if
+    write(*,*) 'error 2'
+    read(*,*)
   end subroutine cell_event
 
   subroutine cell_restack(i)

@@ -35,15 +35,13 @@ program main
      tau = 11111111111.1
      k = 0
      do i = 1, L
-        !vr = exp(real(npack(i)-npack(i+1)))
-        !vl = exp(real(npack(i)-npack(i-1)))
-        vr = max(0.0, 100.0*real(npack(i)-npack(i+1)))
-        vl = max(0.0, 100.0*real(npack(i)-npack(i-1)))
-        a(i) = vr + vl + npack(i)*v
-        tau_temp = ( NP(i) - NT(i) ) / a(i)
-        if ( tau_temp < tau) then
-           tau = tau_temp
-           k = i
+        a(i) = npack(i)*v
+        if ( a(i) > 0 ) then
+           tau_temp = ( NP(i) - NT(i) ) / a(i)
+           if ( tau_temp < tau) then
+              tau = tau_temp
+              k = i
+           end if
         end if
      end do
      if ( k .le. 0 ) then
@@ -56,13 +54,7 @@ program main
      call expdev(u)
      NP(k) = NP(k) + u
      t = t + tau
-     do i = 1, L
-        if ( i .eq. k ) then
-           call cell_event(k)
-        elseif ( abs(i - k) > 100 ) then
-           call cell_restack(i)
-        end if
-     end do
+     call cell_event(k)
      ! perodic boundary condition
      if ( k .eq. 1 ) then
         cmat(L, :) = cmat(0, :)

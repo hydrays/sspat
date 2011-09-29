@@ -1,11 +1,12 @@
 module setting
-  integer, parameter :: L = 60
-  integer, parameter :: H = 60
+  integer, parameter :: L = 200
+  integer, parameter :: H = 200
   real, parameter :: b = 8.0
   real, parameter :: delta_t = 0.001
   real, parameter :: tend = 200.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
+  real, parameter :: w = 1.0
   real, parameter :: D = 1.0
   type cell
      integer type
@@ -110,17 +111,20 @@ contains
     integer, intent(in) :: i
     integer j, k, m
     real u, u1, p0
-    real p_move(3)
+    integer temp_stack
     type(cell) new_cell
     call ran2(u)
     u = u*a(i)
-    print *, 'event happen at ', i
-    print *, 'u', u
-    print *, 'a(i)', a(i)
-    print *, 'npack(i)', npack(i-1:i+1)
+!!$    print *, 'event happen at ', i
+!!$    print *, 'u', u
+!!$    print *, 'a(i)', a(i)
+!!$    print *, 'npack(i)', npack(i-1:i+1)
     do j = 1, npack(i)
+       
+       ! proliferate
        u = u - v
        if ( u < 0 ) then
+          !print *, 'prolife'
           if ( cmat(i,j)%type .eq. 3 ) then ! death
              !print *, 'die at', i, j, cmat(i,j)%type 
              !read(*,*)
@@ -156,36 +160,71 @@ contains
              print *, 'error 3'
              print *, npack(i), i, j
              print *, cmat(i,j)%type
+             do k=1, npack(i)+5
+                print *, cmat(i,k)%type
+             end do
              read(*,*)
           end if
 
-          p_move(1) = 1.0/(npack(i-1)+1.0)
-          p_move(2) = 0.0
-          p_move(3) = 1.0/(npack(i+1)+1.0)
-          call ran2(u1)
-          u1 = u1*sum(p_move)
-          do m = -1, 1
-             u1 = u1 - p_move(m+2)
-             if ( u1 < 0 ) then
-                !print *, 'mov to', m, new_cell%type 
-                !read(*,*)
-                if ( cmat(i+m, j)%type .eq. 0 ) then
-                   cmat(i+m, npack(i+m)+1) = new_cell                   
-                else
-                   do k=npack(i+m)+1, j+1, -1
-                      cmat(i+m, k) = cmat(i+m, k-1)
-                   end do
-                   cmat(i+m, j) = new_cell
-                   npack(i+m) = npack(i+m) + 1
-                   if ( new_cell%type .eq. 3 ) then
-                      TGFbeta(i+m-b:i+m+b) = TGFbeta(i+m-b:i+m+b) + D_TGFbeta
-                   end if
-                end if
-                return
-             end if
+!!$          temp_stack = npack(i)
+!!$          m = i
+!!$          do k = -1, 1
+!!$             if ( npack(i+k) < temp_stack) then
+!!$                temp_stack = npack(i+k)
+!!$                m = i+k
+!!$             end if
+!!$          end do
+!!$          if ( cmat(m, j)%type .eq. 0 ) then
+!!$             cmat(m, npack(m)+1) = new_cell                   
+!!$          else
+          do k=npack(i)+1, j+1, -1
+             cmat(i, k) = cmat(i, k-1)
           end do
+          cmat(i, j) = new_cell
+          npack(i) = npack(i) + 1
+          if ( new_cell%type .eq. 3 ) then
+             TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) + D_TGFbeta
+          end if
           return
        end if
+
+       ! move
+       u = u - w
+       if ( u < 0 ) then
+          !print *, 'move'
+          new_cell = cmat(i, j)
+          do k=j, H-1
+             cmat(i, k) = cmat(i, k+1)
+          end do
+          npack(i) = npack(i) - 1
+
+          m = i - 1
+          if ( npack(i+1) < npack(i-1)) then
+             m = i+1
+          end if
+
+!!$          call ran2(u1)
+!!$          if ( u1 < 0.5 ) then ! move left
+!!$             m = i - 1
+!!$          else
+!!$             m = i + 1
+!!$          end if
+          if ( cmat(m, j)%type .eq. 0 ) then
+             cmat(m, npack(m)+1) = new_cell
+          else
+             do k=npack(m)+1, j+1, -1
+                cmat(m, k) = cmat(m, k-1)
+             end do
+             cmat(m, j) = new_cell
+          end if
+          npack(m) = npack(m) + 1
+          if (new_cell%type .eq. 3) then
+             TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
+             TGFbeta(m-b:m+b) = TGFbeta(m-b:m+b) + D_TGFbeta
+          end if
+          return
+       end if
+
     end do
     write(*,*) 'error 2'
     read(*,*)
@@ -198,6 +237,13 @@ contains
     integer j
     type(cell) temp
     do j = npack(i), 2, -1
+       if ( cmat(i,j)%type .eq. 1 ) then
+          temp = cmat(i,j-1)
+          cmat(i,j-1) = cmat(i,j)
+          cmat(i,j) = temp
+       end if
+    end do
+    do j = 1, npack(i)
        if ( cmat(i,j)%type .eq. 1 ) then
           temp = cmat(i,j-1)
           cmat(i,j-1) = cmat(i,j)

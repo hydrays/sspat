@@ -35,7 +35,7 @@ program main
      tau = 11111111111.1
      k = 0
      do i = 1, L
-        a(i) = npack(i)*v
+        a(i) = npack(i)*(v + w)
         if ( a(i) > 0 ) then
            tau_temp = ( NP(i) - NT(i) ) / a(i)
            if ( tau_temp < tau) then
@@ -55,6 +55,36 @@ program main
      NP(k) = NP(k) + u
      t = t + tau
      call cell_event(k)
+!!$     do i = 1, L
+!!$        call cell_restack(i)
+!!$        ! perodic boundary condition
+!!$        if ( i .eq. 1 ) then
+!!$           cmat(L, :) = cmat(0, :)
+!!$           cmat(L+1, :) = cmat(1, :)
+!!$           npack(L) = npack(0)
+!!$           npack(L+1) = npack(1)
+!!$        end if
+!!$        if ( i .eq. 2 ) then
+!!$           cmat(L+1, :) = cmat(1, :)
+!!$           npack(L+1) = npack(1)
+!!$        end if
+!!$        if ( i .eq. L ) then
+!!$           cmat(1, :) = cmat(L+1, :)
+!!$           cmat(0, :) = cmat(L, :)
+!!$           npack(1) = npack(L+1)
+!!$           npack(0) = npack(L)
+!!$        end if
+!!$        if ( i .eq. L-1 ) then
+!!$           cmat(0, :) = cmat(L, :)
+!!$           npack(0) = npack(L)
+!!$        end if
+!!$        if ( i .le. 2*b+1+1 ) then
+!!$           TGFbeta(L-b:L+b+1) = TGFbeta(-b:b+1)
+!!$        end if
+!!$        if ( i .ge. L - 2*b-1 ) then
+!!$           TGFbeta(-b:b+1) = TGFbeta(L-b:L+b+1)
+!!$        end if
+!!$     end do
      ! perodic boundary condition
      if ( k .eq. 1 ) then
         cmat(L, :) = cmat(0, :)

@@ -73,8 +73,8 @@ program main
      do i = 1, L
         if ( i .eq. k ) then
            call cell_event(k)
-        elseif ( abs(i - k) > 100 ) then
-           call cell_restack(i)
+        !elseif ( abs(i - k) > 100 ) then
+        !   call cell_restack(i)
         end if
      end do
      ! perodic boundary condition

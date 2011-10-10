@@ -1,9 +1,9 @@
 module setting
-  integer, parameter :: L = 200
+  integer, parameter :: L = 400
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
   real, parameter :: delta_t = 0.001
-  real, parameter :: tend = 200.0
+  real, parameter :: tend = 10000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0
@@ -21,6 +21,59 @@ module setting
   real vr, vl
 
 contains
+  subroutine init_cell_pool()
+    use random
+    implicit none
+    integer temp_num
+    real u
+    integer i, j
+
+    cmat(1:L, 1)%type = 1
+    cmat(1:L, 2:3)%type = 2
+    cmat(1:L, 3:4)%type = 3
+    cmat(0, :) = cmat(L, :)
+    cmat(L+1, :) = cmat(1, :)
+
+    npack = 0
+    do i = 1, L
+       do j = 1, H
+          if ( cmat(i,j)%type .ne. 0 ) then
+             npack(i) = npack(i) + 1
+          end if
+       end do
+    end do
+    npack(0) = npack(L)
+    npack(L+1) = npack(1)
+
+    NP = 0.0
+    NT = 0.0
+    do i = 1, L
+       call expdev(u)
+       NP(i) = u
+    end do
+
+    D_TGFbeta = 0.0
+    do j = 1, 1+2*b
+       D_TGFbeta(j) = exp(-real(abs(j-b-1))/b)
+    end do
+
+    TGFbeta = 0.
+    do i = 1, L
+       temp_num = 0.
+       do j = 1, H
+          if ( cmat(i,j)%type .eq. 3 ) then
+             TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) + D_TGFbeta
+          end if
+       end do
+    end do
+    do j = 1, b
+       TGFbeta(j) = TGFbeta(j) + TGFbeta(L+j)
+       TGFbeta(L-j+1) = TGFbeta(L-j+1) + TGFbeta(1-j)
+    end do
+    TGFbeta(-b:0) = TGFbeta(L-b:L)
+    TGFbeta(L+1:L+b+1) = TGFbeta(1:b+1)
+  end subroutine init_cell_pool
+
   subroutine output_to_file(index)
     implicit none
 
@@ -55,12 +108,18 @@ contains
     use random
     implicit none
     integer, intent(in) :: i
-    integer j, k
+    integer j, k, m
     real u, u1, p0
+    type(cell) new_cell
     call ran2(u)
     u = u*a(i)
-    vr = exp(real(npack(i)-npack(i+1)))
-    vl = exp(real(npack(i)-npack(i-1)))
+    if (npack(i).ne.0) then
+       vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
+       vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
+    else
+       vr = 0.0
+       vl = 0.0
+    end if
 !!$    print *, 'event happen at ', i
 !!$    print *, 'u', u
 !!$    print *, 'a(i)', a(i)
@@ -116,26 +175,78 @@ contains
     end do
     u = u - vr
     if ( u < 0 ) then
-       if (cmat(i, npack(i))%type .eq. 3) then
-          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
-          TGFbeta(i-b+1:i+b+1) = TGFbeta(i-b+1:i+b+1) + D_TGFbeta
+       call ran2(u1)
+       j = ceiling(u1*npack(i))
+       if (j < 1 .or. j>npack(i)) then
+          print *, 'error 4', j, u1
+          read(*,*)
        end if
-       cmat(i+1, npack(i+1)+1) = cmat(i, npack(i))  
-       cmat(i, npack(i))%type = 0
-       npack(i+1) = npack(i+1) + 1
+       !print *, 'move right at height j', i, j
+
+       if ( cmat(i, j)%type .eq. 1 ) then
+          call ran2(u1)
+          if (u1 < 0.98) then
+             return
+          end if
+       end if
+
+       new_cell = cmat(i, j)
+       do k=j, H-1
+          cmat(i, k) = cmat(i, k+1)
+       end do
        npack(i) = npack(i) - 1
+
+       m = i + 1
+       if ( cmat(m, j)%type .eq. 0 ) then
+          cmat(m, npack(m)+1) = new_cell
+       else
+          do k=npack(m)+1, j+1, -1
+             cmat(m, k) = cmat(m, k-1)
+          end do
+          cmat(m, j) = new_cell
+       end if
+       npack(m) = npack(m) + 1
+       if (new_cell%type .eq. 3) then
+          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
+          TGFbeta(m-b:m+b) = TGFbeta(m-b:m+b) + D_TGFbeta
+       end if
        return
     end if
     u = u - vl
     if ( u < 0 ) then
-       if (cmat(i, npack(i))%type .eq. 3) then
-          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
-          TGFbeta(i-b-1:i+b-1) = TGFbeta(i-b-1:i+b-1) + D_TGFbeta
+       call ran2(u1)
+       j = ceiling(u1*npack(i))
+       if (j < 1 .or. j>npack(i)) then
+          print *, 'error 5', j, u1, npack(i)
+          read(*,*)
        end if
-       cmat(i-1, npack(i-1)+1) = cmat(i, npack(i))  
-       cmat(i, npack(i))%type = 0
-       npack(i-1) = npack(i-1) + 1
+       !print *, 'move left at height j', i, j
+       if ( cmat(i, j)%type .eq. 1 ) then
+          call ran2(u1)
+          if (u1 < 0.98) then
+             return
+          end if
+       end if
+       new_cell = cmat(i, j)
+       do k=j, H-1
+          cmat(i, k) = cmat(i, k+1)
+       end do
        npack(i) = npack(i) - 1
+
+       m = i - 1
+       if ( cmat(m, j)%type .eq. 0 ) then
+          cmat(m, npack(m)+1) = new_cell
+       else
+          do k=npack(m)+1, j+1, -1
+             cmat(m, k) = cmat(m, k-1)
+          end do
+          cmat(m, j) = new_cell
+       end if
+       npack(m) = npack(m) + 1
+       if (new_cell%type .eq. 3) then
+          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
+          TGFbeta(m-b:m+b) = TGFbeta(m-b:m+b) + D_TGFbeta
+       end if
        return
     else
 !!$       print *, 'u', u

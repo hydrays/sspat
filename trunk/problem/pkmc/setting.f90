@@ -185,7 +185,7 @@ contains
 
        if ( cmat(i, j)%type .eq. 1 ) then
           call ran2(u1)
-          if (u1 < 0.98) then
+          if (u1 < 0.95) then
              return
           end if
        end if

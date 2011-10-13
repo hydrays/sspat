@@ -1,9 +1,8 @@
 module setting
-  integer, parameter :: L = 400
+  integer, parameter :: L = 2000
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
-  real, parameter :: delta_t = 0.001
-  real, parameter :: tend = 10000.0
+  real, parameter :: tend = 100.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0
@@ -305,5 +304,70 @@ contains
     write(100, '(5(F10.2))'), t, real(num_sc)/L, &
          real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
   end subroutine cell_stat
+
+  subroutine Perodic_BC(k)
+    implicit none
+    integer, intent(in) :: k
+
+    if ( k .eq. 1 ) then
+       cmat(L, :) = cmat(0, :)
+       cmat(L+1, :) = cmat(1, :)
+       npack(L) = npack(0)
+       npack(L+1) = npack(1)
+    end if
+    if ( k .eq. 2 ) then
+       cmat(L+1, :) = cmat(1, :)
+       npack(L+1) = npack(1)
+    end if
+    if ( k .eq. L ) then
+       cmat(1, :) = cmat(L+1, :)
+       cmat(0, :) = cmat(L, :)
+       npack(1) = npack(L+1)
+       npack(0) = npack(L)
+    end if
+    if ( k .eq. L-1 ) then
+       cmat(0, :) = cmat(L, :)
+       npack(0) = npack(L)
+    end if
+    if ( k .le. 2*b+1+1 ) then
+       TGFbeta(L-b:L+b+1) = TGFbeta(-b:b+1)
+    end if
+    if ( k .ge. L - 2*b-1 ) then
+       TGFbeta(-b:b+1) = TGFbeta(L-b:L+b+1)
+    end if
+  end subroutine Perodic_BC
+
+  subroutine Next_Reaction(k, tau)
+    implicit none
+    integer, intent(out) :: k
+    real, intent(out) :: tau
+    real tau_temp
+    integer i
+
+    tau = huge(0.0)
+    k = 0
+    do i = 1, L
+       tau_temp = ( NP(i) - NT(i) ) / a(i)
+       if ( tau_temp < tau) then
+          tau = tau_temp
+          k = i
+       end if
+    end do
+    if ( k .le. 0 ) then
+       write(*,*), 'error'
+       read(*,*)
+    end if
+  end subroutine Next_Reaction
+
+  subroutine Update_Rate(i)
+    implicit none
+    integer, intent(in) :: i
+    vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
+    vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
+    if (npack(i).eq.0) then
+       print *, vr, vl
+    end if
+    a(i) = vr + vl + npack(i)*v
+  end subroutine Update_Rate
 
 end module setting

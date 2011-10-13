@@ -2,7 +2,7 @@ module setting
   integer, parameter :: L = 2000
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
-  real, parameter :: tend = 100.0
+  real, parameter :: tend = 1000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0
@@ -15,8 +15,9 @@ module setting
   real NT(1:L)
   real NP(1:L)
   integer npack(0:L+1)
-  real TGFbeta(-b:L+b+1)
-  real D_TGFbeta(1:1+2*b)
+!  real TGFbeta(-b:L+b+1)
+  !real D_TGFbeta(1:1+2*b)
+  integer TDC(0:L+1)
   real vr, vl
 
 contains
@@ -34,43 +35,30 @@ contains
     cmat(L+1, :) = cmat(1, :)
 
     npack = 0
+    TDC = 0
     do i = 1, L
        do j = 1, H
           if ( cmat(i,j)%type .ne. 0 ) then
              npack(i) = npack(i) + 1
           end if
+          if ( cmat(i,j)%type .eq. 3 ) then
+             TDC(i) = TDC(i) + 1
+          end if
        end do
     end do
     npack(0) = npack(L)
     npack(L+1) = npack(1)
+    TDC(0) = TDC(L)
+    TDC(L+1) = TDC(1)
 
     NP = 0.0
     NT = 0.0
     do i = 1, L
        call expdev(u)
+       call Update_Rate(i)
        NP(i) = u
     end do
 
-    D_TGFbeta = 0.0
-    do j = 1, 1+2*b
-       D_TGFbeta(j) = exp(-real(abs(j-b-1))/b)
-    end do
-
-    TGFbeta = 0.
-    do i = 1, L
-       temp_num = 0.
-       do j = 1, H
-          if ( cmat(i,j)%type .eq. 3 ) then
-             TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) + D_TGFbeta
-          end if
-       end do
-    end do
-    do j = 1, b
-       TGFbeta(j) = TGFbeta(j) + TGFbeta(L+j)
-       TGFbeta(L-j+1) = TGFbeta(L-j+1) + TGFbeta(1-j)
-    end do
-    TGFbeta(-b:0) = TGFbeta(L-b:L)
-    TGFbeta(L+1:L+b+1) = TGFbeta(1:b+1)
   end subroutine init_cell_pool
 
   subroutine output_to_file(index)
@@ -89,7 +77,7 @@ contains
        do j = 1, H
           write(11, '(I5)', advance="no"), cmat(i,j)%type
        end do
-       write(11, '(F15.2)', advance="no"), TGFbeta(i)
+       write(11, '(I6)', advance="no"), TDC(i)
        write(11, *)
     end do
 !!$    do i = 1, L
@@ -107,8 +95,8 @@ contains
     use random
     implicit none
     integer, intent(in) :: i
-    integer j, k, m
-    real u, u1, p0
+    integer j, k, m, shift_i
+    real u, u1, p0, TGFbeta
     type(cell) new_cell
     call ran2(u)
     u = u*a(i)
@@ -128,7 +116,18 @@ contains
        u = u - v
        if ( u < 0 ) then
           if ( cmat(i,j)%type .eq. 1 ) then
-             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta(i))
+             TGFbeta = 0.0
+             do k = -b, b
+                shift_i = k + i
+                if ( shift_i .le. 0 ) then
+                   shift_i = shift_i + L
+                else if ( shift_i > L ) then
+                   shift_i = shift_i - L
+                end if
+                TGFbeta = TGFbeta + TDC(shift_i)*exp(-real(abs(k))/b)
+             end do
+             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+             !print *, 'p0', p0
              ! division
              do k=H, j+2, -1
                 cmat(i, k) = cmat(i, k-1)
@@ -156,7 +155,7 @@ contains
                 ! TAC -> 2TDC
                 cmat(i, j)%type = 3
                 cmat(i, j+1) = cmat(i,j)
-                TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) + 2.0*D_TGFbeta
+                TDC(i) = TDC(i) + 2
              end if
              npack(i) = npack(i) + 1
           else if ( cmat(i,j)%type .eq. 3 ) then
@@ -164,7 +163,7 @@ contains
              do k=j, H-1
                 cmat(i, k) = cmat(i, k+1)
              end do
-             TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
+             TDC(i) = TDC(i) - 1
              npack(i) = npack(i) - 1
           else
              ! do nothing
@@ -180,11 +179,10 @@ contains
           print *, 'error 4', j, u1
           read(*,*)
        end if
-       !print *, 'move right at height j', i, j
 
        if ( cmat(i, j)%type .eq. 1 ) then
           call ran2(u1)
-          if (u1 < 0.95) then
+          if (u1 < 0.98) then
              return
           end if
        end if
@@ -206,8 +204,8 @@ contains
        end if
        npack(m) = npack(m) + 1
        if (new_cell%type .eq. 3) then
-          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
-          TGFbeta(m-b:m+b) = TGFbeta(m-b:m+b) + D_TGFbeta
+          TDC(i) = TDC(i) - 1
+          TDC(m) = TDC(m) + 1
        end if
        return
     end if
@@ -243,13 +241,14 @@ contains
        end if
        npack(m) = npack(m) + 1
        if (new_cell%type .eq. 3) then
-          TGFbeta(i-b:i+b) = TGFbeta(i-b:i+b) - D_TGFbeta
-          TGFbeta(m-b:m+b) = TGFbeta(m-b:m+b) + D_TGFbeta
+          TDC(i) = TDC(i) - 1
+          TDC(m) = TDC(m) + 1
        end if
        return
     else
-!!$       print *, 'u', u
-!!$       print *, 'vl', vl
+       print *, 'u', u
+       print *, 'vl', vl
+       print *, 'a', a(i)
        write(*,*) 'error 2'
        read(*,*)
     end if
@@ -314,26 +313,26 @@ contains
        cmat(L+1, :) = cmat(1, :)
        npack(L) = npack(0)
        npack(L+1) = npack(1)
+       TDC(L) = TDC(0)
+       TDC(L+1) = TDC(1)
     end if
     if ( k .eq. 2 ) then
        cmat(L+1, :) = cmat(1, :)
        npack(L+1) = npack(1)
+       TDC(L+1) = TDC(1)
     end if
     if ( k .eq. L ) then
        cmat(1, :) = cmat(L+1, :)
        cmat(0, :) = cmat(L, :)
        npack(1) = npack(L+1)
        npack(0) = npack(L)
+       TDC(1) = TDC(L+1)
+       TDC(0) = TDC(L)
     end if
     if ( k .eq. L-1 ) then
        cmat(0, :) = cmat(L, :)
        npack(0) = npack(L)
-    end if
-    if ( k .le. 2*b+1+1 ) then
-       TGFbeta(L-b:L+b+1) = TGFbeta(-b:b+1)
-    end if
-    if ( k .ge. L - 2*b-1 ) then
-       TGFbeta(-b:b+1) = TGFbeta(L-b:L+b+1)
+       TDC(0) = TDC(L)
     end if
   end subroutine Perodic_BC
 
@@ -347,14 +346,28 @@ contains
     tau = huge(0.0)
     k = 0
     do i = 1, L
-       tau_temp = ( NP(i) - NT(i) ) / a(i)
-       if ( tau_temp < tau) then
-          tau = tau_temp
-          k = i
+       if ( a(i) > 0.0 ) then
+          tau_temp = ( NP(i) - NT(i) ) / a(i)
+          if ( tau_temp < tau) then
+             tau = tau_temp
+             k = i
+          end if
+       else
+!          print *, 'no reaction -------------- ', i, k, a(i)
+!          read(*,*)
        end if
     end do
+!    print *, 'k', k
+!    print *, 'a', a
     if ( k .le. 0 ) then
        write(*,*), 'error'
+       read(*,*)
+    end if
+    if ( tau .le. 0 ) then
+       write(*,*), 'error', 'tau', tau
+       print *, 'NP', NP
+       print *, 'NT', NT
+       print *, 'a', a
        read(*,*)
     end if
   end subroutine Next_Reaction
@@ -365,7 +378,7 @@ contains
     vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
     vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
     if (npack(i).eq.0) then
-       print *, vr, vl
+!       print *, vr, vl
     end if
     a(i) = vr + vl + npack(i)*v
   end subroutine Update_Rate

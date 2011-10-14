@@ -2,10 +2,9 @@ RM := rm -rf
 OUTPUT_FILE := run
 
 #FC = gfortran -fdefault-real-8
-FC = ifort -r8
+FC = ifort -openmp -r8
 OBJS += \
-../../lib/nrtype.o \
-../../lib/random.o \
+./par_zig_mod.o \
 ./setting.o \
 ./main.o
 

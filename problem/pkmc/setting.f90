@@ -2,7 +2,7 @@ module setting
   integer, parameter :: L = 2000
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
-  real, parameter :: tend = 1000.0
+  real, parameter :: tend = 100.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0
@@ -15,14 +15,11 @@ module setting
   real NT(1:L)
   real NP(1:L)
   integer npack(0:L+1)
-!  real TGFbeta(-b:L+b+1)
-  !real D_TGFbeta(1:1+2*b)
   integer TDC(0:L+1)
-  real vr, vl
 
 contains
   subroutine init_cell_pool()
-    use random
+    use par_zig_mod
     implicit none
     integer temp_num
     real u
@@ -54,7 +51,8 @@ contains
     NP = 0.0
     NT = 0.0
     do i = 1, L
-       call expdev(u)
+       call random_number(u)
+       u = -log(u)
        call Update_Rate(i)
        NP(i) = u
     end do
@@ -91,14 +89,15 @@ contains
     !    close(12)
   end subroutine output_to_file
 
-  subroutine cell_event(i)
-    use random
+  subroutine cell_event(i, kpar)
+    use par_zig_mod
     implicit none
-    integer, intent(in) :: i
+    integer, intent(in) :: i, kpar
     integer j, k, m, shift_i
     real u, u1, p0, TGFbeta
+    real vr, vl
     type(cell) new_cell
-    call ran2(u)
+    u = par_uni(kpar)
     u = u*a(i)
     if (npack(i).ne.0) then
        vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
@@ -132,7 +131,7 @@ contains
              do k=H, j+2, -1
                 cmat(i, k) = cmat(i, k-1)
              end do
-             call ran2(u1)
+             u1 = par_uni(kpar)
              if ( u1 < p0 ) then
                 ! SC -> 2SC
                 cmat(i,j+1) = cmat(i,j)
@@ -147,7 +146,7 @@ contains
              do k=H, j+2, -1
                 cmat(i, k) = cmat(i, k-1)
              end do
-             call ran2(u1)
+             u1 = par_uni(kpar)
              if ( u1 < p1 ) then
                 ! TAC -> 2TAC
                 cmat(i, j+1) = cmat(i,j)
@@ -173,7 +172,7 @@ contains
     end do
     u = u - vr
     if ( u < 0 ) then
-       call ran2(u1)
+       u1 = par_uni(kpar)
        j = ceiling(u1*npack(i))
        if (j < 1 .or. j>npack(i)) then
           print *, 'error 4', j, u1
@@ -181,7 +180,7 @@ contains
        end if
 
        if ( cmat(i, j)%type .eq. 1 ) then
-          call ran2(u1)
+          u1 = par_uni(kpar)
           if (u1 < 0.98) then
              return
           end if
@@ -211,7 +210,7 @@ contains
     end if
     u = u - vl
     if ( u < 0 ) then
-       call ran2(u1)
+       u1 = par_uni(kpar)
        j = ceiling(u1*npack(i))
        if (j < 1 .or. j>npack(i)) then
           print *, 'error 5', j, u1, npack(i)
@@ -219,7 +218,7 @@ contains
        end if
        !print *, 'move left at height j', i, j
        if ( cmat(i, j)%type .eq. 1 ) then
-          call ran2(u1)
+          u1 = par_uni(kpar)
           if (u1 < 0.98) then
              return
           end if
@@ -246,6 +245,9 @@ contains
        end if
        return
     else
+       print *, 'event at', i
+       print *, 'npack', npack(i-1:i+1)
+       print *, 'cell', cmat(i, 1:npack(i))%type
        print *, 'u', u
        print *, 'vl', vl
        print *, 'a', a(i)
@@ -255,7 +257,6 @@ contains
   end subroutine cell_event
 
   subroutine cell_restack(i)
-    use random
     implicit none
     integer, intent(in) :: i
     integer j
@@ -336,16 +337,17 @@ contains
     end if
   end subroutine Perodic_BC
 
-  subroutine Next_Reaction(k, tau)
+  subroutine Next_Reaction(k, tau, ilow, iup)
     implicit none
     integer, intent(out) :: k
+    integer, intent(in) :: ilow, iup
     real, intent(out) :: tau
     real tau_temp
     integer i
 
     tau = huge(0.0)
     k = 0
-    do i = 1, L
+    do i = ilow, iup
        if ( a(i) > 0.0 ) then
           tau_temp = ( NP(i) - NT(i) ) / a(i)
           if ( tau_temp < tau) then
@@ -365,9 +367,7 @@ contains
     end if
     if ( tau .le. 0 ) then
        write(*,*), 'error', 'tau', tau
-       print *, 'NP', NP
-       print *, 'NT', NT
-       print *, 'a', a
+       print *, 'NP-NT', NP - NT
        read(*,*)
     end if
   end subroutine Next_Reaction
@@ -375,6 +375,7 @@ contains
   subroutine Update_Rate(i)
     implicit none
     integer, intent(in) :: i
+    real vr, vl
     vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
     vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
     if (npack(i).eq.0) then

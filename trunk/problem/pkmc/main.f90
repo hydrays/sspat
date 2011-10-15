@@ -12,7 +12,7 @@ program main
   integer :: grainsize = 32
   integer, allocatable :: seed(:)
 
-  npar = 1
+  npar = 2
   allocate(seed(npar))
   do i = 1,npar
      call random_number(r)

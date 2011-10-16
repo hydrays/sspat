@@ -7,7 +7,7 @@ program main
   real t, tau, tp, tm, u, private_t
   integer output_index, i, j, active_index
   integer k, shift_i, iredblack
-  integer ilow, iup, nthread, npar, scanner
+  integer ilow, iup, nthread, npar
   real(4) r
   integer :: grainsize = 32
   integer, allocatable :: seed(:)
@@ -39,19 +39,14 @@ program main
         call output_to_file(output_index)
         call cell_stat(t)
         output_index = output_index + 1
-        tp = tp + 1.0
+        tp = tp + 2.0
      end if
-!private(ilow, iup, k, tau, nthread, i, shift_i, u, private_t) !
-!shared(a, L, NT, NP)
-
-!default(shared) private(ilow, iup, k, &
-!     tau, nthread, i, shift_i, u, private_t)
 
      t = t + 0.1
 
      do iredblack = 0, 1
      !$OMP PARALLEL default(private) &
-     shared(a, NT, NP, t, npack, TDC, cmat, iredblack, scanner, npar)
+     shared(a, NT, NP, t, npack, TDC, cmat, iredblack, npar)
      
      nthread = OMP_GET_THREAD_NUM()
      ilow = (nthread)*L/npar + iredblack*L/(2*npar) + 1
@@ -94,7 +89,6 @@ program main
      !$OMP barrier
   end do
 !  read(*,*)
-  scanner = scanner + 1
   end do
   close(unit=100)
 end program main

@@ -48,6 +48,10 @@ program main
      end do
 
      call expdev(u)
+     if ( u.eq.0 ) then
+        print *, 'exp value = 0'
+        read(*,*)
+     end if
      NP(k) = NP(k) + u
      t = t + tau
 

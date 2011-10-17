@@ -30,19 +30,16 @@ program main
   tm = 1000.0
   private_t = 0.0
   output_index = 0
-  scanner = 1
 
   CALL OMP_SET_NUM_THREADS(npar)
 
   do while (t < tend)
-     if (t > tp) then
+     if (t .ge. tp) then
         call output_to_file(output_index)
         call cell_stat(t)
         output_index = output_index + 1
         tp = tp + 2.0
      end if
-
-     t = t + 0.1
 
      do iredblack = 0, 1
      !$OMP PARALLEL default(private) &
@@ -52,7 +49,7 @@ program main
      ilow = (nthread)*L/npar + iredblack*L/(2*npar) + 1
      iup = ilow + L/(2*npar) - 1
      
-!     print *, nthread, ilow, iup
+     !print *, nthread, ilow, iup
      private_t = t
      !print *, nthread, private_t, t
      !read(*,*)
@@ -88,7 +85,8 @@ program main
      !$OMP END PARALLEL
      !$OMP barrier
   end do
-!  read(*,*)
+  !read(*,*)
+  t = t + 0.1
   end do
   close(unit=100)
 end program main

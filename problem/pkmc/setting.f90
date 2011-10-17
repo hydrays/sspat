@@ -5,7 +5,7 @@ module setting
   real, parameter :: tend = 200.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: D = 1.0
+  real, parameter :: stem_fix = 0.99
   type cell
      integer type
      real gene1
@@ -16,6 +16,8 @@ module setting
   real NP(1:L)
   integer npack(0:L+1)
   integer TDC(0:L+1)
+  integer SC(0:L+1)
+  integer TAC(0:L+1)
 
 contains
   subroutine init_cell_pool()
@@ -76,6 +78,8 @@ contains
           write(11, '(I5)', advance="no"), cmat(i,j)%type
        end do
        write(11, '(I6)', advance="no"), TDC(i)
+       write(11, '(I6)', advance="no"), TAC(i)
+       write(11, '(I6)', advance="no"), SC(i)
        write(11, *)
     end do
 !!$    do i = 1, L
@@ -181,7 +185,7 @@ contains
 
        if ( cmat(i, j)%type .eq. 1 ) then
           u1 = par_uni(kpar)
-          if (u1 < 0.98) then
+          if (u1 < stem_fix) then
              return
           end if
        end if
@@ -219,7 +223,7 @@ contains
        !print *, 'move left at height j', i, j
        if ( cmat(i, j)%type .eq. 1 ) then
           u1 = par_uni(kpar)
-          if (u1 < 0.98) then
+          if (u1 < stem_fix) then
              return
           end if
        end if
@@ -276,23 +280,34 @@ contains
     real, intent(in) :: t
     integer i, j, k
     integer num_sc, num_tac, num_tdc, num_mc
+    integer inum_sc, inum_tac, inum_tdc, inum_mc
 
     num_sc = 0
     num_tac = 0
     num_tdc = 0
     num_mc = 0
     do i = 1, L
+       inum_sc = 0
+       inum_tac = 0
+       inum_tdc = 0
+       inum_mc = 0
        do j = 1, H
           if (cmat(i,j)%type.eq.1) then
              num_sc = num_sc + 1
+             inum_sc = inum_sc + 1
           elseif (cmat(i,j)%type.eq.2) then
              num_tac = num_tac + 1
+             inum_tac = inum_tac + 1
           elseif (cmat(i,j)%type.eq.3) then
              num_tdc = num_tdc + 1
+             inum_tdc = inum_tdc + 1
           elseif (cmat(i,j)%type.eq.4) then
              num_mc = num_mc + 1
+             inum_mc = inum_mc + 1
           end if
        end do
+       SC(i) = inum_sc
+       TAC(i) = inum_tac
     end do
 
     write(*, '(5(F10.2))'), t, real(num_sc)/L, &

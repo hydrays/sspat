@@ -7,7 +7,7 @@ mycmap = [1     1    1
 colormap(mycmap)
 
 j = 1;
-for index =0:1:100
+for index =99:1:99
 clf
 s1 = ['0000000' num2str(index)];
 s = s1((length(s1)-4):length(s1));
@@ -17,7 +17,7 @@ gIN  = ['g' s2 '.dat'];
 popline = load(IN);
 %popgene = load(gIN);
 [L, D] = size(popline);
-D = D - 1;
+D = D - 3;
 i = index + 1
 hold on
 %box on;
@@ -29,7 +29,7 @@ axis equal
 shading flat
 %plot(popgene(:,1), 0.5*D*(popgene(:,2)-1),'-+')
 
-plot(1:L, 0.1*popline(1:L, D+1),'m', 'linewidth', lw)
+%plot(1:L, 0.1*popline(1:L, D+1),'m', 'linewidth', lw)
 % plot(1:L, 0.1*popline(1:L, D+2), 'g', 'linewidth', lw)
 % plot(1:L, popline(1:L, D+1), 'm', 'linewidth', lw)
 % s1 = ['0000000' num2str(index)];

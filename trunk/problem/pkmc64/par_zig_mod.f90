@@ -131,6 +131,20 @@ FUNCTION par_shr3(kpar) RESULT( ival )
 END FUNCTION par_shr3
 
 
+FUNCTION par_shr6(kpar) RESULT( ival )
+   INTEGER  ::  ival, kpar
+   integer :: jz, jsr
+
+   jsr = par_jsr(kpar*par_step)
+   jz = jsr
+   jsr = IEOR( jsr, ISHFT( jsr,  13) )
+   jsr = IEOR( jsr, ISHFT( jsr,  -7 ) )
+   jsr = IEOR( jsr, ISHFT( jsr,  17 ) )
+   par_jsr(kpar*par_step) = jsr
+   ival = jz + jsr
+   RETURN
+ END FUNCTION par_shr6
+
 
 !  Generate uniformly distributed random numbers, sequence kpar
 FUNCTION par_uni(kpar) RESULT( fn_val )
@@ -141,7 +155,9 @@ FUNCTION par_uni(kpar) RESULT( fn_val )
 		write(*,*) 'thread number exceeds initialized max: ',kpar,par_n-1
 		stop
 	endif
-   fn_val = half + 0.2328306e-9_DP * par_shr3(kpar)
+        !fn_val = half + 0.2328306e-9_DP * par_shr3(kpar)
+
+        fn_val = half + par_shr3(kpar)/real(real(2)*huge(1))
    RETURN
 END FUNCTION par_uni
 

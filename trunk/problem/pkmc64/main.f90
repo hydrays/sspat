@@ -7,12 +7,12 @@ program main
   real t, tau, tp, tm, u, private_t
   integer output_index, i, j, active_index
   integer k, shift_i, iredblack
-  integer ilow, iup, nthread, npar
+  integer ilow, iup, nthread, npar, scanner
   real(4) r
   integer :: grainsize = 32
   integer, allocatable :: seed(:)
 
-  npar = 2
+  npar = 8
   allocate(seed(npar))
   do i = 1,npar
      call random_number(r)
@@ -30,30 +30,34 @@ program main
   tm = 1000.0
   private_t = 0.0
   output_index = 0
+  scanner = 1
 
-  CALL OMP_SET_NUM_THREADS(npar)
+  call omp_set_num_threads(int(npar, 4))
 
   do while (t < tend)
      if (t .ge. tp) then
         call output_to_file(output_index)
         call cell_stat(t)
         output_index = output_index + 1
-        tp = tp + 2.0
+        tp = tp + 1.0
      end if
+     t = t + 0.01
 
      do iredblack = 0, 1
      !$OMP PARALLEL default(private) &
-     shared(a, NT, NP, t, npack, TDC, cmat, iredblack, npar)
+     shared(a, NT, NP, t, npack, TDC, cmat, iredblack, scanner, npar)
      
      nthread = OMP_GET_THREAD_NUM()
      ilow = (nthread)*L/npar + iredblack*L/(2*npar) + 1
      iup = ilow + L/(2*npar) - 1
      
+!     ilow = 1
+!     iup = L
      !print *, nthread, ilow, iup
      private_t = t
      !print *, nthread, private_t, t
      !read(*,*)
-     do while ( private_t < t + 0.1)
+     do while ( private_t < t + 0.01)
         call Next_Reaction(k, tau, ilow, iup)
         call cell_event(k, nthread)
         if ( (k .le. 2).or.(k .ge. L-1) ) then
@@ -86,7 +90,7 @@ program main
      !$OMP barrier
   end do
   !read(*,*)
-  t = t + 0.1
+  !scanner = scanner + 1
   end do
   close(unit=100)
 end program main

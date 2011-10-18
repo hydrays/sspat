@@ -2,7 +2,7 @@ module setting
   integer, parameter :: L = 2000
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
-  real, parameter :: tend = 100.0
+  real, parameter :: tend = 10000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0
@@ -16,6 +16,8 @@ module setting
   real NP(1:L)
   integer npack(0:L+1)
   integer TDC(0:L+1)
+  integer SC(0:L+1)
+  integer TAC(0:L+1)
 
 contains
   subroutine init_cell_pool()
@@ -30,7 +32,10 @@ contains
     cmat(1:L, 3:4)%type = 3
     cmat(0, :) = cmat(L, :)
     cmat(L+1, :) = cmat(1, :)
-
+    do i = 1, L
+       u = par_uni(0)
+       cmat(i, 1)%gene1 = u
+    end do
     npack = 0
     TDC = 0
     do i = 1, L
@@ -67,26 +72,28 @@ contains
     integer i, j
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
-    !    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
+    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
-    !    open (unit = 12, file=filename2, action="write")
+    open (unit = 12, file=filename2, action="write")
 
     do i = 1, L+1
        do j = 1, H
           write(11, '(I5)', advance="no"), cmat(i,j)%type
        end do
        write(11, '(I6)', advance="no"), TDC(i)
+       write(11, '(I6)', advance="no"), TAC(i)
+       write(11, '(I6)', advance="no"), SC(i)
        write(11, *)
     end do
-!!$    do i = 1, L
-!!$       do j = 1, H
-!!$          if (cmat(i,j)%type.eq.1) then
-!!$             write(12, '(I10, (F15.5))'), i, cmat(i,j)%gene1
-!!$          end if
-!!$       end do
-!!$    end do
+    do i = 1, L
+       do j = 1, H
+          if (cmat(i,j)%type.eq.1) then
+             write(12, '(I10, (F15.5))'), i, cmat(i,j)%gene1
+          end if
+       end do
+    end do
     close(11)
-    !    close(12)
+    close(12)
   end subroutine output_to_file
 
   subroutine cell_event(i, kpar)
@@ -181,7 +188,7 @@ contains
 
        if ( cmat(i, j)%type .eq. 1 ) then
           u1 = par_uni(kpar)
-          if (u1 < 0.98) then
+          if ( u1 < cmat(i,j)%gene1 ) then
              return
           end if
        end if
@@ -219,7 +226,7 @@ contains
        !print *, 'move left at height j', i, j
        if ( cmat(i, j)%type .eq. 1 ) then
           u1 = par_uni(kpar)
-          if (u1 < 0.98) then
+          if ( u1 < cmat(i,j)%gene1 ) then
              return
           end if
        end if
@@ -365,7 +372,7 @@ contains
        write(*,*), 'error'
        read(*,*)
     end if
-    if ( tau .le. 0 ) then
+    if ( tau < 0 ) then
        write(*,*), 'error', 'tau', tau
        print *, 'NP-NT', NP - NT
        read(*,*)

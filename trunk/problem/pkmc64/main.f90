@@ -9,7 +9,7 @@ program main
   integer k, shift_i, iredblack
   integer ilow, iup, nthread, npar, scanner
   real(4) r
-  integer :: grainsize = 32
+  integer :: grainsize = 64
   integer, allocatable :: seed(:)
 
   npar = 8
@@ -39,7 +39,7 @@ program main
         call output_to_file(output_index)
         call cell_stat(t)
         output_index = output_index + 1
-        tp = tp + 1.0
+        tp = tp + 5.0
      end if
      t = t + 0.01
 

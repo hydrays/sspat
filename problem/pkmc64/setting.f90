@@ -2,13 +2,15 @@ module setting
   integer, parameter :: L = 2000
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
-  real, parameter :: tend = 10000.0
+  real, parameter :: tend = 20000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0
   type cell
      integer type
      real gene1
+     real gene2
+     real gene3
   end type cell
   type(cell) cmat(0:L+1,H)
   real a(1:L)
@@ -30,12 +32,15 @@ contains
     cmat(1:L, 1)%type = 1
     cmat(1:L, 2:3)%type = 2
     cmat(1:L, 3:4)%type = 3
-    cmat(0, :) = cmat(L, :)
-    cmat(L+1, :) = cmat(1, :)
     do i = 1, L
        u = par_uni(0)
-       cmat(i, 1)%gene1 = u
+       cmat(i, 1)%gene1 = 0.5
+       cmat(i, 1)%gene2 = 0.2
+       cmat(i, 1)%gene3 = 0.01! + 0.01*(u-0.5)
     end do
+    cmat(0, :) = cmat(L, :)
+    cmat(L+1, :) = cmat(1, :)
+
     npack = 0
     TDC = 0
     do i = 1, L
@@ -88,7 +93,7 @@ contains
     do i = 1, L
        do j = 1, H
           if (cmat(i,j)%type.eq.1) then
-             write(12, '(I10, (F15.5))'), i, cmat(i,j)%gene1
+             write(12, '(I10, (F15.5))'), i, cmat(i,j)%gene3
           end if
        end do
     end do
@@ -132,7 +137,10 @@ contains
                 end if
                 TGFbeta = TGFbeta + TDC(shift_i)*exp(-real(abs(k))/b)
              end do
-             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+             p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
+                  / (1.0 + cmat(i,j)%gene3*TGFbeta)
+             !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+             
              !print *, 'p0', p0
              ! division
              do k=H, j+2, -1

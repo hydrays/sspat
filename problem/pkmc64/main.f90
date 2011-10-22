@@ -39,9 +39,18 @@ program main
         call output_to_file(output_index)
         call cell_stat(t)
         output_index = output_index + 1
-        tp = tp + 5.0
+        tp = tp + 10.0
      end if
      t = t + 0.01
+
+!!$     if (t .ge. tm) then
+!!$        do i = 900, 1100
+!!$           do j = 1, npack(i)
+!!$              cmat(i,j)%gene3 = 0.008
+!!$           end do
+!!$        end do
+!!$        tm = huge(1.0)
+!!$     end if
 
      do iredblack = 0, 1
      !$OMP PARALLEL default(private) &

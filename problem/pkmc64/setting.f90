@@ -1,16 +1,19 @@
 module setting
   integer, parameter :: L = 2000
   integer, parameter :: H = 200
-  real, parameter :: b = 8.0
-  real, parameter :: tend = 20000.0
+  real, parameter :: b = 4.0
+  real, parameter :: bd10 = 10.0/b
+  real, parameter :: tend = 1000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: D = 1.0
+  real, parameter :: D = 200.0
+  real, parameter :: mv = 0.0
   type cell
      integer type
      real gene1
      real gene2
      real gene3
+     real gene4
   end type cell
   type(cell) cmat(0:L+1,H)
   real a(1:L)
@@ -34,9 +37,10 @@ contains
     cmat(1:L, 3:4)%type = 3
     do i = 1, L
        u = par_uni(0)
-       cmat(i, 1)%gene1 = 0.5
+       cmat(i, 1)%gene1 = 0.96
        cmat(i, 1)%gene2 = 0.2
        cmat(i, 1)%gene3 = 0.01! + 0.01*(u-0.5)
+       cmat(i, 1)%gene4 = 10+2.0*(u-0.5)
     end do
     cmat(0, :) = cmat(L, :)
     cmat(L+1, :) = cmat(1, :)
@@ -93,7 +97,9 @@ contains
     do i = 1, L
        do j = 1, H
           if (cmat(i,j)%type.eq.1) then
-             write(12, '(I10, (F15.5))'), i, cmat(i,j)%gene3
+             write(12, '(I10, 4(F15.5))'), i, &
+                  cmat(i,j)%gene1, cmat(i,j)%gene2, &
+                  cmat(i,j)%gene3, cmat(i,j)%gene4
           end if
        end do
     end do
@@ -112,8 +118,8 @@ contains
     u = par_uni(kpar)
     u = u*a(i)
     if (npack(i).ne.0) then
-       vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
-       vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
+       vr = max(0.0, D*real(npack(i)-npack(i+1)))
+       vl = max(0.0, D*real(npack(i)-npack(i-1)))
     else
        vr = 0.0
        vl = 0.0
@@ -123,68 +129,7 @@ contains
 !!$    print *, 'a(i)', a(i)
 !!$    print *, 'npack(i)', npack(i-1:i+1)
 !!$    print *, 'vr, vl', vr, vl
-    do j = 1, npack(i)
-       u = u - v
-       if ( u < 0 ) then
-          if ( cmat(i,j)%type .eq. 1 ) then
-             TGFbeta = 0.0
-             do k = -b, b
-                shift_i = k + i
-                if ( shift_i .le. 0 ) then
-                   shift_i = shift_i + L
-                else if ( shift_i > L ) then
-                   shift_i = shift_i - L
-                end if
-                TGFbeta = TGFbeta + TDC(shift_i)*exp(-real(abs(k))/b)
-             end do
-             p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
-                  / (1.0 + cmat(i,j)%gene3*TGFbeta)
-             !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
-             
-             !print *, 'p0', p0
-             ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
-             end do
-             u1 = par_uni(kpar)
-             if ( u1 < p0 ) then
-                ! SC -> 2SC
-                cmat(i,j+1) = cmat(i,j)
-             else
-                ! SC -> 2TAC
-                cmat(i,j)%type = 2
-                cmat(i,j+1) = cmat(i,j) 
-             end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 2 ) then
-             ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
-             end do
-             u1 = par_uni(kpar)
-             if ( u1 < p1 ) then
-                ! TAC -> 2TAC
-                cmat(i, j+1) = cmat(i,j)
-             else
-                ! TAC -> 2TDC
-                cmat(i, j)%type = 3
-                cmat(i, j+1) = cmat(i,j)
-                TDC(i) = TDC(i) + 2
-             end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 3 ) then
-             ! death
-             do k=j, H-1
-                cmat(i, k) = cmat(i, k+1)
-             end do
-             TDC(i) = TDC(i) - 1
-             npack(i) = npack(i) - 1
-          else
-             ! do nothing
-          end if
-          return
-       end if
-    end do
+
     u = u - vr
     if ( u < 0 ) then
        u1 = par_uni(kpar)
@@ -259,16 +204,103 @@ contains
           TDC(m) = TDC(m) + 1
        end if
        return
-    else
-       print *, 'event at', i
-       print *, 'npack', npack(i-1:i+1)
-       print *, 'cell', cmat(i, 1:npack(i))%type
-       print *, 'u', u
-       print *, 'vl', vl
-       print *, 'a', a(i)
-       write(*,*) 'error 2'
-       read(*,*)
     end if
+    do j = 1, npack(i)
+       u = u - v
+       if ( u < 0 ) then
+          if ( cmat(i,j)%type .eq. 1 ) then
+             TGFbeta = 0.0
+             do k = -b, b
+                shift_i = k + i
+                if ( shift_i .le. 0 ) then
+                   shift_i = shift_i + L
+                else if ( shift_i > L ) then
+                   shift_i = shift_i - L
+                end if
+                TGFbeta = TGFbeta + bd10*TDC(shift_i)*exp(-real(abs(k))/b)
+             end do
+             p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
+                  / (1.0 + cmat(i,j)%gene3*TGFbeta)
+             !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+
+             !print *, 'p0', p0
+             ! division
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             u1 = par_uni(kpar)
+             if ( u1 < p0 ) then
+                ! SC -> 2SC
+                cmat(i,j+1) = cmat(i,j)
+             else
+                ! SC -> 2TAC
+                cmat(i,j)%type = 2
+                cmat(i,j+1) = cmat(i,j) 
+             end if
+             npack(i) = npack(i) + 1
+          else if ( cmat(i,j)%type .eq. 2 ) then
+             ! division
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             u1 = par_uni(kpar)
+             if ( u1 < p1 ) then
+                ! TAC -> 2TAC
+                cmat(i, j+1) = cmat(i,j)
+             else
+                ! TAC -> 2TDC
+                cmat(i, j)%type = 3
+                cmat(i, j+1) = cmat(i,j)
+                TDC(i) = TDC(i) + 2
+             end if
+             npack(i) = npack(i) + 1
+          else if ( cmat(i,j)%type .eq. 3 ) then
+             ! death
+             do k=j, H-1
+                cmat(i, k) = cmat(i, k+1)
+             end do
+             TDC(i) = TDC(i) - 1
+             npack(i) = npack(i) - 1
+          else
+             ! do nothing
+          end if
+          return
+       end if
+    end do
+    if ( mv .ne. 0.0 ) then
+       do j = 1, npack(i)
+          u = u - mv
+          if ( u < 0 ) then
+             if ( cmat(i,j)%type .eq. 1 ) then
+                ! mutation
+                u1 = par_uni(kpar)
+                cmat(i,j)%gene1 = cmat(i,j)%gene1 + (u1-0.5)*0.1
+                if ( cmat(i,j)%gene1 > 0.995) then
+                   cmat(i,j)%gene1 = 0.995
+                else if ( cmat(i,j)%gene1 < 0.0) then
+                   cmat(i,j)%gene1 = 0.0
+                end if
+!!$                u1 = par_uni(kpar)
+!!$                cmat(i,j)%gene2 = cmat(i,j)%gene2 + (u1-0.5)*0.01
+!!$                if ( cmat(i,j)%gene2 > 0.5) then
+!!$                   cmat(i,j)%gene2 = 1.0
+!!$                else if ( cmat(i,j)%gene2 < 0.0) then
+!!$                   cmat(i,j)%gene2 = 0.0
+!!$                end if
+!!$                u1 = par_uni(kpar)
+!!$                cmat(i,j)%gene3 = cmat(i,j)%gene3 + (u1-0.5)*0.0001
+!!$                if ( cmat(i,j)%gene2 > 0.5) then
+!!$                   cmat(i,j)%gene2 = 1.0
+!!$                else if ( cmat(i,j)%gene2 < 0.0) then
+!!$                   cmat(i,j)%gene2 = 0.0
+!!$                end if
+             end if
+             return
+          end if
+       end do
+    end if
+    print *, "not suppose to be here!"
+    stop
   end subroutine cell_event
 
   subroutine cell_restack(i)
@@ -370,12 +402,12 @@ contains
              k = i
           end if
        else
-!          print *, 'no reaction -------------- ', i, k, a(i)
-!          read(*,*)
+          !          print *, 'no reaction -------------- ', i, k, a(i)
+          !          read(*,*)
        end if
     end do
-!    print *, 'k', k
-!    print *, 'a', a
+    !    print *, 'k', k
+    !    print *, 'a', a
     if ( k .le. 0 ) then
        write(*,*), 'error'
        read(*,*)
@@ -391,12 +423,12 @@ contains
     implicit none
     integer, intent(in) :: i
     real vr, vl
-    vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
-    vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
+    vr = max(0.0, D*real(npack(i)-npack(i+1)))
+    vl = max(0.0, D*real(npack(i)-npack(i-1)))
     if (npack(i).eq.0) then
-!       print *, vr, vl
+       !       print *, vr, vl
     end if
-    a(i) = vr + vl + npack(i)*v
+    a(i) = vr + vl + npack(i)*(v+mv)
   end subroutine Update_Rate
 
 end module setting

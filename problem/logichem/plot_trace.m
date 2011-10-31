@@ -1,3 +1,20 @@
+% ===========
+% test
+% ===========
+load tr
+tr = tr;
+plot(tr(:,1), tr(:,2), 'k')
+xlim([0, 1600])
+hold on
+plot(tr(:,1), tr(:,3), 'k')
+plot(tr(:,1), tr(:,4), 'k')
+plot(tr(:,1), tr(:,5), 'k')
+plot(tr(:,1), tr(:,8), 'b')
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC', 'MC', 'Total')
+print('-depsc','asym.eps')
+
 % % ===========
 % % script for 1 feedback
 % % ===========
@@ -271,19 +288,19 @@
 % legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % print('-depsc','asym.eps')
 
-% ===========
-% script pm
-% ===========
-load paperresult_2f_pm
-load paperresult_3f_pm
-datapm1 = paperresult_2f_pm;
-datapm2 = paperresult_3f_pm;
-h = plot(datapm1(:,1), (datapm1(:,5)+datapm1(:,6))./datapm1(:,7), '-r*','markersize', 10, 'linewidth', 1.1)
-hold on
-plot(datapm2(:,1), (datapm2(:,5)+datapm2(:,6))./datapm2(:,7), '-o','markersize', 10, 'linewidth', 1.1)
-xlabel('p_m','fontsize', 18);
-ylabel('ratio of mutant type','fontsize',18)
-ylim([0,1]);
-legend('feedback scheme II', 'feedback scheme III', 2)
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_pm.eps')
+% % ===========
+% % script pm
+% % ===========
+% load paperresult_2f_pm
+% load paperresult_3f_pm
+% datapm1 = paperresult_2f_pm;
+% datapm2 = paperresult_3f_pm;
+% h = plot(datapm1(:,1), (datapm1(:,5)+datapm1(:,6))./datapm1(:,7), '-r*','markersize', 10, 'linewidth', 1.1)
+% hold on
+% plot(datapm2(:,1), (datapm2(:,5)+datapm2(:,6))./datapm2(:,7), '-o','markersize', 10, 'linewidth', 1.1)
+% xlabel('p_m','fontsize', 18);
+% ylabel('ratio of mutant type','fontsize',18)
+% ylim([0,1]);
+% legend('feedback scheme II', 'feedback scheme III', 2)
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_pm.eps')

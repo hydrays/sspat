@@ -14,8 +14,8 @@ program ssa
   real(kind=8) xbar(NSpec), tbar
 
   call ran_seed(sequence=1234)
-  te = 1000.0
-  do pm = 0.0, 1.0, 0.01
+  te = 20000.0
+  do pm = 1.0, 1.0, 0.01
      xbar = 0.0
      do index = 1.0, NSample
         x = xinit
@@ -46,12 +46,12 @@ program ssa
            end if
         if(t > td) then
            if (x(4).eq.0) x(4) = 10
-           td =  td + 200000.0
+           td =  td + 300.0
         end if
-!!$        if(t > tp) then
-!!$           write (*, '(F10.2, 7F10.2, 4E10.2)'), t, x!, p0, sum(x), ap, v0, symp
-!!$           tp =  tp + 1.0
-!!$        end if
+        if(t > tp) then
+           write (*, '(F10.2, 10F8.2)'), t, x, p0, q1, q2!, q3
+           tp =  tp + 1.0
+        end if
         end do
         xbar = xbar + x
         !if (x(5).ne.0) then 
@@ -60,7 +60,7 @@ program ssa
         !end if
      end do
      xbar = xbar / NSample
-     write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
+     !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
   end do
 end program ssa
 

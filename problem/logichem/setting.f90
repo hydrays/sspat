@@ -31,7 +31,7 @@ module chem_data
   integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
-  real(kind=8) ap, p0, p1, v0, q1, q2, q3
+  real(kind=8) ap, p0, p1, v0, q1, q2, q3, v0m
   real(kind=8) k1, k2, k3
   real(kind=8), parameter :: L = 500
   real(kind=8), parameter :: mu = 0.00001
@@ -81,11 +81,15 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8), intent(in) :: pm
-    k1 = 0.9
+    !v0m = 3.0
+    k1 = 0.6
     k2 = 4.0
+    !k2 = 4.0*v0m - 1.0
+    k3 = 3.0
     p1 = 0.4
     p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
-    v0 = 2.5/(1.0 + k2*(x(3)+x(5))/L)
+    v0 = 2.5/(1.0 + k2*x(3)/L)
+    !v0 = v0m/(1.0 + k2*(x(3)+x(5))/L)
 
 !!$    !scheme I
 !!$    if ( p0 .le. 0.5 ) then
@@ -96,10 +100,36 @@ contains
 !!$    q1 = p0 - q2*0.5
 !!$
 !!$    ! scheme II
-    q2 = 0.0
-    q1 = p0 - q2*0.5
+!!$    q2 = 0.0
+!!$    q1 = p0 - q2*0.5
+!!$
+!!$    q3 = 1.0 - q1 - q2
 
+!!$! scheme III
+!!$    q1 = (1.0/(1.0+(3.0*x(3)/L)**2))*(1.0/(1.01+0.6*(x(3)+x(5))/L))
+!!$    q2 = 1.0-1.0/(1.0 + (3.0*x(3)/L)**2)
+!!$    q3 = 1.0 - q1 - q2
+
+! scheme IV
+    q1 = 1.0/(1.01 + (3.0*x(3)/L)**1)
+    q2 = 1.0 - 1.0/(1.0 + (1.0*x(3)/L)**1)
     q3 = 1.0 - q1 - q2
+
+!!$! scheme V
+!!$    q1 = 1.0/(1.01 + (3.6*x(3)/L)**1.7) + 0.5*(1.0 - 1.0/(1.0 + (2.5*x(3)/L)**2))
+!!$    q2 = 0.0
+!!$    q3 = 1.0 - q1 - q2
+
+! scheme VI
+    p0 = 1.0/(1.01 + (3.6*x(3)/L)**1.7) + 0.5*(1.0 - 1.0/(1.0 + (2.5*x(3)/L)**2))
+    if ( p0 .le. 0.5 ) then
+       q2 = 2.0*p0
+    else
+       q2 = -2.0*(p0 - 1.0)
+    end if
+    q1 = p0 - q2*0.5
+    q3 = 1.0 - q1 - q2
+
     if (sum(x) > L) then
        ap = 0.04*(sum(x) - L)
     else

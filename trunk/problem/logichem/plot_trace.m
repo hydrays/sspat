@@ -1,15 +1,17 @@
 % ===========
 % test
 % ===========
-load tr
-tr = tr;
-plot(tr(:,1), tr(:,2), 'k')
-xlim([0, 1600])
+load tr5
+clf;
+tr = tr5;
+plot(tr(:,1), tr(:,2)/500, 'r')
+xlim([150, 350])
 hold on
-plot(tr(:,1), tr(:,3), 'k')
-plot(tr(:,1), tr(:,4), 'k')
-plot(tr(:,1), tr(:,5), 'k')
-plot(tr(:,1), tr(:,8), 'b')
+plot(tr(:,1), tr(:,3)/500, 'b')
+plot(tr(:,1), tr(:,4)/500, 'g')
+plot(tr(:,1), tr(:,5)/500, 'k')
+figure
+plot(tr(:,1), tr(:,7), 'b')
 xlabel('t','fontsize', 18);
 ylabel('cell population','fontsize',18)
 legend('SC', 'TAC', 'TDC', 'MC', 'Total')

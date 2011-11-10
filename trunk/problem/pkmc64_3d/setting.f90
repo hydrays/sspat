@@ -1,12 +1,13 @@
 module setting
-  integer, parameter :: L = 2000
-  integer, parameter :: H = 200
+  integer, parameter :: Lbox = 100
+  integer, parameter :: Lbox2 = Lbox*Lbox
+  integer, parameter :: H = 100
   real, parameter :: b = 4.0
   real, parameter :: bd10 = 10.0/b
   real, parameter :: tend = 1000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: D = 200.0
+  real, parameter :: D = 50.0
   real, parameter :: mv = 0.0
   type cell
      integer type
@@ -15,14 +16,15 @@ module setting
      real gene3
      real gene4
   end type cell
-  type(cell) cmat(0:L+1,H)
-  real a(1:L)
-  real NT(1:L)
-  real NP(1:L)
-  integer npack(0:L+1)
-  integer TDC(0:L+1)
-  integer SC(0:L+1)
-  integer TAC(0:L+1)
+  type(cell) cmat(0:Lbox+1,0:Lbox+1,H)
+  real a(1:Lbox,1:Lbox)
+  real NT(1:Lbox,1:Lbox)
+  real NP(1:Lbox,1:Lbox)
+  integer npack(0:Lbox+1,0:Lbox+1)
+  integer TDC(0:Lbox+1,0:Lbox+1)
+  integer SC(0:Lbox+1,0:Lbox+1)
+  integer TAC(0:Lbox+1,0:Lbox+1)
+  real v_diff(1:Lbox, 1:Lbox, 4)
 
 contains
   subroutine init_cell_pool()
@@ -30,45 +32,57 @@ contains
     implicit none
     integer temp_num
     real u
-    integer i, j
+    integer i, j, k
 
-    cmat(1:L, 1)%type = 1
-    cmat(1:L, 2:3)%type = 2
-    cmat(1:L, 3:4)%type = 3
-    do i = 1, L
-       u = par_uni(0)
-       cmat(i, 1)%gene1 = 0.96
-       cmat(i, 1)%gene2 = 0.2
-       cmat(i, 1)%gene3 = 0.01! + 0.01*(u-0.5)
-       cmat(i, 1)%gene4 = 10+2.0*(u-0.5)
+    cmat(1:Lbox, 1:Lbox, 1)%type = 1
+    cmat(1:Lbox, 1:Lbox, 2:3)%type = 2
+    cmat(1:Lbox, 1:Lbox, 3:4)%type = 3
+    do i = 1, Lbox
+       do j = 1, Lbox
+          !u = par_uni(0)
+          cmat(i,j, 1)%gene1 = 0.96
+          cmat(i,j, 1)%gene2 = 0.2
+          cmat(i,j, 1)%gene3 = 0.01! + 0.01*(u-0.5)
+          cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
+       end do
     end do
-    cmat(0, :) = cmat(L, :)
-    cmat(L+1, :) = cmat(1, :)
+    cmat(0,1:Lbox,:) = cmat(Lbox,1:Lbox,:)
+    cmat(Lbox+1,1:Lbox,:) = cmat(1,1:Lbox,:)
+    cmat(1:Lbox,0,:) = cmat(1:Lbox,Lbox,:)
+    cmat(1:Lbox,Lbox+1,:) = cmat(1:Lbox,1,:)
 
     npack = 0
     TDC = 0
-    do i = 1, L
-       do j = 1, H
-          if ( cmat(i,j)%type .ne. 0 ) then
-             npack(i) = npack(i) + 1
-          end if
-          if ( cmat(i,j)%type .eq. 3 ) then
-             TDC(i) = TDC(i) + 1
-          end if
+    do i = 1, Lbox
+       do j = 1, Lbox
+          do k = 1, H
+             if ( cmat(i,j,k)%type .ne. 0 ) then
+                npack(i,j) = npack(i,j) + 1
+             end if
+             if ( cmat(i,j,k)%type .eq. 3 ) then
+                TDC(i,j) = TDC(i,j) + 1
+             end if
+          end do
        end do
     end do
-    npack(0) = npack(L)
-    npack(L+1) = npack(1)
-    TDC(0) = TDC(L)
-    TDC(L+1) = TDC(1)
+    npack(0,1:Lbox) = npack(Lbox,1:Lbox)
+    npack(Lbox+1,1:Lbox) = npack(1,1:Lbox)
+    npack(1:Lbox,0) = npack(1:Lbox,Lbox)
+    npack(1:Lbox,Lbox+1) = npack(1:Lbox,1)
+    TDC(0,1:Lbox) = TDC(Lbox,1:Lbox)
+    TDC(Lbox+1,1:Lbox) = TDC(1,1:Lbox)
+    TDC(1:Lbox,0) = TDC(1:Lbox,Lbox)
+    TDC(1:Lbox,Lbox+1) = TDC(1:Lbox,1)
 
     NP = 0.0
     NT = 0.0
-    do i = 1, L
-       call random_number(u)
-       u = -log(u)
-       call Update_Rate(i)
-       NP(i) = u
+    do i = 1, Lbox
+       do j = 1, Lbox
+          call random_number(u)
+          u = -log(u)
+          call Update_Rate(i,j)
+          NP(i,j) = u
+       end do
     end do
 
   end subroutine init_cell_pool
@@ -78,189 +92,180 @@ contains
 
     integer, intent(in) :: index
     character(30) filename, filename2
-    integer i, j
+    integer i, j, k
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
     WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
     open (unit = 12, file=filename2, action="write")
 
-    do i = 1, L+1
-       do j = 1, H
-          write(11, '(I5)', advance="no"), cmat(i,j)%type
+    do i = 1, Lbox+1
+       do j = 1, Lbox+1
+          do k = 1, H
+             write(11, '(I5)', advance="no"), cmat(i,j,k)%type
+          end do
+          write(11, '(I6)', advance="no"), TDC(i,j)
+          write(11, '(I6)', advance="no"), TAC(i,j)
+          write(11, '(I6)', advance="no"), SC(i,j)
+          write(11, '(I6)', advance="no"), npack(i,j)
+          write(11, *)
        end do
-       write(11, '(I6)', advance="no"), TDC(i)
-       write(11, '(I6)', advance="no"), TAC(i)
-       write(11, '(I6)', advance="no"), SC(i)
-       write(11, *)
     end do
-    do i = 1, L
-       do j = 1, H
-          if (cmat(i,j)%type.eq.1) then
-             write(12, '(I10, 4(F15.5))'), i, &
-                  cmat(i,j)%gene1, cmat(i,j)%gene2, &
-                  cmat(i,j)%gene3, cmat(i,j)%gene4
-          end if
+    do i = 1, Lbox
+       do j = 1, Lbox
+          do k = 1, H
+             if (cmat(i,j,k)%type.eq.1) then
+                write(12, '(I10, 4(F15.5))'), i, j, &
+                     cmat(i,j,k)%gene1, cmat(i,j,k)%gene2, &
+                     cmat(i,j,k)%gene3, cmat(i,j,k)%gene4
+             end if
+          end do
        end do
     end do
     close(11)
     close(12)
   end subroutine output_to_file
 
-  subroutine cell_event(i, kpar)
+  subroutine cell_event(i, j, kpar)
     use par_zig_mod
     implicit none
-    integer, intent(in) :: i, kpar
-    integer j, k, m, shift_i
+    integer, intent(in) :: i, j, kpar
+    integer l, k, k2, mi, mj,  shift_i, shift_j
     real u, u1, p0, TGFbeta
-    real vr, vl
     type(cell) new_cell
     u = par_uni(kpar)
-    u = u*a(i)
-    if (npack(i).ne.0) then
-       vr = max(0.0, D*real(npack(i)-npack(i+1)))
-       vl = max(0.0, D*real(npack(i)-npack(i-1)))
-    else
-       vr = 0.0
-       vl = 0.0
-    end if
+    u = u*a(i, j)
 !!$    print *, 'event happen at ', i
 !!$    print *, 'u', u
 !!$    print *, 'a(i)', a(i)
 !!$    print *, 'npack(i)', npack(i-1:i+1)
 !!$    print *, 'vr, vl', vr, vl
 
-    u = u - vr
+    u = u - v_diff(i, j, 1)
+    if ( u < 0 ) then
+       mi = i+1
+       mj = j
+    else
+       u = u - v_diff(i, j, 2)
+       if ( u < 0 ) then
+          mi = i-1
+          mj = j
+       else
+          u = u - v_diff(i, j, 3)
+          if ( u < 0 ) then
+             mi = i
+             mj = j+1
+          else
+             u = u - v_diff(i, j, 4)
+             if ( u < 0 ) then
+                mi = i
+                mj = j-1
+             end if
+          end if
+       end if
+    end if
     if ( u < 0 ) then
        u1 = par_uni(kpar)
-       j = ceiling(u1*npack(i))
-       if (j < 1 .or. j>npack(i)) then
-          print *, 'error 4', j, u1
+       l = ceiling(u1*npack(i, j))
+       if (l < 1 .or. l>npack(i,j)) then
+          print *, 'error 4', l, u1
           read(*,*)
        end if
 
-       if ( cmat(i, j)%type .eq. 1 ) then
+       if ( cmat(i,j,l)%type .eq. 1 ) then
           u1 = par_uni(kpar)
-          if ( u1 < cmat(i,j)%gene1 ) then
+          if ( u1 < cmat(i,j,l)%gene1 ) then
              return
           end if
        end if
 
-       new_cell = cmat(i, j)
-       do k=j, H-1
-          cmat(i, k) = cmat(i, k+1)
+       new_cell = cmat(i, j, l)
+       do k=l, H-1
+          cmat(i,j,k) = cmat(i,j,k+1)
        end do
-       npack(i) = npack(i) - 1
+       npack(i,j) = npack(i,j) - 1
 
-       m = i + 1
-       if ( cmat(m, j)%type .eq. 0 ) then
-          cmat(m, npack(m)+1) = new_cell
+       if ( cmat(mi,mj,l)%type .eq. 0 ) then
+          cmat(mi,mj,npack(mi,mj)+1) = new_cell
        else
-          do k=npack(m)+1, j+1, -1
-             cmat(m, k) = cmat(m, k-1)
+          do k=npack(mi,mj)+1, l+1, -1
+             cmat(mi,mj,k) = cmat(mi,mj,k-1)
           end do
-          cmat(m, j) = new_cell
+          cmat(mi,mj,l) = new_cell
        end if
-       npack(m) = npack(m) + 1
+       npack(mi,mj) = npack(mi,mj) + 1
        if (new_cell%type .eq. 3) then
-          TDC(i) = TDC(i) - 1
-          TDC(m) = TDC(m) + 1
+          TDC(i,j) = TDC(i,j) - 1
+          TDC(mi,mj) = TDC(mi,mj) + 1
        end if
        return
     end if
-    u = u - vl
-    if ( u < 0 ) then
-       u1 = par_uni(kpar)
-       j = ceiling(u1*npack(i))
-       if (j < 1 .or. j>npack(i)) then
-          print *, 'error 5', j, u1, npack(i)
-          read(*,*)
-       end if
-       !print *, 'move left at height j', i, j
-       if ( cmat(i, j)%type .eq. 1 ) then
-          u1 = par_uni(kpar)
-          if ( u1 < cmat(i,j)%gene1 ) then
-             return
-          end if
-       end if
-       new_cell = cmat(i, j)
-       do k=j, H-1
-          cmat(i, k) = cmat(i, k+1)
-       end do
-       npack(i) = npack(i) - 1
 
-       m = i - 1
-       if ( cmat(m, j)%type .eq. 0 ) then
-          cmat(m, npack(m)+1) = new_cell
-       else
-          do k=npack(m)+1, j+1, -1
-             cmat(m, k) = cmat(m, k-1)
-          end do
-          cmat(m, j) = new_cell
-       end if
-       npack(m) = npack(m) + 1
-       if (new_cell%type .eq. 3) then
-          TDC(i) = TDC(i) - 1
-          TDC(m) = TDC(m) + 1
-       end if
-       return
-    end if
-    do j = 1, npack(i)
+    do l = 1, npack(i,j)
        u = u - v
        if ( u < 0 ) then
-          if ( cmat(i,j)%type .eq. 1 ) then
+          if ( cmat(i,j,l)%type .eq. 1 ) then
              TGFbeta = 0.0
              do k = -b, b
-                shift_i = k + i
-                if ( shift_i .le. 0 ) then
-                   shift_i = shift_i + L
-                else if ( shift_i > L ) then
-                   shift_i = shift_i - L
-                end if
-                TGFbeta = TGFbeta + bd10*TDC(shift_i)*exp(-real(abs(k))/b)
+                do k2 = -b, b
+                   shift_i = k + i
+                   shift_j = k + j
+                   if ( shift_i .le. 0 ) then
+                      shift_i = shift_i + Lbox
+                   else if ( shift_i > Lbox ) then
+                      shift_i = shift_i - Lbox
+                   end if
+                   if ( shift_j .le. 0 ) then
+                      shift_j = shift_j + Lbox
+                   else if ( shift_j > Lbox ) then
+                      shift_j = shift_j - Lbox
+                   end if
+                   TGFbeta = TGFbeta + bd10*TDC(shift_i,shift_j)*&
+                        exp(- sqrt( (real(abs(k))/b)**2 + (real(abs(k2))/b)**2 ) )
+                end do
              end do
-             p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
-                  / (1.0 + cmat(i,j)%gene3*TGFbeta)
-             !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+             !p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
+             !     / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
+             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
 
              !print *, 'p0', p0
              ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
+             do k=H, l+2, -1
+                cmat(i,j,k) = cmat(i,j,k-1)
              end do
              u1 = par_uni(kpar)
              if ( u1 < p0 ) then
                 ! SC -> 2SC
-                cmat(i,j+1) = cmat(i,j)
+                cmat(i,j,l+1) = cmat(i,j,l)
              else
                 ! SC -> 2TAC
-                cmat(i,j)%type = 2
-                cmat(i,j+1) = cmat(i,j) 
+                cmat(i,j,l)%type = 2
+                cmat(i,j,l+1) = cmat(i,j,l) 
              end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 2 ) then
+             npack(i,j) = npack(i,j) + 1
+          else if ( cmat(i,j,l)%type .eq. 2 ) then
              ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
+             do k=H, l+2, -1
+                cmat(i,j,k) = cmat(i,j,k-1)
              end do
              u1 = par_uni(kpar)
              if ( u1 < p1 ) then
                 ! TAC -> 2TAC
-                cmat(i, j+1) = cmat(i,j)
+                cmat(i,j,l+1) = cmat(i,j,l)
              else
                 ! TAC -> 2TDC
-                cmat(i, j)%type = 3
-                cmat(i, j+1) = cmat(i,j)
-                TDC(i) = TDC(i) + 2
+                cmat(i,j,l)%type = 3
+                cmat(i,j,l+1) = cmat(i,j,l)
+                TDC(i,j) = TDC(i,j) + 2
              end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 3 ) then
+             npack(i,j) = npack(i,j) + 1
+          else if ( cmat(i,j,l)%type .eq. 3 ) then
              ! death
-             do k=j, H-1
-                cmat(i, k) = cmat(i, k+1)
+             do k=l, H-1
+                cmat(i,j,k) = cmat(i,j,k+1)
              end do
-             TDC(i) = TDC(i) - 1
-             npack(i) = npack(i) - 1
+             TDC(i,j) = TDC(i,j) - 1
+             npack(i,j) = npack(i,j) - 1
           else
              ! do nothing
           end if
@@ -268,17 +273,17 @@ contains
        end if
     end do
     if ( mv .ne. 0.0 ) then
-       do j = 1, npack(i)
+       do l = 1, npack(i,j)
           u = u - mv
           if ( u < 0 ) then
-             if ( cmat(i,j)%type .eq. 1 ) then
+             if ( cmat(i,j,l)%type .eq. 1 ) then
                 ! mutation
                 u1 = par_uni(kpar)
-                cmat(i,j)%gene1 = cmat(i,j)%gene1 + (u1-0.5)*0.1
-                if ( cmat(i,j)%gene1 > 0.995) then
-                   cmat(i,j)%gene1 = 0.995
-                else if ( cmat(i,j)%gene1 < 0.0) then
-                   cmat(i,j)%gene1 = 0.0
+                cmat(i,j,l)%gene1 = cmat(i,j,l)%gene1 + (u1-0.5)*0.1
+                if ( cmat(i,j,l)%gene1 > 0.995) then
+                   cmat(i,j,l)%gene1 = 0.995
+                else if ( cmat(i,j,l)%gene1 < 0.0) then
+                   cmat(i,j,l)%gene1 = 0.0
                 end if
 !!$                u1 = par_uni(kpar)
 !!$                cmat(i,j)%gene2 = cmat(i,j)%gene2 + (u1-0.5)*0.01
@@ -303,112 +308,121 @@ contains
     stop
   end subroutine cell_event
 
-  subroutine cell_restack(i)
-    implicit none
-    integer, intent(in) :: i
-    integer j
-    type(cell) temp
-    do j = npack(i), 2, -1
-       if ( cmat(i,j)%type .eq. 1 ) then
-          temp = cmat(i,j-1)
-          cmat(i,j-1) = cmat(i,j)
-          cmat(i,j) = temp
-       end if
-    end do
-  end subroutine cell_restack
-
   subroutine cell_stat(t)
     implicit none
 
     real, intent(in) :: t
     integer i, j, k
-    integer num_sc, num_tac, num_tdc, num_mc
 
-    num_sc = 0
-    num_tac = 0
-    num_tdc = 0
-    num_mc = 0
-    do i = 1, L
-       do j = 1, H
-          if (cmat(i,j)%type.eq.1) then
-             num_sc = num_sc + 1
-          elseif (cmat(i,j)%type.eq.2) then
-             num_tac = num_tac + 1
-          elseif (cmat(i,j)%type.eq.3) then
-             num_tdc = num_tdc + 1
-          elseif (cmat(i,j)%type.eq.4) then
-             num_mc = num_mc + 1
-          end if
+    SC = 0
+    TAC = 0
+    do i = 1, Lbox
+       do j = 1, Lbox
+          do k = 1, H
+             if (cmat(i,j,k)%type.eq.1) then
+                SC(i,j) = SC(i,j) + 1
+             elseif (cmat(i,j,k)%type.eq.2) then
+                TAC(i,j) = TAC(i,j) + 1
+             end if
+          end do
        end do
     end do
 
-    write(*, '(5(F10.2))'), t, real(num_sc)/L, &
-         real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
-!!$  do i = -b, L+1+b
-!!$     write(*, '(F8.2)', advance="no"), TGFbeta(i)
-!!$  end do
-!!$  write(*, *)
-    write(100, '(5(F10.2))'), t, real(num_sc)/L, &
-         real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
+    write(*, '(5(F10.2))'), t, real(sum(SC))/Lbox2, &
+         real(sum(tac))/Lbox2, real(sum(tdc))/Lbox2
+    write(100, '(5(F10.2))'), t, real(sum(SC))/Lbox2, &
+         real(sum(tac))/Lbox2, real(sum(tdc))/Lbox2
   end subroutine cell_stat
 
-  subroutine Perodic_BC(k)
+  subroutine Perodic_BC(i, j)
     implicit none
-    integer, intent(in) :: k
+    integer, intent(in) :: i, j
 
-    if ( k .eq. 1 ) then
-       cmat(L, :) = cmat(0, :)
-       cmat(L+1, :) = cmat(1, :)
-       npack(L) = npack(0)
-       npack(L+1) = npack(1)
-       TDC(L) = TDC(0)
-       TDC(L+1) = TDC(1)
+    if ( i .eq. 1 ) then
+       cmat(Lbox, j-1:j+1, :) = cmat(0, j-1:j+1, :) 
+       cmat(Lbox+1, j-1:j+1, :) = cmat(1, j-1:j+1, :)
+       npack(Lbox, j-1:j+1) = npack(0,j-1:j+1)
+       npack(Lbox+1,j-1:j+1) = npack(1,j-1:j+1)
+       TDC(Lbox,j-1:j+1) = TDC(0,j-1:j+1)
+       TDC(Lbox+1,j-1:j+1) = TDC(1,j-1:j+1)
     end if
-    if ( k .eq. 2 ) then
-       cmat(L+1, :) = cmat(1, :)
-       npack(L+1) = npack(1)
-       TDC(L+1) = TDC(1)
+    if ( i .eq. 2 ) then
+       cmat(Lbox+1,j-1:j+1, :) = cmat(1, j-1:j+1,:)
+       npack(Lbox+1,j-1:j+1) = npack(1,j-1:j+1)
+       TDC(Lbox+1,j-1:j+1) = TDC(1,j-1:j+1)
     end if
-    if ( k .eq. L ) then
-       cmat(1, :) = cmat(L+1, :)
-       cmat(0, :) = cmat(L, :)
-       npack(1) = npack(L+1)
-       npack(0) = npack(L)
-       TDC(1) = TDC(L+1)
-       TDC(0) = TDC(L)
+    if ( i .eq. Lbox ) then
+       cmat(1, j-1:j+1,:) = cmat(Lbox+1, j-1:j+1,:)
+       cmat(0,j-1:j+1, :) = cmat(Lbox,j-1:j+1, :)
+       npack(1,j-1:j+1) = npack(Lbox+1,j-1:j+1)
+       npack(0,j-1:j+1) = npack(Lbox,j-1:j+1)
+       TDC(1,j-1:j+1) = TDC(Lbox+1,j-1:j+1)
+       TDC(0,j-1:j+1) = TDC(Lbox,j-1:j+1)
     end if
-    if ( k .eq. L-1 ) then
-       cmat(0, :) = cmat(L, :)
-       npack(0) = npack(L)
-       TDC(0) = TDC(L)
+    if ( i .eq. Lbox-1 ) then
+       cmat(0, j-1:j+1,:) = cmat(Lbox, j-1:j+1,:)
+       npack(0,j-1:j+1) = npack(Lbox,j-1:j+1)
+       TDC(0,j-1:j+1) = TDC(Lbox,j-1:j+1)
+    end if
+
+
+    if ( j .eq. 1 ) then
+       cmat(i-1:i+1,Lbox, :) = cmat(i-1:i+1,0, :) 
+       cmat(i-1:i+1,Lbox+1, :) = cmat(i-1:i+1,1, :)
+       npack(i-1:i+1,Lbox) = npack(i-1:i+1,0)
+       npack(i-1:i+1,Lbox+1) = npack(i-1:i+1,1)
+       TDC(i-1:i+1,Lbox) = TDC(i-1:i+1,0)
+       TDC(i-1:i+1,Lbox+1) = TDC(i-1:i+1,1)
+    end if
+    if ( j .eq. 2 ) then
+       cmat(i-1:i+1,Lbox+1, :) = cmat(i-1:i+1,1, :)
+       npack(i-1:i+1,Lbox+1) = npack(i-1:i+1,1)
+       TDC(i-1:i+1,Lbox+1) = TDC(i-1:i+1,1)
+    end if
+    if ( j .eq. Lbox ) then
+       cmat(i-1:i+1,1, :) = cmat(i-1:i+1,Lbox+1, :)
+       cmat(i-1:i+1,0, :) = cmat(i-1:i+1,Lbox, :)
+       npack(i-1:i+1,1) = npack(i-1:i+1,Lbox+1)
+       npack(i-1:i+1,0) = npack(i-1:i+1,Lbox)
+       TDC(i-1:i+1,1) = TDC(i-1:i+1,Lbox+1)
+       TDC(i-1:i+1,0) = TDC(i-1:i+1,Lbox)
+    end if
+    if ( j .eq. Lbox-1 ) then
+       cmat(i-1:i+1,0, :) = cmat(i-1:i+1,Lbox, :)
+       npack(i-1:i+1,0) = npack(i-1:i+1,Lbox)
+       TDC(i-1:i+1,0) = TDC(i-1:i+1,Lbox)
     end if
   end subroutine Perodic_BC
 
-  subroutine Next_Reaction(k, tau, ilow, iup)
+  subroutine Next_Reaction(k1, k2, tau, ilow, iup, jlow, jup)
     implicit none
-    integer, intent(out) :: k
-    integer, intent(in) :: ilow, iup
+    integer, intent(out) :: k1, k2
+    integer, intent(in) :: ilow, iup, jlow, jup
     real, intent(out) :: tau
     real tau_temp
-    integer i
+    integer i, j
 
     tau = huge(0.0)
-    k = 0
+    k1 = 0
+    k2 = 0
     do i = ilow, iup
-       if ( a(i) > 0.0 ) then
-          tau_temp = ( NP(i) - NT(i) ) / a(i)
-          if ( tau_temp < tau) then
-             tau = tau_temp
-             k = i
-          end if
-       else
+       do j = jlow, jup
+          if ( a(i,j) > 0.0 ) then
+             tau_temp = ( NP(i,j) - NT(i,j) ) / a(i,j)
+             if ( tau_temp < tau) then
+                tau = tau_temp
+                k1 = i
+                k2 = j
+             end if
+          else
           !          print *, 'no reaction -------------- ', i, k, a(i)
           !          read(*,*)
-       end if
+          end if
+       end do
     end do
     !    print *, 'k', k
     !    print *, 'a', a
-    if ( k .le. 0 ) then
+    if ( k1 .le. 0 .or. k2 .le. 0 ) then
        write(*,*), 'error'
        read(*,*)
     end if
@@ -419,16 +433,14 @@ contains
     end if
   end subroutine Next_Reaction
 
-  subroutine Update_Rate(i)
+  subroutine Update_Rate(i,j)
     implicit none
-    integer, intent(in) :: i
-    real vr, vl
-    vr = max(0.0, D*real(npack(i)-npack(i+1)))
-    vl = max(0.0, D*real(npack(i)-npack(i-1)))
-    if (npack(i).eq.0) then
-       !       print *, vr, vl
-    end if
-    a(i) = vr + vl + npack(i)*(v+mv)
+    integer, intent(in) :: i,j
+    v_diff(i, j, 1) = max(0.0, D*real(npack(i,j)-npack(i+1,j)))
+    v_diff(i, j, 2) = max(0.0, D*real(npack(i,j)-npack(i-1,j)))
+    v_diff(i, j, 3) = max(0.0, D*real(npack(i,j)-npack(i,j+1)))
+    v_diff(i, j, 4) = max(0.0, D*real(npack(i,j)-npack(i,j-1)))
+    a(i,j) = sum(v_diff(i, j, :)) + npack(i,j)*(v+mv)
   end subroutine Update_Rate
 
 end module setting

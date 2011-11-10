@@ -2,7 +2,7 @@ RM := rm -rf
 OUTPUT_FILE := run
 
 #FC = gfortran -fdefault-real-8
-FC = ifort -openmp -r8 -i8
+FC = ifort -r8 -i8
 OBJS += \
 ./par_zig_mod.o \
 ./setting.o \

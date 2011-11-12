@@ -1,13 +1,13 @@
 module setting
-  integer, parameter :: Lbox = 100
+  integer, parameter :: Lbox = 256
   integer, parameter :: Lbox2 = Lbox*Lbox
   integer, parameter :: H = 100
-  real, parameter :: b = 4.0
+  real, parameter :: b = 8.0
   real, parameter :: bd10 = 10.0/b
-  real, parameter :: tend = 1000.0
+  real, parameter :: tend = 50.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: D = 50.0
+  real, parameter :: D = 100.0
   real, parameter :: mv = 0.0
   type cell
      integer type
@@ -40,7 +40,7 @@ contains
     do i = 1, Lbox
        do j = 1, Lbox
           !u = par_uni(0)
-          cmat(i,j, 1)%gene1 = 0.96
+          cmat(i,j, 1)%gene1 = 0.0
           cmat(i,j, 1)%gene2 = 0.2
           cmat(i,j, 1)%gene3 = 0.01! + 0.01*(u-0.5)
           cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
@@ -111,17 +111,17 @@ contains
           write(11, *)
        end do
     end do
-    do i = 1, Lbox
-       do j = 1, Lbox
-          do k = 1, H
-             if (cmat(i,j,k)%type.eq.1) then
-                write(12, '(I10, 4(F15.5))'), i, j, &
-                     cmat(i,j,k)%gene1, cmat(i,j,k)%gene2, &
-                     cmat(i,j,k)%gene3, cmat(i,j,k)%gene4
-             end if
-          end do
-       end do
-    end do
+!!$    do i = 1, Lbox
+!!$       do j = 1, Lbox
+!!$          do k = 1, H
+!!$             if (cmat(i,j,k)%type.eq.1) then
+!!$                write(12, '(I10, 4(F15.5))'), i, j, &
+!!$                     cmat(i,j,k)%gene1, cmat(i,j,k)%gene2, &
+!!$                     cmat(i,j,k)%gene3, cmat(i,j,k)%gene4
+!!$             end if
+!!$          end do
+!!$       end do
+!!$    end do
     close(11)
     close(12)
   end subroutine output_to_file
@@ -226,7 +226,7 @@ contains
              end do
              !p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
              !     / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
-             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+             p0 = 0.2 + 0.6 / (1.0 + 0.001*TGFbeta)
 
              !print *, 'p0', p0
              ! division

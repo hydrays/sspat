@@ -2,9 +2,9 @@ module setting
   integer, parameter :: Lbox = 256
   integer, parameter :: Lbox2 = Lbox*Lbox
   integer, parameter :: H = 100
-  real, parameter :: b = 8.0
+  real, parameter :: b = 15.0
   real, parameter :: bd10 = 10.0/b
-  real, parameter :: tend = 50.0
+  real, parameter :: tend = 500.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 100.0
@@ -40,7 +40,7 @@ contains
     do i = 1, Lbox
        do j = 1, Lbox
           !u = par_uni(0)
-          cmat(i,j, 1)%gene1 = 0.0
+          cmat(i,j, 1)%gene1 = 0.96
           cmat(i,j, 1)%gene2 = 0.2
           cmat(i,j, 1)%gene3 = 0.01! + 0.01*(u-0.5)
           cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
@@ -226,7 +226,7 @@ contains
              end do
              !p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
              !     / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
-             p0 = 0.2 + 0.6 / (1.0 + 0.001*TGFbeta)
+             p0 = 0.2 + 0.6 / (1.0 + 0.0005*TGFbeta)
 
              !print *, 'p0', p0
              ! division

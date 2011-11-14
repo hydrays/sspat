@@ -65,8 +65,8 @@ program main
 !!$        tm = huge(1.0)
 !!$     end if
 
-     do jbl = 0, 1
-        do ibl = 0, 1
+     do ibl = 1, 0, -1
+        do jbl = 1, 0, -1
            !$OMP PARALLEL default(private) &
            shared(a, NT, NP, t, npack, TDC, cmat, ibl, jbl, scanner, npar, Lbox_npar, Lbox_2npar)
 

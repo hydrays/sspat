@@ -49,8 +49,8 @@ program main
 
   do while (t < tend)
      if (t .ge. tp) then
-        call output_to_file(output_index)
         call cell_stat(t)
+        call output_to_file(output_index)
         output_index = output_index + 1
         tp = tp + 2.0
      end if

@@ -2,7 +2,7 @@ module setting
   integer, parameter :: Lbox = 256
   integer, parameter :: Lbox2 = Lbox*Lbox
   integer, parameter :: H = 100
-  real, parameter :: b = 15.0
+  real, parameter :: b = 8.0
   real, parameter :: bd10 = 10.0/b
   real, parameter :: tend = 500.0
   real, parameter :: p1 = 0.3
@@ -24,6 +24,8 @@ module setting
   integer TDC(0:Lbox+1,0:Lbox+1)
   integer SC(0:Lbox+1,0:Lbox+1)
   integer TAC(0:Lbox+1,0:Lbox+1)
+  real gene3(1:Lbox,1:Lbox)
+  real gene1(1:Lbox,1:Lbox)
   real v_diff(1:Lbox, 1:Lbox, 4)
 
 contains
@@ -42,7 +44,7 @@ contains
           !u = par_uni(0)
           cmat(i,j, 1)%gene1 = 0.96
           cmat(i,j, 1)%gene2 = 0.2
-          cmat(i,j, 1)%gene3 = 0.01! + 0.01*(u-0.5)
+          cmat(i,j, 1)%gene3 = 0.002! + 0.001*(u-0.5)
           cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
        end do
     end do
@@ -95,35 +97,37 @@ contains
     integer i, j, k
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
-    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
-    open (unit = 12, file=filename2, action="write")
 
     do i = 1, Lbox+1
        do j = 1, Lbox+1
+          gene3(i,j) = 0.0
+          gene1(i,j) = 0.0
           do k = 1, H
+             if (cmat(i,j,k)%type.eq.1) then
+                gene3(i,j) = gene3(i,j) + cmat(i,j,k)%gene3
+                gene1(i,j) = gene1(i,j) + cmat(i,j,k)%gene1
+             end if
              write(11, '(I5)', advance="no"), cmat(i,j,k)%type
           end do
+          if ( SC(i,j).eq.0 ) then
+             gene1(i,j) = -1.0
+             gene3(i,j) = -1.0
+          else
+             gene1(i,j) = gene1(i,j) / SC(i,j)
+             gene3(i,j) = gene3(i,j) / SC(i,j)
+          end if
+
           write(11, '(I6)', advance="no"), TDC(i,j)
           write(11, '(I6)', advance="no"), TAC(i,j)
           write(11, '(I6)', advance="no"), SC(i,j)
           write(11, '(I6)', advance="no"), npack(i,j)
+          write(11, '(F10.2)', advance="no"), gene1(i,j)
+          write(11, '(F10.2)', advance="no"), gene3(i,j)
           write(11, *)
        end do
     end do
-!!$    do i = 1, Lbox
-!!$       do j = 1, Lbox
-!!$          do k = 1, H
-!!$             if (cmat(i,j,k)%type.eq.1) then
-!!$                write(12, '(I10, 4(F15.5))'), i, j, &
-!!$                     cmat(i,j,k)%gene1, cmat(i,j,k)%gene2, &
-!!$                     cmat(i,j,k)%gene3, cmat(i,j,k)%gene4
-!!$             end if
-!!$          end do
-!!$       end do
-!!$    end do
     close(11)
-    close(12)
   end subroutine output_to_file
 
   subroutine cell_event(i, j, kpar)
@@ -224,9 +228,9 @@ contains
                         exp(- sqrt( (real(abs(k))/b)**2 + (real(abs(k2))/b)**2 ) )
                 end do
              end do
-             !p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
-             !     / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
-             p0 = 0.2 + 0.6 / (1.0 + 0.0005*TGFbeta)
+             p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
+                  / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
+             !p0 = 0.2 + 0.6 / (1.0 + 0.0005*TGFbeta)
 
              !print *, 'p0', p0
              ! division

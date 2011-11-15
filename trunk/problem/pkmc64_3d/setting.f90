@@ -1,13 +1,13 @@
 module setting
-  integer, parameter :: Lbox = 512
+  integer, parameter :: Lbox = 128
   integer, parameter :: Lbox2 = Lbox*Lbox
-  integer, parameter :: H = 200
-  real, parameter :: b = 30.0
+  integer, parameter :: H = 100
+  real, parameter :: b = 5.0
   real, parameter :: bd10 = 10.0/b
-  real, parameter :: tend = 50000.0
+  real, parameter :: tend = 500.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: D = 100.0
+  real, parameter :: D = 50.0
   real, parameter :: mv = 0.0
   type cell
      integer type
@@ -16,16 +16,11 @@ module setting
      real gene3
      real gene4
   end type cell
-  type(cell) cmat(0:Lbox+1,0:Lbox+1,H)
-  real a(1:Lbox,1:Lbox)
-  real NT(1:Lbox,1:Lbox)
-  real NP(1:Lbox,1:Lbox)
-  integer npack(0:Lbox+1,0:Lbox+1)
-  integer TDC(0:Lbox+1,0:Lbox+1)
-  integer SC(0:Lbox+1,0:Lbox+1)
-  integer TAC(0:Lbox+1,0:Lbox+1)
-  real v_diff(1:Lbox, 1:Lbox, 4)
-  real geneinfo(0:Lbox+1,0:Lbox+1,4)
+  type(cell), allocatable :: cmat(:,:,:)
+!  type(cell) cmat(0:Lbox+1,0:Lbox+1,H)
+  real, allocatable :: a(:,:), NT(:,:), NP(:,:)
+  integer, allocatable :: npack(:, :), TDC(:,:), SC(:,:), TAC(:,:)
+  real, allocatable ::  v_diff(:,:,:), geneinfo(:,:,:)
   
 contains
   subroutine init_cell_pool()
@@ -35,13 +30,24 @@ contains
     real u
     integer i, j, k
 
+    allocate(cmat(0:Lbox+1,0:Lbox+1,H))
+    allocate(a(1:Lbox,1:Lbox))
+    allocate(NT(1:Lbox,1:Lbox))
+    allocate(NP(1:Lbox,1:Lbox))
+    allocate(npack(0:Lbox+1,0:Lbox+1))
+    allocate(TDC(0:Lbox+1,0:Lbox+1))
+    allocate(SC(0:Lbox+1,0:Lbox+1))
+    allocate(TAC(0:Lbox+1,0:Lbox+1))
+    allocate(v_diff(1:Lbox, 1:Lbox, 4))
+    allocate(geneinfo(0:Lbox+1,0:Lbox+1,4))
+
     cmat(1:Lbox, 1:Lbox, 1)%type = 1
     cmat(1:Lbox, 1:Lbox, 2:3)%type = 2
     cmat(1:Lbox, 1:Lbox, 3:4)%type = 3
     do i = 1, Lbox
        do j = 1, Lbox
-          u = par_uni(0)
-          cmat(i,j, 1)%gene1 = min(u, 0.96)
+          !u = par_uni(0)
+          cmat(i,j, 1)%gene1 = 0.96!min(u, 0.96)
           cmat(i,j, 1)%gene2 = 0.2
           cmat(i,j, 1)%gene3 = 0.002! + 0.01*(u-0.5)
           cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
@@ -209,7 +215,7 @@ contains
              do k = -b, b
                 do k2 = -b, b
                    shift_i = k + i
-                   shift_j = k + j
+                   shift_j = k2 + j
                    if ( shift_i .le. 0 ) then
                       shift_i = shift_i + Lbox
                    else if ( shift_i > Lbox ) then
@@ -341,26 +347,60 @@ contains
     implicit none
     integer, intent(in) :: i, j
 
-    if ( i .eq. 1 ) then
-       cmat(Lbox, j-1:j+1, :) = cmat(0, j-1:j+1, :) 
-       cmat(Lbox+1, j-1:j+1, :) = cmat(1, j-1:j+1, :)
-       npack(Lbox, j-1:j+1) = npack(0,j-1:j+1)
-       npack(Lbox+1,j-1:j+1) = npack(1,j-1:j+1)
-       TDC(Lbox,j-1:j+1) = TDC(0,j-1:j+1)
-       TDC(Lbox+1,j-1:j+1) = TDC(1,j-1:j+1)
+    if ( i.eq.1 ) then
+       if ( j.eq.1 ) then !upper-left coner
+          cmat(Lbox:Lbox+1, 1:2, :) = cmat(0:1, 1:2, :) 
+          npack(Lbox:Lbox+1, 1:2) = npack(0:1,1:2)
+          TDC(Lbox:Lbox+1,1:2) = TDC(0:1,1:2)
+
+          cmat(1:2, Lbox:Lbox+1, :) = cmat(1:2, 0:1, :) 
+          npack(1:2, Lbox:Lbox+1) = npack(1:2, 0:1)
+          TDC(1:2, Lbox:Lbox+1) = TDC(1:2, 0:1)
+       else if ( j.eq.Lbox ) then !down-left coner
+          cmat(Lbox:Lbox+1, Lbox-1:Lbox, :) = cmat(0:1, Lbox-1:Lbox, :) 
+          npack(Lbox:Lbox+1, Lbox-1:Lbox) = npack(0:1,Lbox-1:Lbox)
+          TDC(Lbox:Lbox+1,Lbox-1:Lbox) = TDC(0:1,Lbox-1:Lbox)
+
+          cmat(1:2, 0:1, :) = cmat(1:2, Lbox:Lbox+1, :) 
+          npack(1:2, 0:1) = npack(1:2, Lbox:Lbox+1)
+          TDC(1:2, 0:1) = TDC(1:2, Lbox:Lbox+1)
+       else ! left edge
+          cmat(Lbox, j-1:j+1, :) = cmat(0, j-1:j+1, :) 
+          cmat(Lbox+1, j-1:j+1, :) = cmat(1, j-1:j+1, :)
+          npack(Lbox, j-1:j+1) = npack(0,j-1:j+1)
+          npack(Lbox+1,j-1:j+1) = npack(1,j-1:j+1)
+          TDC(Lbox,j-1:j+1) = TDC(0,j-1:j+1)
+          TDC(Lbox+1,j-1:j+1) = TDC(1,j-1:j+1)
+       end if
     end if
     if ( i .eq. 2 ) then
        cmat(Lbox+1,j-1:j+1, :) = cmat(1, j-1:j+1,:)
        npack(Lbox+1,j-1:j+1) = npack(1,j-1:j+1)
        TDC(Lbox+1,j-1:j+1) = TDC(1,j-1:j+1)
     end if
+
     if ( i .eq. Lbox ) then
-       cmat(1, j-1:j+1,:) = cmat(Lbox+1, j-1:j+1,:)
-       cmat(0,j-1:j+1, :) = cmat(Lbox,j-1:j+1, :)
-       npack(1,j-1:j+1) = npack(Lbox+1,j-1:j+1)
-       npack(0,j-1:j+1) = npack(Lbox,j-1:j+1)
-       TDC(1,j-1:j+1) = TDC(Lbox+1,j-1:j+1)
-       TDC(0,j-1:j+1) = TDC(Lbox,j-1:j+1)
+       if ( j.eq.1 ) then !upper-right coner
+          cmat(0:1, 1:2, :) = cmat(Lbox:Lbox+1, 1:2, :) 
+          npack(0:1, 1:2) = npack(Lbox:Lbox+1,1:2)
+          TDC(0:1, 1:2) = TDC(Lbox:Lbox+1,1:2)
+
+          cmat(Lbox-1:Lbox, Lbox:Lbox+1, :) = cmat(Lbox-1:Lbox, 0:1, :) 
+          npack(Lbox-1:Lbox, Lbox:Lbox+1) = npack(Lbox-1:Lbox, 0:1)
+          TDC(Lbox-1:Lbox, Lbox:Lbox+1) = TDC(Lbox-1:Lbox, 0:1)
+       else if ( j.eq.Lbox ) then !down-right coner
+          cmat(0:1, Lbox-1:Lbox, :) = cmat(Lbox:Lbox+1, Lbox-1:Lbox, :) 
+          npack(0:1, Lbox-1:Lbox) = npack(Lbox:Lbox+1,Lbox-1:Lbox)
+          TDC(0:1,Lbox-1:Lbox) = TDC(Lbox:Lbox+1,Lbox-1:Lbox)
+
+          cmat(Lbox-1:Lbox, 0:1, :) = cmat(Lbox-1:Lbox, Lbox:Lbox+1, :) 
+          npack(Lbox-1:Lbox, 0:1) = npack(Lbox-1:Lbox, Lbox:Lbox+1)
+          TDC(Lbox-1:Lbox, 0:1) = TDC(Lbox-1:Lbox, Lbox:Lbox+1)
+       else ! right edge
+          cmat(0:1, j-1:j+1,:) = cmat(Lbox:Lbox+1, j-1:j+1,:)
+          npack(0:1,j-1:j+1) = npack(Lbox:Lbox+1,j-1:j+1)
+          TDC(0:1,j-1:j+1) = TDC(Lbox:Lbox+1,j-1:j+1)
+       end if
     end if
     if ( i .eq. Lbox-1 ) then
        cmat(0, j-1:j+1,:) = cmat(Lbox, j-1:j+1,:)
@@ -370,25 +410,32 @@ contains
 
 
     if ( j .eq. 1 ) then
-       cmat(i-1:i+1,Lbox, :) = cmat(i-1:i+1,0, :) 
-       cmat(i-1:i+1,Lbox+1, :) = cmat(i-1:i+1,1, :)
-       npack(i-1:i+1,Lbox) = npack(i-1:i+1,0)
-       npack(i-1:i+1,Lbox+1) = npack(i-1:i+1,1)
-       TDC(i-1:i+1,Lbox) = TDC(i-1:i+1,0)
-       TDC(i-1:i+1,Lbox+1) = TDC(i-1:i+1,1)
+       if ( i .eq. 1 ) then
+          ! do nothing
+       else if ( i.eq. Lbox) then
+          ! do nothing
+       else
+          cmat(i-1:i+1,Lbox:Lbox+1, :) = cmat(i-1:i+1,0:1, :) 
+          npack(i-1:i+1,Lbox:Lbox+1) = npack(i-1:i+1,0:1)
+          TDC(i-1:i+1,Lbox:Lbox+1) = TDC(i-1:i+1,0:1)
+       end if
     end if
     if ( j .eq. 2 ) then
        cmat(i-1:i+1,Lbox+1, :) = cmat(i-1:i+1,1, :)
        npack(i-1:i+1,Lbox+1) = npack(i-1:i+1,1)
        TDC(i-1:i+1,Lbox+1) = TDC(i-1:i+1,1)
     end if
+
     if ( j .eq. Lbox ) then
-       cmat(i-1:i+1,1, :) = cmat(i-1:i+1,Lbox+1, :)
-       cmat(i-1:i+1,0, :) = cmat(i-1:i+1,Lbox, :)
-       npack(i-1:i+1,1) = npack(i-1:i+1,Lbox+1)
-       npack(i-1:i+1,0) = npack(i-1:i+1,Lbox)
-       TDC(i-1:i+1,1) = TDC(i-1:i+1,Lbox+1)
-       TDC(i-1:i+1,0) = TDC(i-1:i+1,Lbox)
+       if ( i .eq. 1 ) then
+          ! do nothing
+       else if ( i.eq. Lbox) then
+          ! do nothing
+       else
+          cmat(i-1:i+1,0:1, :) = cmat(i-1:i+1,Lbox:Lbox+1, :)
+          npack(i-1:i+1,0:1) = npack(i-1:i+1,Lbox:Lbox+1)
+          TDC(i-1:i+1,0:1) = TDC(i-1:i+1,Lbox:Lbox+1)
+       end if
     end if
     if ( j .eq. Lbox-1 ) then
        cmat(i-1:i+1,0, :) = cmat(i-1:i+1,Lbox, :)
@@ -408,8 +455,8 @@ contains
     tau = huge(0.0)
     k1 = 0
     k2 = 0
-    do i = ilow, iup
-       do j = jlow, jup
+    do j = jlow, jup
+       do i = ilow, iup
           if ( a(i,j) > 0.0 ) then
              tau_temp = ( NP(i,j) - NT(i,j) ) / a(i,j)
              if ( tau_temp < tau) then

@@ -1,10 +1,10 @@
 module setting
-  integer, parameter :: Lbox = 256
+  integer, parameter :: Lbox = 512
   integer, parameter :: Lbox2 = Lbox*Lbox
-  integer, parameter :: H = 100
-  real, parameter :: b = 15.0
+  integer, parameter :: H = 200
+  real, parameter :: b = 30.0
   real, parameter :: bd10 = 10.0/b
-  real, parameter :: tend = 500.0
+  real, parameter :: tend = 50000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 100.0
@@ -25,7 +25,8 @@ module setting
   integer SC(0:Lbox+1,0:Lbox+1)
   integer TAC(0:Lbox+1,0:Lbox+1)
   real v_diff(1:Lbox, 1:Lbox, 4)
-
+  real geneinfo(0:Lbox+1,0:Lbox+1,4)
+  
 contains
   subroutine init_cell_pool()
     use par_zig_mod
@@ -40,9 +41,9 @@ contains
     do i = 1, Lbox
        do j = 1, Lbox
           u = par_uni(0)
-          cmat(i,j, 1)%gene1 = u
+          cmat(i,j, 1)%gene1 = min(u, 0.96)
           cmat(i,j, 1)%gene2 = 0.2
-          cmat(i,j, 1)%gene3 = 0.01! + 0.01*(u-0.5)
+          cmat(i,j, 1)%gene3 = 0.002! + 0.01*(u-0.5)
           cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
        end do
     end do
@@ -91,39 +92,38 @@ contains
     implicit none
 
     integer, intent(in) :: index
-    character(30) filename, filename2
+    character(30) filename
     integer i, j, k
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
-    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
-    open (unit = 12, file=filename2, action="write")
 
     do i = 1, Lbox+1
        do j = 1, Lbox+1
+          geneinfo(i,j,:) = 0.0
           do k = 1, H
+             if ( cmat(i,j,k)%type .eq. 1 ) then
+                geneinfo(i,j,1) = geneinfo(i,j,1) + cmat(i,j,k)%gene1
+                geneinfo(i,j,2) = geneinfo(i,j,2) + cmat(i,j,k)%gene2
+                geneinfo(i,j,3) = geneinfo(i,j,3) + cmat(i,j,k)%gene3
+                geneinfo(i,j,4) = geneinfo(i,j,4) + cmat(i,j,k)%gene4
+             end if
              write(11, '(I5)', advance="no"), cmat(i,j,k)%type
           end do
+          if ( SC(i,j).eq.0 ) then
+             geneinfo(i,j,:) = -1.0
+          else
+             geneinfo(i,j,:) = geneinfo(i,j,:) / SC(i,j)
+          end if
           write(11, '(I6)', advance="no"), TDC(i,j)
           write(11, '(I6)', advance="no"), TAC(i,j)
           write(11, '(I6)', advance="no"), SC(i,j)
           write(11, '(I6)', advance="no"), npack(i,j)
+          write(11, '(f14.7)', advance="no"), geneinfo(i,j,1)
           write(11, *)
        end do
     end do
-!!$    do i = 1, Lbox
-!!$       do j = 1, Lbox
-!!$          do k = 1, H
-!!$             if (cmat(i,j,k)%type.eq.1) then
-!!$                write(12, '(I10, 4(F15.5))'), i, j, &
-!!$                     cmat(i,j,k)%gene1, cmat(i,j,k)%gene2, &
-!!$                     cmat(i,j,k)%gene3, cmat(i,j,k)%gene4
-!!$             end if
-!!$          end do
-!!$       end do
-!!$    end do
     close(11)
-    close(12)
   end subroutine output_to_file
 
   subroutine cell_event(i, j, kpar)
@@ -226,7 +226,7 @@ contains
              end do
              !p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
              !     / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
-             p0 = 0.2 + 0.6 / (1.0 + 0.0005*TGFbeta)
+             p0 = 0.2 + 0.6 / (1.0 + 0.001*TGFbeta)
 
              !print *, 'p0', p0
              ! division
@@ -305,6 +305,9 @@ contains
        end do
     end if
     print *, "not suppose to be here!"
+    print *, "u", u
+    print *, "a", a(i,j)
+    print *, 'i,j', i, j
     stop
   end subroutine cell_event
 

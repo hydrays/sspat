@@ -2,7 +2,7 @@ module setting
   integer, parameter :: Lbox = 128
   integer, parameter :: Lbox2 = Lbox*Lbox
   integer, parameter :: H = 100
-  real, parameter :: b = 5.0
+  real, parameter :: b = 8.0
   real, parameter :: bd10 = 10.0/b
   real, parameter :: tend = 500.0
   real, parameter :: p1 = 0.3
@@ -49,7 +49,7 @@ contains
           !u = par_uni(0)
           cmat(i,j, 1)%gene1 = 0.96!min(u, 0.96)
           cmat(i,j, 1)%gene2 = 0.2
-          cmat(i,j, 1)%gene3 = 0.002! + 0.01*(u-0.5)
+          cmat(i,j, 1)%gene3 = 0.001! + 0.01*(u-0.5)
           cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
        end do
     end do
@@ -230,9 +230,9 @@ contains
                         exp(- sqrt( (real(abs(k))/b)**2 + (real(abs(k2))/b)**2 ) )
                 end do
              end do
-             !p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
-             !     / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
-             p0 = 0.2 + 0.6 / (1.0 + 0.001*TGFbeta)
+             p0 = cmat(i,j,l)%gene2 + (1.0 - 2.0*cmat(i,j,l)%gene2) &
+                  / (1.0 + cmat(i,j,l)%gene3*TGFbeta)
+             !p0 = 0.2 + 0.6 / (1.0 + 0.005*TGFbeta)
 
              !print *, 'p0', p0
              ! division

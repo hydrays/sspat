@@ -52,7 +52,7 @@ program main
         call cell_stat(t)
         call output_to_file(output_index)
         output_index = output_index + 1
-        tp = tp + 1.0
+        tp = tp + 5.0
      end if
      t = t + 0.004
 

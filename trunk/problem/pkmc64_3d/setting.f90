@@ -1,10 +1,10 @@
 module setting
-  integer, parameter :: Lbox = 128
+  integer, parameter :: Lbox = 256
   integer, parameter :: Lbox2 = Lbox*Lbox
   integer, parameter :: H = 100
   real, parameter :: b = 8.0
   real, parameter :: bd10 = 10.0/b
-  real, parameter :: tend = 500.0
+  real, parameter :: tend = 10000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 50.0
@@ -46,8 +46,8 @@ contains
     cmat(1:Lbox, 1:Lbox, 3:4)%type = 3
     do i = 1, Lbox
        do j = 1, Lbox
-          !u = par_uni(0)
-          cmat(i,j, 1)%gene1 = 0.96!min(u, 0.96)
+          u = par_uni(0)
+          cmat(i,j, 1)%gene1 = 0.98!min(u, 0.99)
           cmat(i,j, 1)%gene2 = 0.2
           cmat(i,j, 1)%gene3 = 0.001! + 0.01*(u-0.5)
           cmat(i,j, 1)%gene4 = 10!+2.0*(u-0.5)
@@ -117,7 +117,7 @@ contains
              write(11, '(I5)', advance="no"), cmat(i,j,k)%type
           end do
           if ( SC(i,j).eq.0 ) then
-             geneinfo(i,j,:) = -1.0
+             geneinfo(i,j,:) = 0./0.
           else
              geneinfo(i,j,:) = geneinfo(i,j,:) / SC(i,j)
           end if
@@ -126,6 +126,7 @@ contains
           write(11, '(I6)', advance="no"), SC(i,j)
           write(11, '(I6)', advance="no"), npack(i,j)
           write(11, '(f14.7)', advance="no"), geneinfo(i,j,1)
+          write(11, '(f14.7)', advance="no"), geneinfo(i,j,3)
           write(11, *)
        end do
     end do

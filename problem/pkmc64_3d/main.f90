@@ -5,7 +5,7 @@ program main
   implicit none
 
   real t, tau, tp, tm, u, private_t
-  integer output_index, i, j, active_index
+  integer output_index, i, j, active_index, l
   integer k1, k2, shift_i, shift_j 
   integer ibl, jbl
   integer ilow, iup, jlow, jup
@@ -37,7 +37,7 @@ program main
 
   t = 0.0
   tp = 0.0
-  tm = 1000.0
+  tm = 400.0
   private_t = 0.0
   output_index = 0
   scanner = 1
@@ -52,18 +52,20 @@ program main
         call cell_stat(t)
         call output_to_file(output_index)
         output_index = output_index + 1
-        tp = tp + 5.0
+        tp = tp + 10.0
      end if
      t = t + 0.004
 
-!!$     if (t .ge. tm) then
-!!$        do i = 900, 1100
-!!$           do j = 1, npack(i)
-!!$              cmat(i,j)%gene3 = 0.008
-!!$           end do
-!!$        end do
-!!$        tm = huge(1.0)
-!!$     end if
+     if (t .ge. tm) then
+        do i = 110, 140
+           do j = 110, 140
+              do l = 1, npack(i,j)
+                 cmat(i,j,l)%gene3 = 0.0008
+              end do
+           end do
+           tm = huge(1.0)
+        end do
+     end if
 
      do ibl = 1, 0, -1
         do jbl = 1, 0, -1

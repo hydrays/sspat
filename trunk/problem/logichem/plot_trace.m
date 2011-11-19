@@ -1,66 +1,145 @@
-% ===========
-% test
-% ===========
-load tr5
-clf;
-tr = tr5;
-plot(tr(:,1), tr(:,2)/500, 'r')
-xlim([150, 350])
-hold on
-plot(tr(:,1), tr(:,3)/500, 'b')
-plot(tr(:,1), tr(:,4)/500, 'g')
-plot(tr(:,1), tr(:,5)/500, 'k')
-figure
-plot(tr(:,1), tr(:,7), 'b')
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-print('-depsc','asym.eps')
+% % ===========
+% % test
+% % ===========
+% load tr
+% clf;
+% tr = tr;
+% plot(tr(:,1), tr(:,2), 'r')
+% %xlim([150, 350])
+% hold on
+% plot(tr(:,1), tr(:,3), 'b')
+% plot(tr(:,1), tr(:,4), 'g')
+% plot(tr(:,1), tr(:,5), 'k')
+% % figure
+% plot(tr(:,1), tr(:,7), 'm')
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC', 'Total')
+% print('-depsc','asym.eps')
 
 % % ===========
-% % script for 1 feedback
+% % script for 2 feedback, self-recovery, asym/asym
 % % ===========
-% load paperresult_1f_tr_k1
-% tr = paperresult_1f_tr_k1;
+% load pr2_slefrecover_logi_aa
+% tr = pr2_slefrecover_logi_aa;
 % h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-% %xlim([0, 600])
+% xlim([0, 450])
 % hold on
 % plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
 % plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-% %plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+% plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'total')
+% legend('SC', 'TAC', 'TDC', 'MC', 'total')
+% %ylim([0, 600])
 % %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_1f_k1.eps')
+% print('-depsc','fig_logi_selfrecover_aa.eps')
+% 
+% figure
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('p_0, v_0','fontsize',18)
+% legend('p_0', 'v_0')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_selfrecover_pvplot_aa.eps')
 % 
 % % ===========
-% % script for 1 feedback bar-plot
+% % script for 2 feedback, self-recovery, sym/sym
 % % ===========
-% mycmap = [1     0     0
-%      0     0     1
-%      0     1     0];
-% colormap(mycmap)
-% load paperresult_1f_tr_k07
-% load paperresult_1f_tr_k85
-% load paperresult_1f_tr_k1
-% tr3 = paperresult_1f_tr_k07;
-% tr2 = paperresult_1f_tr_k85;
-% tr1 = paperresult_1f_tr_k1;
-% 
-% xpmean(1,:) = mean(tr1(600:1000,2:4));
-% xpmean(2,:) = mean(tr2(600:1000,2:4));
-% xpmean(3,:) = mean(tr3(600:1000,2:4));
-% bar(xpmean,1)
-% xlabel('k_1','fontsize', 18);
+% load pr2_slefrecover_logi_ss
+% tr = pr2_slefrecover_logi_ss;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+% plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC')
+% legend('SC', 'TAC', 'TDC', 'MC', 'total')
+% %ylim([0, 600])
 % %set(get(h,'axis'),'FontSize',24)
-% set(gca,'XTickLabel',{'1', '0.85', '0.7'},'fontsize', 14);
-% box on;
-% print('-depsc','fig_logi_1f_bar.eps')
+% print('-depsc','fig_logi_selfrecover_ss.eps')
+% 
+% figure
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('p_0, v_0','fontsize',18)
+% legend('p_0', 'v_0')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_selfrecover_pvplot_ss.eps')
 
+% % ===========
+% % script for 2 feedback, self-recovery, asym/sym
+% % ===========
+% load pr2_slefrecover_logi_as
+% tr = pr2_slefrecover_logi_as;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+% plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC', 'total')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_selfrecover_as.eps')
+% 
+% figure
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('p_0, v_0','fontsize',18)
+% legend('p_0', 'v_0')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_selfrecover_pvplot_as.eps')
+
+% ===========
+% script for 2 feedback, self-recovery, sym/asym
+% ===========
+load pr2_slefrecover_logi_sa
+tr = pr2_slefrecover_logi_sa;
+h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+xlim([0, 450])
+hold on
+plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC', 'MC', 'total')
+%ylim([0, 600])
+%set(get(h,'axis'),'FontSize',24)
+print('-depsc','fig_logi_selfrecover_sa.eps')
+
+figure
+xlim([0, 450])
+hold on
+plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
+plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
+xlabel('t','fontsize', 18);
+ylabel('p_0, v_0','fontsize',18)
+legend('p_0', 'v_0')
+%ylim([0, 600])
+%set(get(h,'axis'),'FontSize',24)
+print('-depsc','fig_logi_selfrecover_pvplot_sa.eps')
 
 % % ===========
 % % script for 2 feedback, woundhealing
@@ -91,74 +170,6 @@ print('-depsc','asym.eps')
 % ylabel('Stem cell property','fontsize', 18)
 % print('-depsc','fig_logi_2f_woundhealing_supp.eps')
 
-% % ===========
-% % script for 2 feedback, self-recovery
-% % ===========
-% load paperresult_tr_2f_selfrecover
-% tr = paperresult_tr_2f_selfrecover;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-% xlim([0, 250])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'total')
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_2f_selfrecover.eps')
-
-
-% % ===========
-% % script for 3 feedback, woundhealing
-% % ===========
-% load paperresult_tr_3f_wondhealing
-% tr = paperresult_tr_3f_wondhealing;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 2)
-% xlim([0, 200])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 2)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 2)
-% %plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% %plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC')
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_3f_woundhealing.eps')
-% figure
-% plot(tr(:,1), tr(:,7), '-r','linewidth', 2)
-% hold on
-% xlim([0, 200])
-% plot(tr(:,1), tr(:,10), '-g','linewidth', 2)
-% plot(tr(:,1), tr(:,11), '-b','linewidth', 2)
-% legend('p_0','v_0', 'p_{sym}')
-% xlabel('t','fontsize', 18);
-% ylabel('Stem cell property','fontsize', 18)
-% print('-depsc','fig_logi_3f_woundhealing_supp.eps')
-
-
-% % ===========
-% % script for 3 feedback, self-recovery
-% % ===========
-% load paperresult_tr_3f_selfrecover
-% tr = paperresult_tr_3f_selfrecover;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-% xlim([0, 250])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% plot(tr(:,1), tr(:,8), '-m','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'total')
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_3f_selfrecover.eps')
 
 % 
 % % ===========

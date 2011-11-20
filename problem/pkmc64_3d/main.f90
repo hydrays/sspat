@@ -19,7 +19,7 @@ program main
   npar = 4
   Lbox_npar = Lbox/npar
   Lbox_2npar = Lbox/(2*npar)
-  
+
   !print *, Lbox_npar, Lbox_2npar
   !read(*,*)
 
@@ -37,7 +37,7 @@ program main
 
   t = 0.0
   tp = 0.0
-  tm = 400.0
+  tm = 100.0
   private_t = 0.0
   output_index = 0
   scanner = 1
@@ -52,16 +52,24 @@ program main
         call cell_stat(t)
         call output_to_file(output_index)
         output_index = output_index + 1
-        tp = tp + 10.0
+        tp = tp + 1.0
      end if
      t = t + 0.004
 
      if (t .ge. tm) then
-        do i = 110, 140
-           do j = 110, 140
+        do i = 60, 190
+           do j = 60, 190
               do l = 1, npack(i,j)
-                 cmat(i,j,l)%gene3 = 0.0008
+                 !cmat(i,j,l)%gene3 = 0.0008
+                 cmat(i,j,l)%type = 0
               end do
+              npack(i,j) = 0
+              TDC(i,j) = 0
+              call Update_Rate(i, j)
+              call Update_Rate(i-1, j)
+              call Update_Rate(i+1, j)
+              call Update_Rate(i, j-1)
+              call Update_Rate(i, j+1)
            end do
            tm = huge(1.0)
         end do
@@ -92,47 +100,51 @@ program main
            do while ( private_t < t +  0.004)
               call Next_Reaction(k1, k2, tau, ilow, iup, jlow, jup)
               !print *, 'next', k1, k2
-              call cell_event(k1, k2, nthread)
-              if ( (k1 .le. 2).or.(k1 .ge. Lbox-1) ) then
-                 call Perodic_BC(k1,k2)
-              end if
-              if ( (k2 .le. 2).or.(k2 .ge. Lbox-1) ) then
-                 call Perodic_BC(k1,k2)
-              end if
+              if (k1.eq.0 .and. k2.eq.0) then
+                 private_t = private_t + 0.00001
+              else
+                 call cell_event(k1, k2, nthread)
+                 if ( (k1 .le. 2).or.(k1 .ge. Lbox-1) ) then
+                    call Perodic_BC(k1,k2)
+                 end if
+                 if ( (k2 .le. 2).or.(k2 .ge. Lbox-1) ) then
+                    call Perodic_BC(k1,k2)
+                 end if
 
-              do i = ilow, iup
-                 do j = jlow, jup
-                    NT(i,j) = NT(i,j) + a(i,j)*tau
+                 do i = ilow, iup
+                    do j = jlow, jup
+                       NT(i,j) = NT(i,j) + a(i,j)*tau
+                    end do
                  end do
-              end do
 
-              do i = -2, 2
-                 do j = -2, 2
-                    shift_i = k1 + i
-                    shift_j = k2 + j
-                    if ( shift_i .le. 0 ) then
-                       shift_i = shift_i + Lbox
-                    else if ( shift_i > Lbox ) then
-                       shift_i = shift_i - Lbox
-                    end if
+                 do i = -2, 2
+                    do j = -2, 2
+                       shift_i = k1 + i
+                       shift_j = k2 + j
+                       if ( shift_i .le. 0 ) then
+                          shift_i = shift_i + Lbox
+                       else if ( shift_i > Lbox ) then
+                          shift_i = shift_i - Lbox
+                       end if
 
-                    if ( shift_j .le. 0 ) then
-                       shift_j = shift_j + Lbox
-                    else if ( shift_j > Lbox ) then
-                       shift_j = shift_j - Lbox
-                    end if
-                    call Update_Rate(shift_i, shift_j)
+                       if ( shift_j .le. 0 ) then
+                          shift_j = shift_j + Lbox
+                       else if ( shift_j > Lbox ) then
+                          shift_j = shift_j - Lbox
+                       end if
+                       call Update_Rate(shift_i, shift_j)
+                    end do
                  end do
-              end do
-              u = par_uni(nthread)
-              if ( u.le.0 .or. u.ge.1) then
-                 print *, 'haha ran error'
-                 stop
+                 u = par_uni(nthread)
+                 if ( u.le.0 .or. u.ge.1) then
+                    print *, 'haha ran error'
+                    stop
+                 end if
+                 u = -log(u)
+                 NP(k1, k2) = NP(k1, k2) + u
+                 private_t = private_t + tau
+                 !print *, 'event', k1, k2, npack(k1, k2)
               end if
-              u = -log(u)
-              NP(k1, k2) = NP(k1, k2) + u
-              private_t = private_t + tau
-              !print *, 'event', k1, k2, npack(k1, k2)
            end do
            !$OMP END parallel
            !$OMP barrier

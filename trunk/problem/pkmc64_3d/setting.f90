@@ -4,7 +4,7 @@ module setting
   integer, parameter :: H = 100
   real, parameter :: b = 8.0
   real, parameter :: bd10 = 10.0/b
-  real, parameter :: tend = 10000.0
+  real, parameter :: tend = 1000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 50.0
@@ -473,7 +473,7 @@ contains
     end do
     !    print *, 'k', k
     !    print *, 'a', a
-    if ( k1 .le. 0 .or. k2 .le. 0 ) then
+    if ( k1 < 0 .or. k2 < 0 ) then
        write(*,*), 'error'
        read(*,*)
     end if

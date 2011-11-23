@@ -44,15 +44,16 @@
 % ===========
 function dy = funcs(t,y)
 dy = zeros(5,1);    % a column vector
-N = 500;
-k1 = 0.9/N;
-k2 = 4/N;
-vm = 2.5;
-p0 = 1/(1.01+k1*(y(3)+y(5)));
-v = vm/(1+k2*(y(3)+y(5)));
+N = 200;
+k1 = 1;
+v0max = 3.0;
+v0min = 0.5;
+k2 = v0max/v0min - 1;
+p0 = 1/(1.01+k1*y(3)/N);
+v = v0max/(1+k2*y(3)/N);
 p1 = 0.4;
 pm = 1.0;
-lambda = max(0, 0.04*(sum(y)-N));
+lambda = max(0, 0.1*(sum(y)-N));
 dy(1) = v*p0*y(1) - v*(1-p0)*y(1) - lambda*y(1);
 dy(2) = 2*v*(1-p0)*y(1) + p1*y(2) - (1-p1)*y(2) - lambda*y(2);
 dy(3) = -0.2*y(3) + 2*(1-p1)*y(2) - lambda*y(3);

@@ -17,37 +17,38 @@
 % legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % print('-depsc','asym.eps')
 
-% % ===========
-% % script for 2 feedback, self-recovery, asym/asym
-% % ===========
-% load pr2_slefrecover_logi_aa
-% tr = pr2_slefrecover_logi_aa;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-% xlim([0, 450])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-% plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'total')
-% %ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_selfrecover_aa.eps')
-% 
-% figure
-% xlim([0, 450])
-% hold on
-% plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
-% plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
-% xlabel('t','fontsize', 18);
-% ylabel('p_0, v_0','fontsize',18)
-% legend('p_0', 'v_0')
-% %ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_selfrecover_pvplot_aa.eps')
-% 
+% ===========
+% script for 2 feedback, self-recovery, asym/asym
+% ===========
+load pr2_slefrecover_logi_aa
+tr = pr2_slefrecover_logi_aa;
+h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+xlim([0, 450])
+hold on
+plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC', 'MC', 'total')
+%ylim([0, 600])
+%set(get(h,'axis'),'FontSize',24)
+print('-depsc','fig_logi_selfrecover_aa.eps')
+
+figure
+xlim([0, 450])
+hold on
+plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
+plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
+xlabel('t','fontsize', 18);
+ylabel('p_0, v_0','fontsize',18)
+legend('p_0', 'v_0')
+%ylim([0, 600])
+%set(get(h,'axis'),'FontSize',24)
+box on
+print('-depsc','fig_logi_selfrecover_pvplot_aa.eps')
+
 % % ===========
 % % script for 2 feedback, self-recovery, sym/sym
 % % ===========
@@ -77,6 +78,7 @@
 % legend('p_0', 'v_0')
 % %ylim([0, 600])
 % %set(get(h,'axis'),'FontSize',24)
+% box on
 % print('-depsc','fig_logi_selfrecover_pvplot_ss.eps')
 
 % % ===========
@@ -108,38 +110,40 @@
 % legend('p_0', 'v_0')
 % %ylim([0, 600])
 % %set(get(h,'axis'),'FontSize',24)
+% box on
 % print('-depsc','fig_logi_selfrecover_pvplot_as.eps')
 
-% ===========
-% script for 2 feedback, self-recovery, sym/asym
-% ===========
-load pr2_slefrecover_logi_sa
-tr = pr2_slefrecover_logi_sa;
-h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-xlim([0, 450])
-hold on
-plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC', 'total')
-%ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_selfrecover_sa.eps')
-
-figure
-xlim([0, 450])
-hold on
-plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
-plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
-xlabel('t','fontsize', 18);
-ylabel('p_0, v_0','fontsize',18)
-legend('p_0', 'v_0')
-%ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_selfrecover_pvplot_sa.eps')
+% % ===========
+% % script for 2 feedback, self-recovery, sym/asym
+% % ===========
+% load pr2_slefrecover_logi_sa
+% tr = pr2_slefrecover_logi_sa;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+% plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC', 'total')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_selfrecover_sa.eps')
+% 
+% figure
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('p_0, v_0','fontsize',18)
+% legend('p_0', 'v_0')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% box on
+% print('-depsc','fig_logi_selfrecover_pvplot_sa.eps')
 
 % % ===========
 % % script for 2 feedback, woundhealing

@@ -28,7 +28,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1
+  integer(I4B) :: NSample = 1000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, q1, q2, q3, vmut
@@ -37,10 +37,18 @@ module chem_data
   real(kind=8), parameter :: L = 200
   real(kind=8), parameter :: mu = 0.00001
 
+!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
+!!$       10, & !SC
+!!$       0, & !TA
+!!$       0, & !TC
+!!$       00, & !MC
+!!$       00 & !TMC
+!!$       /)
+
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       10, & !SC
-       0, & !TA
-       0, & !TC
+       30, & !SC
+       50, & !TA
+       120, & !TC
        00, & !MC
        00 & !TMC
        /)
@@ -87,21 +95,21 @@ contains
     k1 = 1.0
     k2 = v0max/v0min - 1.0
     p1 = 0.4
-    p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
-    v0 = v0max/(1.0 + k2*(x(3)+x(5))/L)
+    p0 = 1.0/(1.01 + k1*x(3)/L)
+    v0 = v0max/(1.0 + k2*x(3)/L)
 
-!!$    if ( p0 .le. 0.5 ) then
-!!$       q2 = 2.0*p0
-!!$    else
-!!$       q2 = -2.0*(p0 - 1.0)
-!!$    end if
-!!$    q1 = p0 - q2*0.5
-!!$    q3 = 1.0 - q1 - q2
-!!$
-    q1 = p0
-    q2 = 0.0
-    q3 = 1.0 - q1
-!!$
+    if ( p0 .le. 0.5 ) then
+       q2 = 2.0*p0
+    else
+       q2 = -2.0*(p0 - 1.0)
+    end if
+    q1 = p0 - q2*0.5
+    q3 = 1.0 - q1 - q2
+
+!!$    q1 = p0
+!!$    q2 = 0.0
+!!$    q3 = 1.0 - q1
+
     qq1 = 0.0
     qq2 = 2.0*p1
     qq3 = 1.0 - qq1 - qq2
@@ -136,8 +144,8 @@ contains
     a(14) = ap*x(4)
     a(15) = ap*x(5)
 
-    a(16) = 0.0*mu*v0*x(1)
-    a(17) = 0.0*mu*x(2)
+    a(16) = mu*v0*x(1)
+    a(17) = mu*x(2)
 
   end subroutine getrate
 

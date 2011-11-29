@@ -7,14 +7,15 @@ program ssa
   real(kind=8) x(NSpec)
   real(kind=8) te
   real(kind=8) a(NReac), cuma(NReac), u
-  real(kind=8) delta_t, t, tp, td
-  integer(I4B) is_nag
+  real(kind=8) delta_t, t, tp, td, tac_mtime, sc_mtime
+  integer(I4B) is_nag, tac_mflag, sc_mflag
   integer(I4B) i, j, k, index
   real(kind=8) pm, N_mutation
   real(kind=8) xbar(NSpec), tbar
 
-  call ran_seed(sequence=12349)
+  call ran_seed(sequence=1234)
   te = 1000.0
+  !te = huge(1.0)
   xbar = 0.0
   pm = 1.0
   vmut = 1.0
@@ -25,6 +26,10 @@ program ssa
      tp = 0.0
      td = 150.0
      tbar = 0.0
+     tac_mflag = 0
+     sc_mflag = 0
+     tac_mtime = 0.0
+     sc_mtime = 0.0
      do while(t < te)
         call getrate(x, a, pm)
         cuma = a
@@ -46,22 +51,36 @@ program ssa
            print *, 'nag'
            pause
         end if
-        if(t > td) then
-           if (x(4).eq.0) x(4) = 1
-           td =  td + 150.0
+        
+        if ( j .eq. 17 .and. tac_mflag.eq.0) then
+           tac_mtime = t
+           tac_mflag = 1
         end if
-        if(t > tp) then
-           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
-           tp =  tp + 1.0
+
+        if ( j .eq. 16 .and. sc_mflag .eq. 0) then
+           sc_mtime = t
+           sc_mflag = 1
+           exit
+        end if
+!!$        if(t > td) then
+!!$           if (x(4).eq.0) x(4) = 1
+!!$           td =  td + 150.0
+!!$        end if
+!!$        if(t > tp) then
+!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
+!!$           tp =  tp + 1.0
+!!$        end if
+        !if (x(1).eq.0 .or. x(5).ne.0 .or. x(4).ne.0) then 
+        if (x(1).eq.0 .or. x(5).ne.0) then 
+!           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0           
+           exit
         end if
      end do
-     xbar = xbar + x
-     !if (x(5).ne.0) then 
-     !   print *, x
-     !   read(*,*)
-     !end if
+     write (*, '(F10.2, 9F8.2, 2I8, 2F10.2)'), t, x, sum(x), ap, p0, v0, &
+          tac_mflag, sc_mflag, tac_mtime, sc_mtime
+     !xbar = xbar + x
   end do
-  xbar = xbar / NSample
+  !xbar = xbar / NSample
   !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
 end program ssa
 

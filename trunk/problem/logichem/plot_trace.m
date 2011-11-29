@@ -17,37 +17,37 @@
 % legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % print('-depsc','asym.eps')
 
-% ===========
-% script for 2 feedback, self-recovery, asym/asym
-% ===========
-load pr2_slefrecover_logi_aa
-tr = pr2_slefrecover_logi_aa;
-h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
-xlim([0, 450])
-hold on
-plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
-plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
-plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
-plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC', 'total')
-%ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-print('-depsc','fig_logi_selfrecover_aa.eps')
-
-figure
-xlim([0, 450])
-hold on
-plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
-plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
-xlabel('t','fontsize', 18);
-ylabel('p_0, v_0','fontsize',18)
-legend('p_0', 'v_0')
-%ylim([0, 600])
-%set(get(h,'axis'),'FontSize',24)
-box on
-print('-depsc','fig_logi_selfrecover_pvplot_aa.eps')
+% % ===========
+% % script for 2 feedback, self-recovery, asym/asym
+% % ===========
+% load pr2_slefrecover_logi_aa
+% tr = pr2_slefrecover_logi_aa;
+% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.1)
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.1)
+% plot(tr(:,1), tr(:,5), 'k','linewidth', 1.1)
+% plot(tr(:,1), tr(:,7), '-m','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC', 'total')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% print('-depsc','fig_logi_selfrecover_aa.eps')
+% 
+% figure
+% xlim([0, 450])
+% hold on
+% plot(tr(:,1), tr(:,9), '-b','linewidth', 1.1)
+% plot(tr(:,1), tr(:,10), '-r','linewidth', 1.1)
+% xlabel('t','fontsize', 18);
+% ylabel('p_0, v_0','fontsize',18)
+% legend('p_0', 'v_0')
+% %ylim([0, 600])
+% %set(get(h,'axis'),'FontSize',24)
+% box on
+% print('-depsc','fig_logi_selfrecover_pvplot_aa.eps')
 
 % % ===========
 % % script for 2 feedback, self-recovery, sym/sym
@@ -174,72 +174,56 @@ print('-depsc','fig_logi_selfrecover_pvplot_aa.eps')
 % ylabel('Stem cell property','fontsize', 18)
 % print('-depsc','fig_logi_2f_woundhealing_supp.eps')
 
-
-% 
 % % ===========
-% % script for 1 feedback, mutation
+% % script for mutation
 % % ===========
-% load paperresult_geneticstability_tr1f
-% tr = paperresult_geneticstability_tr1f;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
+% load pr_mutation 
+% tr = pr_mutation;
+% h = plot(tr(1:5000,1), tr(1:5000,2), '-r','linewidth', 1.0)
 % %xlim([0, 250])
 % hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
-% plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
-% plot(tr(:,1), tr(:,6), '-k','linewidth', 2.0)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC','TDC', 'MC1', 'MC2',2)
-% %plot(tr(length(tr),1), tr(length(tr),3), 'k*', 'markersize', 8)
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_1f_mutation.eps')
-
-
-% % ===========
-% % script for 2 feedback, mutation
-% % ===========
-% load paperresult_geneticstability_tr2f_k09 
-% tr = paperresult_geneticstability_tr2f_k09;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
-% %xlim([0, 250])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
-% plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
-% plot(tr(:,1), tr(:,6), '-k','linewidth', 1.0)
+% plot(tr(1:5000,1), tr(1:5000,3), '-b','linewidth', 1.0)
+% plot(tr(1:5000,1), tr(1:5000,4), '-g','linewidth', 1.0)
+% plot(tr(1:5000,1), tr(1:5000,5), '-k','linewidth', 1.0)
+% %plot(tr(1:5000,1), tr(1:5000,6), '-k','linewidth', 1.0)
 % %plot(tr(:,1), tr(:,8), '-m','linewidth', 1.0)
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'MC')
-% plot(tr(length(tr),1), tr(length(tr),2), 'k*', 'markersize', 8)
-% ylim([0, 600])
+% %plot(tr(length(tr),1), tr(length(tr),2), 'k*', 'markersize', 8)
+% %ylim([0, 600])
 % %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_2f_mutation.eps')
-
-
+% print('-depsc','fig_logi_mutation.eps')
 % 
-% % ===========
-% % script for 3 feedback, mutation
-% % ===========
-% load paperresult_geneticstability_tr3f
-% tr = paperresult_geneticstability_tr3f;
-% h = plot(tr(:,1), tr(:,2), '-r','linewidth', 1.0)
-% %xlim([0, 250])
-% hold on
-% plot(tr(:,1), tr(:,3), '-b','linewidth', 1.0)
-% plot(tr(:,1), tr(:,4), '-g','linewidth', 1.0)
-% plot(tr(:,1), tr(:,5), ':k','linewidth', 1.0)
-% plot(tr(:,1), tr(:,6), '-k','linewidth', 1.0)
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC')
-% plot(tr(length(tr),1), tr(length(tr),2), 'k*', 'markersize', 8)
-% ylim([0, 600])
-% %set(get(h,'axis'),'FontSize',24)
-% print('-depsc','fig_logi_3f_mutation.eps')
+% counter = 0;
+% for i=1:length(sample_aa)
+%     if ( sample_aa(i, 2) == 0 )
+%         counter = counter + 1;
+%     end
+% end
 
+% ===========
+% script for pie
+% ===========
+load sample_survive
+counter = zeros(1,4);
+for i=1:length(sample_survive)
+    if ( sample_survive(i,12) ~= 0 )
+        counter(4) = counter(4) + 1;
+    end
+    if ( sample_survive(i,11) ~= 0 && sample_survive(i,12) == 0 && sample_survive(i, 2)~=0)
+        counter(2) = counter(2) + 1;
+    end
+    if ( sample_survive(i,11) == 0 && sample_survive(i,12) == 0 )
+        counter(1) = counter(1) + 1;
+    end
+    if ( sample_survive(i,11) ~= 0 && sample_survive(i,12) == 0 && sample_survive(i, 2)==0)
+        counter(3) = counter(3) + 1;
+    end
+end
+pie(counter)
+colormap cool
+print('-depsc','fig_logi_mpie.eps')
 
 % % ===========
 % % script for srI_short

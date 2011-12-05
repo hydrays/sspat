@@ -1,21 +1,21 @@
-% % ===========
-% % test
-% % ===========
-% load tr
-% clf;
-% tr = tr;
-% plot(tr(:,1), tr(:,2), 'r')
-% %xlim([150, 350])
-% hold on
-% plot(tr(:,1), tr(:,3), 'b')
-% plot(tr(:,1), tr(:,4), 'g')
-% plot(tr(:,1), tr(:,5), 'k')
-% % figure
-% plot(tr(:,1), tr(:,7), 'm')
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-% print('-depsc','asym.eps')
+% ===========
+% test
+% ===========
+load tr
+clf;
+tr = tr;
+plot(tr(:,1), tr(:,2), 'r')
+%xlim([150, 350])
+hold on
+plot(tr(:,1), tr(:,3), 'b')
+plot(tr(:,1), tr(:,4), 'g')
+plot(tr(:,1), tr(:,5), 'k')
+% figure
+plot(tr(:,1), tr(:,7), 'm')
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC', 'MC', 'Total')
+print('-depsc','asym.eps')
 
 % % ===========
 % % script for 2 feedback, self-recovery, asym/asym
@@ -202,28 +202,48 @@
 %     end
 % end
 
-% ===========
-% script for pie
-% ===========
-load sample_survive
-counter = zeros(1,4);
-for i=1:length(sample_survive)
-    if ( sample_survive(i,12) ~= 0 )
-        counter(4) = counter(4) + 1;
-    end
-    if ( sample_survive(i,11) ~= 0 && sample_survive(i,12) == 0 && sample_survive(i, 2)~=0)
-        counter(2) = counter(2) + 1;
-    end
-    if ( sample_survive(i,11) == 0 && sample_survive(i,12) == 0 )
-        counter(1) = counter(1) + 1;
-    end
-    if ( sample_survive(i,11) ~= 0 && sample_survive(i,12) == 0 && sample_survive(i, 2)==0)
-        counter(3) = counter(3) + 1;
-    end
-end
-pie(counter)
-colormap cool
-print('-depsc','fig_logi_mpie.eps')
+% % ===========
+% % script for pie
+% % ===========
+% load sample_survive
+% counter = zeros(1,4);
+% for i=1:length(sample_survive)
+%     if ( sample_survive(i,12) ~= 0 )
+%         counter(4) = counter(4) + 1;
+%     end
+%     if ( sample_survive(i,11) ~= 0 && sample_survive(i,12) == 0 && sample_survive(i, 2)~=0)
+%         counter(2) = counter(2) + 1;
+%     end
+%     if ( sample_survive(i,11) == 0 && sample_survive(i,12) == 0 )
+%         counter(1) = counter(1) + 1;
+%     end
+%     if ( sample_survive(i,11) ~= 0 && sample_survive(i,12) == 0 && sample_survive(i, 2)==0)
+%         counter(3) = counter(3) + 1;
+%     end
+% end
+% pie(counter)
+% colormap cool
+% print('-depsc','fig_logi_mpie.eps')
+
+% % ===========
+% % script for stable solution
+% % ===========
+% load pr2_stable_ss06
+% clf;
+% tr = pr2_stable_ss06;
+% plot(tr(:,1), tr(:,2), 'r','linewidth', 2)
+% xlim([0, 200])
+% ylim([0, 250])
+% hold on
+% plot(tr(:,1), tr(:,3), 'b','linewidth', 2)
+% plot(tr(:,1), tr(:,4), 'g','linewidth', 2)
+% %plot(tr(:,1), tr(:,5), 'k','linewidth', 2)
+% % figure
+% plot(tr(:,1), tr(:,7), 'm','linewidth', 2)
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'Total')
+% print('-depsc','fig_logi_stable_ss06.eps')
 
 % % ===========
 % % script for srI_short

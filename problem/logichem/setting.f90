@@ -28,7 +28,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1000
+  integer(I4B) :: NSample = 100000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, q1, q2, q3, vmut
@@ -37,21 +37,21 @@ module chem_data
   real(kind=8), parameter :: L = 200
   real(kind=8), parameter :: mu = 0.00001
 
-!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
-!!$       10, & !SC
-!!$       0, & !TA
-!!$       0, & !TC
-!!$       00, & !MC
-!!$       00 & !TMC
-!!$       /)
-
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       30, & !SC
-       50, & !TA
-       120, & !TC
+       10, & !SC
+       00, & !TA
+       00, & !TC
        00, & !MC
        00 & !TMC
        /)
+!!$
+!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
+!!$       30, & !SC
+!!$       50, & !TA
+!!$       120, & !TC
+!!$       00, & !MC
+!!$       00 & !TMC
+!!$       /)
 
 !!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
 !!$       100, & !SC
@@ -70,8 +70,10 @@ module chem_data
        (/00, 01, 00, 00, 00/), & !4
        (/00, 00, 01, 00, 00/), & !5
        (/00, -1, 02, 00, 00/), & !6
-       (/00, 00, 00, 01, 00/), & !7
-       (/00, 00, 00, -1, 02/), & !8
+       (/00, 00, 00, 00, 01/), & !7
+       (/00, 00, 00, 01, 00/), & !8
+!       (/00, 00, 00, 01, 00/), & !7
+!       (/00, 00, 00, -1, 02/), & !8
        (/00, 00, -1, 00, 00/), & !9
        (/00, 00, 00, 00, -1/), & !10
        (/-1, 00, 00, 00, 00/), & !11
@@ -96,8 +98,9 @@ contains
     k2 = v0max/v0min - 1.0
     p1 = 0.4
     p0 = 1.0/(1.01 + k1*x(3)/L)
-    v0 = v0max/(1.0 + k2*x(3)/L)
-
+    !v0 = v0max/(1.0 + k2*x(3)/L)
+    v0 = 0.65
+!!$
     if ( p0 .le. 0.5 ) then
        q2 = 2.0*p0
     else
@@ -131,11 +134,15 @@ contains
     a(5) = qq2*x(2)
     a(6) = qq3*x(2)
 
-    a(7) = vmut*x(4)*pm
-    a(8) = vmut*x(4)*(1.0-pm)
+    !a(7) = vmut*x(4)*pm
+    !a(8) = vmut*x(4)*(1.0-pm)
+
+    a(7) = v0*x(5)
+    a(8) = x(4)
 
     a(9) = 0.2*x(3)
-    a(10) = 0.2*x(5)
+    !a(10) = 0.2*x(5)
+    a(10) = 0.0*x(5)
 
     a(11) = ap*x(1)
     a(12) = ap*x(2)

@@ -14,7 +14,7 @@ program ssa
   real(kind=8) xbar(NSpec), tbar
 
   call ran_seed(sequence=1234)
-  te = 1000.0
+  te = 10000.0
   !te = huge(1.0)
   xbar = 0.0
   pm = 1.0
@@ -46,22 +46,26 @@ program ssa
            j = j+1
         end do
         x = x + nu(:, j)
+!!$        if (j.eq.16) then
+!!$           print *, x
+!!$           read(*,*)
+!!$        end if
         call checkx(x, is_nag)
         if (is_nag .eq. 1) then
            print *, 'nag'
            pause
         end if
         
-        if ( j .eq. 17 .and. tac_mflag.eq.0) then
-           tac_mtime = t
-           tac_mflag = 1
-        end if
-
-        if ( j .eq. 16 .and. sc_mflag .eq. 0) then
-           sc_mtime = t
-           sc_mflag = 1
-           exit
-        end if
+!!$        if ( j .eq. 17 .and. tac_mflag.eq.0) then
+!!$           tac_mtime = t
+!!$           tac_mflag = 1
+!!$        end if
+!!$
+!!$        if ( j .eq. 16 .and. sc_mflag .eq. 0) then
+!!$           sc_mtime = t
+!!$           sc_mflag = 1
+!!$           exit
+!!$        end if
 !!$        if(t > td) then
 !!$           if (x(4).eq.0) x(4) = 1
 !!$           td =  td + 150.0
@@ -71,13 +75,14 @@ program ssa
 !!$           tp =  tp + 1.0
 !!$        end if
         !if (x(1).eq.0 .or. x(5).ne.0 .or. x(4).ne.0) then 
-        if (x(1).eq.0 .or. x(5).ne.0) then 
-!           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0           
+        !if (x(1).eq.0 .or. x(5).ne.0) then 
+        if (sum(x(1:3)).eq.0) then 
+           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0           
            exit
         end if
      end do
-     write (*, '(F10.2, 9F8.2, 2I8, 2F10.2)'), t, x, sum(x), ap, p0, v0, &
-          tac_mflag, sc_mflag, tac_mtime, sc_mtime
+!     write (*, '(F10.2, 9F8.2, 2I8, 2F10.2)'), t, x, sum(x), ap, p0, v0, &
+!          tac_mflag, sc_mflag, tac_mtime, sc_mtime
      !xbar = xbar + x
   end do
   !xbar = xbar / NSample

@@ -14,7 +14,7 @@ program ssa
   real(kind=8) xbar(NSpec), tbar
 
   call ran_seed(sequence=1234)
-  te = 10000.0
+  te = 1000000.0
   !te = huge(1.0)
   xbar = 0.0
   pm = 1.0
@@ -70,10 +70,10 @@ program ssa
 !!$           if (x(4).eq.0) x(4) = 1
 !!$           td =  td + 150.0
 !!$        end if
-!!$        if(t > tp) then
-!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
-!!$           tp =  tp + 1.0
-!!$        end if
+        if(t > tp) then
+           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
+           tp =  tp + 1.0
+        end if
         !if (x(1).eq.0 .or. x(5).ne.0 .or. x(4).ne.0) then 
         !if (x(1).eq.0 .or. x(5).ne.0) then 
         if (sum(x(1:3)).eq.0) then 

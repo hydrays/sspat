@@ -11,25 +11,28 @@ program ssa
   integer(I4B) is_nag, tac_mflag, sc_mflag
   integer(I4B) i, j, k, index
   real(kind=8) pm, N_mutation
-  real(kind=8) xbar(NSpec), tbar
+  real(kind=8) xbar(NSpec), tbar, xbar_counter
 
   call ran_seed(sequence=1234)
-  te = 1000000.0
+  te = 200.0
   !te = huge(1.0)
-  xbar = 0.0
   pm = 1.0
   vmut = 1.0
 
+  do pm = 0.0, 1.0001, 0.02
+  do vmut = 0.1, 3.1, 0.1
+  xbar = 0.0
   do index = 1.0, NSample
      x = xinit
      t = 0.0
      tp = 0.0
-     td = 150.0
+     td = 100.0
      tbar = 0.0
      tac_mflag = 0
      sc_mflag = 0
      tac_mtime = 0.0
      sc_mtime = 0.0
+     xbar_counter = 0.0
      do while(t < te)
         call getrate(x, a, pm)
         cuma = a
@@ -66,27 +69,31 @@ program ssa
 !!$           sc_mflag = 1
 !!$           exit
 !!$        end if
-!!$        if(t > td) then
-!!$           if (x(4).eq.0) x(4) = 1
-!!$           td =  td + 150.0
-!!$        end if
+        if(t > td) then
+           if (x(4).eq.0) x(4) = 1
+           td =  td + 200.0
+        end if
         if(t > tp) then
-           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
+           !write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
            tp =  tp + 1.0
+           if (t > 1000) then
+           end if
         end if
         !if (x(1).eq.0 .or. x(5).ne.0 .or. x(4).ne.0) then 
         !if (x(1).eq.0 .or. x(5).ne.0) then 
-        if (sum(x(1:3)).eq.0) then 
-           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0           
-           exit
-        end if
+!!$        if (sum(x(1:3)).eq.0) then 
+!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0           
+!!$           exit
+!!$        end if
      end do
+     xbar = xbar + x
 !     write (*, '(F10.2, 9F8.2, 2I8, 2F10.2)'), t, x, sum(x), ap, p0, v0, &
 !          tac_mflag, sc_mflag, tac_mtime, sc_mtime
-     !xbar = xbar + x
   end do
-  !xbar = xbar / NSample
-  !write (*, '(F18.8, 6F10.2)'), pm, xbar, sum(xbar)
+  xbar = xbar / Nsample
+  write (*, '(F18.8, 8F10.2)'), pm, vmut, xbar, sum(xbar)
+  end do 
+  end do
 end program ssa
 
 subroutine checkx(x, is_nag)

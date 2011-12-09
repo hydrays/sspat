@@ -28,19 +28,19 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 2000
+  integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=17
   real(kind=8) ap, p0, p1, v0, q1, q2, q3, vmut
   real(kind=8) k1, k2, v0max, v0min
   real(kind=8) qq1, qq2, qq3
-  real(kind=8), parameter :: L = 200
+  real(kind=8), parameter :: L = 1000
   real(kind=8), parameter :: mu = 0.0
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       20, & !SC
-       30, & !TA
-       150, & !TC
+       10, & !SC
+       0, & !TA
+       0, & !TC
        00, & !MC
        00 & !TMC
        /)

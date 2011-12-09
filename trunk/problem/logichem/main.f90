@@ -19,9 +19,9 @@ program ssa
   pm = 1.0
   vmut = 1.0
 
-  do pm = 0.0, 1.0001, 0.02
-  do vmut = 0.1, 3.1, 0.1
-  xbar = 0.0
+!  do pm = 0.0, 1.0001, 0.02
+!  do vmut = 0.1, 3.1, 0.1
+!  xbar = 0.0
   do index = 1.0, NSample
      x = xinit
      t = 0.0
@@ -69,12 +69,12 @@ program ssa
 !!$           sc_mflag = 1
 !!$           exit
 !!$        end if
-        if(t > td) then
-           if (x(4).eq.0) x(4) = 1
-           td =  td + 200.0
-        end if
+!!$        if(t > td) then
+!!$           if (x(4).eq.0) x(4) = 1
+!!$           td =  td + 200.0
+!!$        end if
         if(t > tp) then
-           !write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
+           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
            tp =  tp + 1.0
            if (t > 1000) then
            end if
@@ -90,10 +90,10 @@ program ssa
 !     write (*, '(F10.2, 9F8.2, 2I8, 2F10.2)'), t, x, sum(x), ap, p0, v0, &
 !          tac_mflag, sc_mflag, tac_mtime, sc_mtime
   end do
-  xbar = xbar / Nsample
-  write (*, '(F18.8, 8F10.2)'), pm, vmut, xbar, sum(xbar)
-  end do 
-  end do
+!  xbar = xbar / Nsample
+!  write (*, '(F18.8, 8F10.2)'), pm, vmut, xbar, sum(xbar)
+!  end do 
+!  end do
 end program ssa
 
 subroutine checkx(x, is_nag)

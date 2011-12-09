@@ -1,21 +1,20 @@
-% % ===========
-% % test
-% % ===========
-% load tr
-% clf;
-% tr = tr;
-% plot(tr(:,1), tr(:,2), 'r')
-% %xlim([150, 350])
-% hold on
-% plot(tr(:,1), tr(:,3), 'b')
-% plot(tr(:,1), tr(:,4), 'g')
-% plot(tr(:,1), tr(:,5), 'k')
-% % figure
-% plot(tr(:,1), tr(:,7), 'm')
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-% print('-depsc','asym.eps')
+% ===========
+% test
+% ===========
+load tr
+clf;
+tr = tr;
+plot(tr(:,1), tr(:,2), 'r')
+%xlim([150, 350])
+hold on
+plot(tr(:,1), tr(:,3), 'b')
+plot(tr(:,1), tr(:,4), 'g')
+plot(tr(:,1), tr(:,5), 'k')
+% figure
+plot(tr(:,1), tr(:,7), 'm')
+xlabel('t','fontsize', 18);
+ylabel('cell population','fontsize',18)
+legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 
 % % ===========
 % % script for 2 feedback, self-recovery, asym/asym
@@ -307,30 +306,30 @@
 % legend('feedback scheme II', 'feedback scheme III', 2)
 % %set(get(h,'axis'),'FontSize',24)
 % print('-depsc','fig_logi_pm.eps')
-
-% ===========
-% script pm ultra
-% ===========
-load pr2_p0v0_data2
-data = pr2_p0v0_data2
-ymap = 0.1:.1:3.009;
-xmap = 0.0:0.02:1.0001;
-[X,Y] = meshgrid(xmap, ymap);
-wg_barmap = reshape((data(:,6)+data(:,7))./(data(:,3)+data(:,4)+data(:,5)+data(:,6)+data(:,7)), length(ymap), length(xmap))
-surf(X, Y, wg_barmap)
-xlabel('p_m','fontsize', 18);
-ylabel('v_m','fontsize',18);
-zlabel('ratio of mutant cell','fontsize',18);
-xlim([0.5,1]);
-%print('-depsc','fig_logi_pmvm.eps')
-figure
-plot(xmap, wg_barmap(10, :),'linewidth', 2)
-hold on
-plot(xmap, wg_barmap(7, :),'g', 'linewidth', 2)
-plot(xmap, wg_barmap(15, :),'r', 'linewidth', 2)
-%plot(xmap, wg_barmap(25, :),'r', 'linewidth', 2)
-xlim([0.5,1]);
-legend('v_m = 0.7', 'v_m=1', 'v_m=1.5','location', 'northwest')
-xlabel('p_m','fontsize', 18);
-ylabel('ratio of mutant cell','fontsize',18);
-print('-depsc','fig_logi_pmvm_slicev.eps')
+% 
+% % ===========
+% % script pm ultra
+% % ===========
+% load pr2_p0v0_data2
+% data = pr2_p0v0_data2
+% ymap = 0.1:.1:3.009;
+% xmap = 0.0:0.02:1.0001;
+% [X,Y] = meshgrid(xmap, ymap);
+% wg_barmap = reshape((data(:,6)+data(:,7))./(data(:,3)+data(:,4)+data(:,5)+data(:,6)+data(:,7)), length(ymap), length(xmap))
+% surf(X, Y, wg_barmap)
+% xlabel('p_m','fontsize', 18);
+% ylabel('v_m','fontsize',18);
+% zlabel('ratio of mutant cell','fontsize',18);
+% xlim([0.5,1]);
+% %print('-depsc','fig_logi_pmvm.eps')
+% figure
+% plot(xmap, wg_barmap(10, :),'linewidth', 2)
+% hold on
+% plot(xmap, wg_barmap(7, :),'g', 'linewidth', 2)
+% plot(xmap, wg_barmap(15, :),'r', 'linewidth', 2)
+% %plot(xmap, wg_barmap(25, :),'r', 'linewidth', 2)
+% xlim([0.5,1]);
+% legend('v_m = 0.7', 'v_m=1', 'v_m=1.5','location', 'northwest')
+% xlabel('p_m','fontsize', 18);
+% ylabel('ratio of mutant cell','fontsize',18);
+% print('-depsc','fig_logi_pmvm_slicev.eps')

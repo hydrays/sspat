@@ -34,13 +34,13 @@ module chem_data
   real(kind=8) ap, p0, p1, v0, q1, q2, q3, vmut
   real(kind=8) k1, k2, v0max, v0min
   real(kind=8) qq1, qq2, qq3
-  real(kind=8), parameter :: L = 1000
+  real(kind=8), parameter :: L = 200
   real(kind=8), parameter :: mu = 0.0
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       10, & !SC
-       0, & !TA
-       0, & !TC
+       20, & !SC
+       30, & !TA
+       150, & !TC
        00, & !MC
        00 & !TMC
        /)
@@ -98,9 +98,9 @@ contains
     k2 = v0max/v0min - 1.0
     p1 = 0.4
     p0 = 1.0/(1.01 + k1*(x(3)+x(5))/L)
-    v0 = v0max/(1.0 + k2*(x(3)+x(5))/L)
-    !v0 = 0.65
-!!$
+    !v0 = v0max/(1.0 + k2*(x(3)+x(5))/L)
+    v0 = 0.65
+
     if ( p0 .le. 0.5 ) then
        q2 = 2.0*p0
     else

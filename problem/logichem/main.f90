@@ -13,8 +13,8 @@ program ssa
   real(kind=8) pm, N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
-  call ran_seed(sequence=1234)
-  te = 200.0
+  call ran_seed(sequence=12342)
+  te = 600.0
   !te = huge(1.0)
   pm = 1.0
   vmut = 1.0
@@ -69,10 +69,11 @@ program ssa
 !!$           sc_mflag = 1
 !!$           exit
 !!$        end if
-!!$        if(t > td) then
-!!$           if (x(4).eq.0) x(4) = 1
-!!$           td =  td + 200.0
-!!$        end if
+        if(t > td) then
+!           if (x(4).eq.0) x(4) = 1
+           x(3) = 20
+           td =  td + 200.0
+        end if
         if(t > tp) then
            write (*, '(F10.2, 10F8.2)'), t, x, sum(x), ap, p0, v0
            tp =  tp + 1.0

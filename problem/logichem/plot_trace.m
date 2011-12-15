@@ -189,53 +189,55 @@ legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % print('-depsc','fig_logi_mutation_system2.eps')
 
 
-% % ===========
-% % script for pie
-% % ===========
-% load pr2_sample_system1
-% sample = pr2_sample_system1;
-% counter = zeros(1,4);
-% for i=1:length(sample)
-%     if ( sum(sample(i,2:6)) == 0 )
-%         counter(4) = counter(4) + 1;
-%     end
-%     if ( sample(i,5) == 0 && sample(i,6) ~= 0 )
-%         counter(1) = counter(1) + 1;
-%     end
-%     if ( sample(i,5) ~= 0 && sample(i,6) == 0 )
-%         counter(3) = counter(3) + 1;
-%     end
-%     if ( sample(i,5) ~= 0 && sample(i,6) ~= 0)
-%         counter(2) = counter(2) + 1;
-%     end
-% end
-% subplot(1, 2, 1), pie(counter(1:3))
-% %colormap cool
-% %print('-depsc','fig_logi_mpie_system1.eps')
-% 
-% % ===========
-% % script for pie
-% % ===========
-% load pr2_sample_system2
-% sample = pr2_sample_system2;
-% counter = zeros(1,4);
-% for i=1:length(sample)
-%     if ( sum(sample(i,2:6)) == 0 )
-%         counter(4) = counter(4) + 1;
-%     end
-%     if ( sample(i,5) == 0 && sample(i,6) ~= 0 )
-%         counter(1) = counter(1) + 1;
-%     end
-%     if ( sample(i,5) ~= 0 && sample(i,6) == 0 )
-%         counter(3) = counter(3) + 1;
-%     end
-%     if ( sample(i,5) ~= 0 && sample(i,6) ~= 0)
-%         counter(2) = counter(2) + 1;
-%     end
-% end
-% subplot(1, 2, 2), pie(counter(1:3))
-% %colormap cool
-% print('-depsc','fig_logi_mpie.eps')
+% ===========
+% script for pie
+% ===========
+load pr2_sample_system1
+sample = pr2_sample_system1;
+counter = zeros(1,4);
+for i=1:length(sample)
+    if ( sum(sample(i,2:6)) == 0 )
+        counter(4) = counter(4) + 1;
+    end
+    if ( sample(i,5) == 0 && sample(i,6) ~= 0 )
+        counter(3) = counter(3) + 1;
+    end
+    if ( sample(i,5) ~= 0 && sample(i,6) == 0 )
+        counter(1) = counter(1) + 1;
+    end
+    if ( sample(i,5) ~= 0 && sample(i,6) ~= 0)
+        counter(2) = counter(2) + 1;
+    end
+end
+subplot(1, 2, 2), pie(counter(1:3))
+title('System 2')
+%colormap cool
+%print('-depsc','fig_logi_mpie_system1.eps')
+
+% ===========
+% script for pie
+% ===========
+load pr2_sample_system2
+sample = pr2_sample_system2;
+counter = zeros(1,4);
+for i=1:length(sample)
+    if ( sum(sample(i,2:6)) == 0 )
+        counter(4) = counter(4) + 1;
+    end
+    if ( sample(i,5) == 0 && sample(i,6) ~= 0 )
+        counter(3) = counter(3) + 1;
+    end
+    if ( sample(i,5) ~= 0 && sample(i,6) == 0 )
+        counter(1) = counter(1) + 1;
+    end
+    if ( sample(i,5) ~= 0 && sample(i,6) ~= 0)
+        counter(2) = counter(2) + 1;
+    end
+end
+subplot(1, 2, 1), pie(counter(1:3))
+%colormap cool
+title('System 1')
+print('-depsc','fig_logi_mpie.eps')
 
 % % ===========
 % % script for stable solution

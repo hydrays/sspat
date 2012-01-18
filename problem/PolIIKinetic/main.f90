@@ -13,7 +13,7 @@ program ssa
 
   call ran_seed(sequence=12341)
   !te = huge(1.0)
-  te = 100000.0
+  te = 10000.0
   !td = 1000.0
   do index = 1.0, NSample
      x = xinit
@@ -29,7 +29,7 @@ program ssa
 !!$           s3 = 1.0
 !!$        end if
         call getrate(x, a)
-!!$        print *, x
+!!$        write(*, '(4(F12.4))'), t, x
 !!$        print *, a
 !!$        read(*,*)
         cuma = a
@@ -44,6 +44,12 @@ program ssa
         call expdev(delta_t)
         delta_t = delta_t/cuma(NReac)
         t = t + delta_t
+
+        if ( t > te ) then
+           write(*, '(4(F12.4))'), te, x
+           exit
+        end if
+
         call ran2(u)
         u = cuma(NReac)*u
         j = 1
@@ -56,10 +62,10 @@ program ssa
            print *, 'nag'
            pause
         end if
-        if ( t > tp ) then
-           write(*, '(4(F12.4))'), t, x
-           tp = tp + 10.0
-        end if
+!!$        if ( t > tp ) then
+!!$           !write(*, '(4(F12.4))'), t, x
+!!$           tp = tp + 1.0
+!!$        end if
 !!$        if (x(3) .eq. 1) then
 !!$           write(*, '(4(F12.4))'), t, x
 !!$           exit

@@ -44,6 +44,6 @@ load re_hist
 %re_hist = re_hist001;
 x(1) = 0;
 x(2) = sum(re_hist(:, 3));
-x(3:10) = sum(re_hist(:, 4))/7;
-plot(x,'m');
+x(3:10) = sum(re_hist(:, 4))/5;
+plot(x,'b');
 %print('-depsc','fig_polII_dist.eps')

@@ -21,29 +21,49 @@
 % print('-depsc','fig_switch_dist.eps')
 
 
+% % ============
+% % PolII Distribution
+% % ============
+% clear all
+% % load re_hist01
+% % re_hist = re_hist01;
+% % x(1) = 0;
+% % x(2) = sum(re_hist(:, 3));
+% % x(3:10) = sum(re_hist(:, 4))/7;
+% % plot(x);
+% hold on;
+% % 
+% % load re_hist02
+% % re_hist = re_hist02;
+% % x(1) = 0;
+% % x(2) = sum(re_hist(:, 3));
+% % x(3:10) = sum(re_hist(:, 4))/7;
+% % plot(x,'g');
+% 
+% load re_hist
+% %re_hist = re_hist001;
+% x(1) = 0;
+% x(2) = sum(re_hist(:, 3));
+% x(3:10) = sum(re_hist(:, 4))/5;
+% plot(x,'r');
+% %print('-depsc','fig_polII_dist.eps')
+
 % ============
-% PolII Distribution
+% Response Time
 % ============
 clear all
-% load re_hist01
-% re_hist = re_hist01;
-% x(1) = 0;
-% x(2) = sum(re_hist(:, 3));
-% x(3:10) = sum(re_hist(:, 4))/7;
-% plot(x);
-hold on;
-% 
-% load re_hist02
-% re_hist = re_hist02;
-% x(1) = 0;
-% x(2) = sum(re_hist(:, 3));
-% x(3:10) = sum(re_hist(:, 4))/7;
-% plot(x,'g');
-
-load re_hist
-%re_hist = re_hist001;
-x(1) = 0;
-x(2) = sum(re_hist(:, 3));
-x(3:10) = sum(re_hist(:, 4))/5;
+load re_expression
+n = size(re_expression);
+x = zeros(n(2),1);
+y = zeros(n(2),1);
+for i=1: n(2) 
+    x(i) = sum(re_expression(:,i));
+    y(i) = 50*abs(sin(0.01*10*i));
+end
 plot(x,'b');
-%print('-depsc','fig_polII_dist.eps')
+hold on;
+%plot(y, 'k')
+
+
+print('-depsc','fig_express.eps')
+

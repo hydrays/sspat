@@ -13,7 +13,7 @@ program ssa
 
   call ran_seed(sequence=12341)
   !te = huge(1.0)
-  te = 10000.0
+  te = 1000.0
   !td = 1000.0
   do index = 1.0, NSample
      x = xinit
@@ -21,7 +21,7 @@ program ssa
      tp = 0.0
      s1 = 1.0
      s2 = 1.0
-     s3 = 0.001
+     s3 = 0.0002
      do while(t < te)
 !!$        if ( t > td ) then 
 !!$           s1 = 1.0
@@ -29,7 +29,7 @@ program ssa
 !!$           s3 = 1.0
 !!$        end if
         call getrate(x, a)
-!!$        write(*, '(4(F12.4))'), t, x
+!!$        write(*, '(5(F12.4))'), t, x
 !!$        print *, a
 !!$        read(*,*)
         cuma = a
@@ -46,7 +46,7 @@ program ssa
         t = t + delta_t
 
         if ( t > te ) then
-           write(*, '(4(F12.4))'), te, x
+           write(*, '(5(F12.4))'), te, x
            exit
         end if
 

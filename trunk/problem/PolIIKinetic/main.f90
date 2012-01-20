@@ -13,29 +13,27 @@ program ssa
 
   call ran_seed(sequence=12341)
   !te = huge(1.0)
-  te = 20000.0
-  td = 1000.0
+  te = 10000.0
+  !td = 1000.0
   do index = 1.0, NSample
      x = xinit
      t = 0.0
      tp = 0.0
      s1 = 1.0
      s2 = 1.0
-     s3 = 0.0001
+     s3 = 0.01
      do while(.true.)
-        !print *, t, td
-        !read(*,*)
-        if ( t > td ) then 
-           !s1 = tiny(1.0)
-           !s1 = 1.0
-           !s1 = abs(sin(0.005*t))
-           !s2 = 1.0
-           if ( mod(t, 1000.0) < 1 ) then
-              s3 = 1.0
-           else
-              s3 = 0.0
-           end if
-        end if
+!!$        if ( t > td ) then 
+!!$           !s1 = tiny(1.0)
+!!$           !s1 = 1.0
+!!$           !s1 = abs(sin(0.005*t))
+!!$           !s2 = 1.0
+!!$           if ( mod(t, 1000.0) < 1 ) then
+!!$              s3 = 1.0
+!!$           else
+!!$              s3 = 0.0
+!!$           end if
+!!$        end if
         call getrate(x, a)
         !write(*, '(5(F12.4))'), t, x
         !print *, a
@@ -47,29 +45,15 @@ program ssa
         if ( cuma(NReac) .eq. 0.0 ) then
            !print *, 'waiting', t
            t = t + 0.1
-           do while ( t > tp )
-              write(*, '((F8.1))', advance='no'), x(3)
-              !read(*,*)
-              tp = tp + 10.0
-           end do
            cycle
         end if
         call expdev(delta_t)
         delta_t = delta_t/cuma(NReac)
         t = t + delta_t
 
-        do while ( t > tp )
-           write(*, '((F8.1))', advance='no'),  x(3)
-           !read(*,*)
-           tp = tp + 10.0
-           if ( tp > te ) then
-              exit
-           end if
-        end do
-
         if ( t > te ) then
-           !write(*, '(5(F12.4))'), te, x
-           write(*,*), ' '
+           write(*, '(5(F12.4))'), te, x
+           !write(*,*), ' '
            exit
         end if
 

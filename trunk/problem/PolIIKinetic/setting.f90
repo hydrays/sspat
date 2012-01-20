@@ -22,7 +22,7 @@ module chem_data
   integer(I4B), parameter :: NSpec=4
   integer(I4B), parameter :: NReac=7
   real(kind=8) s1, s2, s3
-  real(kind=8), parameter :: ep = 0.01
+  real(kind=8), parameter :: ep = 0.0
 
   integer(I4B), parameter, dimension(NSpec,NReac) :: nu = reshape( &
        source=(/ &
@@ -31,13 +31,13 @@ module chem_data
        (/-1, 01, 00, 00/), & !3
        (/01, -1, 00, 00/), & !4
        (/01, -1, 01, 00/), & !5
-       (/00, 00, -1, 01/), &  !6
+       (/00, 00, -1, 01/), & !6
        (/00, -1, 01, 00/) &  !7
        /), shape = (/NSpec, NReac/) &
        )
 
   real(kind=8), parameter, dimension(NReac) :: c =  &
-       (/0.001, 0.0, 2.0, 0.0, 1000.0, 0.2, -1.0/)
+       (/0.02, 0.0, 2, 1, 10.0, 0.2, -1.0/)
 
   real(kind=8), parameter, dimension(NSpec) :: xinit =  &
        (/0.0, 0.0, 0.0, 0.0/)
@@ -63,9 +63,9 @@ contains
     a(2) = c(2)*x(1)
     a(3) = s2*c(3)*x(1)
     a(4) = c(4)*x(2)
-    a(5) = (1.0-ep)*s3*c(5)*x(2)
+    a(5) = s3*c(5)*x(2)
     a(6) = c(6)*x(3)
-    a(7) = ep*s3*c(5)*x(2)
+    a(7) = 0.0!ep*s3*c(5)*x(2)
 
   end subroutine getrate
 

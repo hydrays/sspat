@@ -21,7 +21,7 @@ program ssa
      tp = 0.0
      s1 = 1.0
      s2 = 1.0
-     s3 = 0.01
+     s3 = 0.001
      do while(.true.)
 !!$        if ( t > td ) then 
 !!$           !s1 = tiny(1.0)

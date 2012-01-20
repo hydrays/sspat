@@ -37,7 +37,7 @@ module chem_data
        )
 
   real(kind=8), parameter, dimension(NReac) :: c =  &
-       (/0.02, 0.0, 2, 1, 10.0, 0.2, -1.0/)
+       (/0.01, 0.0, 1, 0.1, 10.0, 0.01, -1.0/)
 
   real(kind=8), parameter, dimension(NSpec) :: xinit =  &
        (/0.0, 0.0, 0.0, 0.0/)

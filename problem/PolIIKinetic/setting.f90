@@ -18,11 +18,14 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1000
+  integer(I4B) :: NSample = 100000
   integer(I4B), parameter :: NSpec=4
   integer(I4B), parameter :: NReac=7
   real(kind=8) s1, s2, s3
   real(kind=8), parameter :: ep = 0.0
+  real NT(NReac)
+  real NP(NReac)
+  real(kind=8) a(NReac)
 
   integer(I4B), parameter, dimension(NSpec,NReac) :: nu = reshape( &
        source=(/ &
@@ -68,5 +71,34 @@ contains
     a(7) = 0.0!ep*s3*c(5)*x(2)
 
   end subroutine getrate
+
+  subroutine Next_Reaction(k, tau)
+    implicit none
+    integer(I4B), intent(out) :: k
+    real(kind=8), intent(out) :: tau
+    real(kind=8) tau_temp
+    integer(I4B) i
+
+    tau = huge(0.0)
+    k = 0
+    do i = 1, NReac
+       if ( a(i) > 0.0 ) then
+          tau_temp = ( NP(i) - NT(i) ) / a(i)
+          if ( tau_temp < tau) then
+             tau = tau_temp
+             k = i
+          end if
+       else
+       end if
+    end do
+    if ( k .eq. 0 ) then
+       tau = 0.1
+    end if
+    if ( tau < 0 .or. k < 0 ) then
+       write(*,*), 'error', 'tau', tau
+       print *, k, NP(k) - NT(k), a(k)
+       read(*,*)
+    end if
+  end subroutine Next_Reaction
 
 end module chem_data

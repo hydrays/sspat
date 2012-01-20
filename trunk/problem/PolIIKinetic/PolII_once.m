@@ -45,7 +45,7 @@ load re_hist
 x(1) = 0;
 x(2) = sum(re_hist(:, 3));
 x(3:10) = sum(re_hist(:, 4))/5;
-plot(x,'b');
+plot(x,'b','linewidth', 2);
 %print('-depsc','fig_polII_dist.eps')
 
 % % ============

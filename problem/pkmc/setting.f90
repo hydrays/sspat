@@ -2,10 +2,10 @@ module setting
   integer, parameter :: L = 2000
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
-  real, parameter :: tend = 200.0
+  real, parameter :: tend = 10000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: stem_fix = 0.99
+  real, parameter :: stem_fix = 0.96
   type cell
      integer type
      real gene1

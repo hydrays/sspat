@@ -18,11 +18,11 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 100000
+  integer(I4B) :: NSample = 1000
   integer(I4B), parameter :: NSpec=4
   integer(I4B), parameter :: NReac=7
   real(kind=8) s1, s2, s3
-  real(kind=8), parameter :: ep = 0.0
+  real(kind=8), parameter :: ep = 0.02
   real NT(NReac)
   real NP(NReac)
   real(kind=8) a(NReac)
@@ -40,7 +40,7 @@ module chem_data
        )
 
   real(kind=8), parameter, dimension(NReac) :: c =  &
-       (/0.01, 0.0, 1, 0.1, 10.0, 0.01, -1.0/)
+       (/0.01, 0.0, 1.0, 0.0, 10.0, 0.1, -1.0/)
 
   real(kind=8), parameter, dimension(NSpec) :: xinit =  &
        (/0.0, 0.0, 0.0, 0.0/)
@@ -66,9 +66,9 @@ contains
     a(2) = c(2)*x(1)
     a(3) = s2*c(3)*x(1)
     a(4) = c(4)*x(2)
-    a(5) = s3*c(5)*x(2)
+    a(5) = (1-ep)*s3*c(5)*x(2)
     a(6) = c(6)*x(3)
-    a(7) = 0.0!ep*s3*c(5)*x(2)
+    a(7) = ep*s3*c(5)*x(2)
 
   end subroutine getrate
 
@@ -91,9 +91,13 @@ contains
        else
        end if
     end do
-    if ( k .eq. 0 ) then
+    if ( tau > 0.1 ) then
        tau = 0.1
+       k = 0
     end if
+    !if ( k .eq. 0 ) then
+    !   tau = 0.1
+    !end if
     if ( tau < 0 .or. k < 0 ) then
        write(*,*), 'error', 'tau', tau
        print *, k, NP(k) - NT(k), a(k)

@@ -97,8 +97,8 @@ contains
     real(kind=8), intent(in) :: pm
     real(kind=8) TGFbeta 
 
-    TGFbeta = x(3) + x(5)
-    !TGFbeta = x(3)
+    !TGFbeta = x(3) + x(5)
+    TGFbeta = x(3)
 
     v0max = 3.0
     v0min = 0.5

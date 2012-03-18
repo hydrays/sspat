@@ -97,8 +97,8 @@ contains
     real(kind=8), intent(in) :: pm
     real(kind=8) TGFbeta 
 
-    !TGFbeta = x(3) + x(5)
-    TGFbeta = x(3)
+    TGFbeta = x(3) + x(5)
+    !TGFbeta = x(3)
 
     v0max = 3.0
     v0min = 0.5
@@ -106,7 +106,8 @@ contains
     k2 = v0max/v0min - 1.0
     p1 = 0.4
     p0 = 1.0/(1.01 + k1*TGFbeta/L)
-    v0 = v0max/(1.0 + k2*TGFbeta/L)
+    !v0 = v0max/(1.0 + k2*TGFbeta/L)
+    v0 = 0.65
 !!$
 
     if ( p0 .le. 0.5 ) then

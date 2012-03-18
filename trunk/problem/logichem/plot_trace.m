@@ -18,33 +18,36 @@
 % 
 % figure
 
-% % ===========
-% % test
-% % ===========
-% load test
-% data = test;
-% vm = 0.1:.1:3.009;
-% pm = 0.0:0.02:1.0001;
-% [X,Y] = meshgrid(pm, vm);
-% wg_barmap = reshape(data(:,6), length(vm), length(pm));
-% pcolor(X, Y, wg_barmap);
-% xlabel('p_m','fontsize', 18);
-% ylabel('v_m','fontsize',18);
-% zlabel('ratio of mutant cell','fontsize',18);
-% print('-depsc','pmvm_response_nf_ayms.eps')
-% 
-% figure
-% pmvmmult = max(0, vm'*(pm-0.5));
-% pcolor(X, Y, pmvmmult);
-% print('-depsc','pmvm_product.eps')
+% ===========
+% test
+% ===========
+load test2
+data = test2;
+vm = 0.1:.1:3.009;
+pm = 0.0:0.02:1.0001;
+[X,Y] = meshgrid(pm, vm);
+wg_barmap = reshape(data(:,3), length(vm), length(pm));
+pcolor(X, Y, wg_barmap);
+xlabel('p_m','fontsize', 18);
+ylabel('v_m','fontsize',18);
+zlabel('ratio of mutant cell','fontsize',18);
+print('-depsc','pmvm_response_nf_ayms.eps')
+
+figure
+wg_barmap = reshape(data(:,6), length(vm), length(pm));
+pcolor(X, Y, wg_barmap);
+xlabel('p_m','fontsize', 18);
+ylabel('v_m','fontsize',18);
+zlabel('ratio of mutant cell','fontsize',18);
+print('-depsc','pmvm_response_nf_ayms.eps')
 
 
-load test
-data = test;
-hold on
-for i=1: length(data)
-    plot(data(i, 2)*(data(i,1)-0.5), data(i, 6),'*')
-end
+% load test2
+% data = test2;
+% hold on
+% for i=1: length(data)
+%     plot(data(i, 2)*(data(i,1)-0.5), data(i, 6),'*')
+% end
 
 % % ===========
 % % script for 2 feedback, self-recovery, asym/asym

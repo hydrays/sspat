@@ -106,8 +106,8 @@ contains
     k2 = v0max/v0min - 1.0
     p1 = 0.4
     p0 = 1.0/(1.01 + k1*TGFbeta/L)
-    !v0 = v0max/(1.0 + k2*TGFbeta/L)
-    v0 = 0.65
+    v0 = v0max/(1.0 + k2*TGFbeta/L)
+    !v0 = 0.65
 !!$
 
     if ( p0 .le. 0.5 ) then

@@ -16,11 +16,11 @@ program ssa
   real(kind=8) N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
-  call ran_seed(sequence=12345)
+  call ran_seed(sequence=1234)
   te = 1000.0
   !te = huge(1.0)
-  pm = 0.98
-  vm = 2.5
+  pm = 0.6
+  vm = 0.8
 
 !  do pm = 0.5, 1.0001, 0.02
 !  do vm = 0.1, 3.01, 0.03

@@ -16,14 +16,14 @@ program ssa
   real(kind=8) N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
-  call ran_seed(sequence=12342)
-  te = 5000.0
+  call ran_seed(sequence=12341)
+  te = 1000.0
   !te = huge(1.0)
-!  pm = 1.0
-!  vm = 2.9
+  pm = 0.7
+  vm = 1.0
 
-  do pm = 0.0, 1.0001, 0.01
-  do vm = 0.1, 3.01, 0.01
+!  do pm = 0.5, 1.0001, 0.02
+!  do vm = 0.1, 3.01, 0.03
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0
@@ -70,10 +70,10 @@ program ssa
            pause
         end if
         
-!!$        if(t > tp) then
-!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
-!!$           tp =  tp + 1.0
-!!$        end if
+        if(t > tp) then
+           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
+           tp =  tp + 1.0
+        end if
 
         if(t > td) then
            if ( x(4) .eq. 0 ) then
@@ -91,11 +91,11 @@ program ssa
            exit
         end if
 
-        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
-           nottakeover_counter = nottakeover_counter + 1.0
-           nottakeover_flag = 1.0
-           exit
-        end if
+!!$        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
+!!$           nottakeover_counter = nottakeover_counter + 1.0
+!!$           nottakeover_flag = 1.0
+!!$           exit
+!!$        end if
 
      end do
 !     xbar = xbar + x
@@ -106,10 +106,10 @@ program ssa
      !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
-  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
-       coexist_counter, average_max_SCnum 
-  end do 
-  end do
+!  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
+!       coexist_counter, average_max_SCnum 
+!  end do 
+!  end do
 end program ssa
 
 subroutine checkx(x, is_nag)

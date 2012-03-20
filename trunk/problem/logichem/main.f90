@@ -16,11 +16,11 @@ program ssa
   real(kind=8) N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
-  call ran_seed(sequence=12341)
+  call ran_seed(sequence=12345)
   te = 1000.0
   !te = huge(1.0)
-  pm = 0.9
-  vm = 1.2
+  pm = 0.95
+  vm = 2.0
 
 !  do pm = 0.5, 1.0001, 0.02
 !  do vm = 0.1, 3.01, 0.03
@@ -82,15 +82,15 @@ program ssa
            td =  td + 400000.0
         end if
 
-        if ( x(1) .gt. max_SCnum ) then
-           max_SCnum = x(1)
-        end if
-        if ( x(1)+x(2)+x(3).eq.0 ) then
-           takeover_counter = takeover_counter + 1.0
-           takeover_flag = 1.0
-           exit
-        end if
-
+!!$        if ( x(1) .gt. max_SCnum ) then
+!!$           max_SCnum = x(1)
+!!$        end if
+!!$        if ( x(1)+x(2)+x(3).eq.0 ) then
+!!$           takeover_counter = takeover_counter + 1.0
+!!$           takeover_flag = 1.0
+!!$           exit
+!!$        end if
+!!$
 !!$        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
 !!$           nottakeover_counter = nottakeover_counter + 1.0
 !!$           nottakeover_flag = 1.0

@@ -19,8 +19,8 @@ program ssa
   call ran_seed(sequence=1234)
   te = 1000.0
   !te = huge(1.0)
-  pm = 0.8
-  vm = 0.9
+  pm = 0.9
+  vm = 1.0
 
 !  do pm = 0.5, 1.0001, 0.02
 !  do vm = 0.1, 3.01, 0.03

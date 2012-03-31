@@ -21,7 +21,7 @@ program ssa
   !te = huge(1.0)
   
   do km1 = 0.1, 2.0001, 0.01
-  do vmmax = 0.5, 3.01, 0.05
+  do vmmax = 3.0, 4.01, 0.05
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0

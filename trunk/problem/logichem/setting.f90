@@ -96,8 +96,8 @@ contains
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8) TGFbeta, g1
     
-    !TGFbeta = x(3) + x(5)
-    TGFbeta = x(3)
+    TGFbeta = x(3) + x(5)
+    !TGFbeta = x(3)
 
     v0max = 3.0
     v0min = 0.5
@@ -108,14 +108,16 @@ contains
     k2 = v0max/v0min - 1.0
     km2 = vmmax/vmmin - 1.0
     p1 = 0.4
+    v1 = 1.0
 
     p0 = 1.0/(1.01 + k1*TGFbeta/L)
     v0 = v0max/(1.0 + k2*TGFbeta/L)
     !v0 = 0.65
 
-    p1 = 1.0/(1.01 + km1*TGFbeta/L)
-    v1 = vmmax/(1.0 + km2*TGFbeta/L)
+    pm = 1.0/(1.01 + km1*TGFbeta/L)
+    vm = vmmax/(1.0 + km2*TGFbeta/L)
     !vm = 0.85
+
 
     !v0 = 0.65
     !v0 = 1.0

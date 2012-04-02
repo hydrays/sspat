@@ -29,7 +29,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1000
+  integer(I4B) :: NSample = 100
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
   real(kind=8) ap, p0, p1, v0, v1

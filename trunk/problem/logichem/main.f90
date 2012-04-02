@@ -17,7 +17,7 @@ program ssa
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
   call ran_seed(sequence=1234)
-  te = 2000.0
+  te = 1000.0
   !te = huge(1.0)
 
 !  km1 = 1.9
@@ -33,7 +33,7 @@ program ssa
      x = xinit
      t = 0.0
      tp = 0.0
-     td = 2000.0
+     td = 200.0
      tbar = 0.0
      xbar_counter = 0.0
      takeover_flag = 0.0

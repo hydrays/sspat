@@ -17,11 +17,13 @@ program ssa
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
   call ran_seed(sequence=1234)
-  te = 2000.0
+  te = 1000.0
   !te = huge(1.0)
-  
-  do km1 = 0.1, 2.0001, 0.01
-  do vmmax = 3.0, 4.01, 0.05
+
+!  km1 = 0.9
+!  vmmax = 3.0
+  do km1 = 0.1, 2.0001, 0.05
+  do vmmax = 0.5, 4.01, 0.1
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0
@@ -31,7 +33,7 @@ program ssa
      x = xinit
      t = 0.0
      tp = 0.0
-     td = 200.0
+     td = 2000.0
      tbar = 0.0
      xbar_counter = 0.0
      takeover_flag = 0.0
@@ -83,17 +85,18 @@ program ssa
         if ( x(1) .gt. max_SCnum ) then
            max_SCnum = x(1)
         end if
-        if ( x(1)+x(2)+x(3).eq.0 ) then
+        !if ( x(1)+x(2)+x(3).eq.0 ) then
+        if ( x(1).eq.0 ) then
            takeover_counter = takeover_counter + 1.0
            takeover_flag = 1.0
            exit
         end if
 
-        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
-           nottakeover_counter = nottakeover_counter + 1.0
-           nottakeover_flag = 1.0
-           exit
-        end if
+!!$        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
+!!$           nottakeover_counter = nottakeover_counter + 1.0
+!!$           nottakeover_flag = 1.0
+!!$           exit
+!!$        end if
 
      end do
 !     xbar = xbar + x

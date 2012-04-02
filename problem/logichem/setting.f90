@@ -32,7 +32,7 @@ module chem_data
   integer(I4B) :: NSample = 1000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
-  real(kind=8) ap, p0, p1, v0
+  real(kind=8) ap, p0, p1, v0, v1
   real(kind=8) pm, vm
   real(kind=8) k1, k2, v0max, v0min, km1, km2, vmmax, vmmin
   real(kind=8) q1, q2, q3
@@ -113,8 +113,8 @@ contains
     v0 = v0max/(1.0 + k2*TGFbeta/L)
     !v0 = 0.65
 
-    pm = 1.0/(1.01 + km1*TGFbeta/L)
-    vm = vmmax/(1.0 + km2*TGFbeta/L)
+    p1 = 1.0/(1.01 + km1*TGFbeta/L)
+    v1 = vmmax/(1.0 + km2*TGFbeta/L)
     !vm = 0.85
 
     !v0 = 0.65
@@ -162,9 +162,9 @@ contains
     a(2) = q2*v0*x(1)
     a(3) = q3*v0*x(1)
 
-    a(4) = qq1*x(2)
-    a(5) = qq2*x(2)
-    a(6) = qq3*x(2)
+    a(4) = qq1*v1*x(2)
+    a(5) = qq2*v1*x(2)
+    a(6) = qq3*v1*x(2)
 
     a(7) = qm1*vm*x(4)
     a(8) = qm2*vm*x(4)

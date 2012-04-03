@@ -22,8 +22,8 @@ program ssa
 
 !  km1 = 1.9
 !  vmmax = 0.6
-  do km1 = 0.1, 2.0001, 0.05
-  do vmmax = 0.5, 5.01, 0.1
+  do km1 = 0.1, 2.0001, 0.01
+  do vmmax = 0.5, 5.01, 0.01
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0

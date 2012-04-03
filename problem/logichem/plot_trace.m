@@ -1,45 +1,45 @@
-% ===========
-% test
-% ===========
-load tr
-clf;
-tr = tr;
-plot(tr(:,1), tr(:,2), '-r')
-%xlim([150, 350])
-hold on
-plot(tr(:,1), tr(:,3), '-b')
-plot(tr(:,1), tr(:,4), '-g')
-plot(tr(:,1), tr(:,5), '-k')
-% figure
-plot(tr(:,1), tr(:,7), '-m')
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-% 
-% figure
-
 % % ===========
 % % test
 % % ===========
-% load test2
-% data = test2;
-% vm = 0.1:.1:3.009;
-% pm = 0.0:0.02:1.0001;
-% [X,Y] = meshgrid(pm, vm);
-% wg_barmap = reshape(data(:,3), length(vm), length(pm));
-% pcolor(X, Y, wg_barmap);
-% xlabel('p_m','fontsize', 18);
-% ylabel('v_m','fontsize',18);
-% zlabel('ratio of mutant cell','fontsize',18);
-% print('-depsc','pmvm_response_nf_ayms.eps')
+% load tr
+% clf;
+% tr = tr;
+% plot(tr(:,1), tr(:,2), '.r')
+% %xlim([150, 350])
+% hold on
+% plot(tr(:,1), tr(:,3), '.b')
+% plot(tr(:,1), tr(:,4), '.g')
+% plot(tr(:,1), tr(:,5), '.k')
+% % figure
+% plot(tr(:,1), tr(:,7), '.m')
+% xlabel('t','fontsize', 18);
+% ylabel('cell population','fontsize',18)
+% legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % 
 % figure
-% wg_barmap = reshape(data(:,6), length(vm), length(pm));
-% pcolor(X, Y, wg_barmap);
-% xlabel('p_m','fontsize', 18);
-% ylabel('v_m','fontsize',18);
-% zlabel('ratio of mutant cell','fontsize',18);
-% print('-depsc','pmvm_response_nf_ayms.eps')
+
+% ===========
+% test
+% ===========
+load test2
+data = test2;
+vm = 0.1:.1:3.009;
+pm = 0.0:0.02:1.0001;
+[X,Y] = meshgrid(pm, vm);
+wg_barmap = reshape(data(:,3), length(vm), length(pm));
+pcolor(X, Y, wg_barmap);
+xlabel('p_m','fontsize', 18);
+ylabel('v_m','fontsize',18);
+zlabel('ratio of mutant cell','fontsize',18);
+print('-depsc','pmvm_response_nf_ayms.eps')
+
+figure
+wg_barmap = reshape(data(:,6), length(vm), length(pm));
+pcolor(X, Y, wg_barmap);
+xlabel('p_m','fontsize', 18);
+ylabel('v_m','fontsize',18);
+zlabel('ratio of mutant cell','fontsize',18);
+print('-depsc','pmvm_response_nf_ayms.eps')
 
 
 % load test2
@@ -273,9 +273,9 @@ legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % % ===========
 % % script for stable solution
 % % ===========
-% load pr2_stable_ss10
+% load pr2_stable_ss06
 % clf;
-% tr = pr2_stable_ss10;
+% tr = pr2_stable_ss06;
 % plot(tr(:,1), tr(:,2), 'r','linewidth', 2)
 % xlim([0, 200])
 % ylim([0, 250])
@@ -288,7 +288,7 @@ legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'Total')
-% print('-depsc','fig_logi_stable_ss10.eps')
+% print('-depsc','fig_logi_stable_ss06.eps')
 
 % % ===========
 % % plot the average MC vs pm

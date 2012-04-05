@@ -16,15 +16,13 @@ program ssa
   real(kind=8) N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
-  call ran_seed(sequence=12342)
-  te = 5000.0
-  !te = huge(1.0)
-!  pm = 1.0
-!  vm = 2.9
+  call ran_seed(sequence=1234)
+  te = 2000.0
+  pm = 0.97
+  vm = 1.2
 
-  do pm = 0.0, 1.0001, 0.01
-  do vm = 0.1, 3.01, 0.01
-!  xbar = 0.0
+!  do pm = 0.0, 1.0001, 0.01
+!  do vm = 0.1, 3.01, 0.01
   takeover_counter = 0.0
   nottakeover_counter = 0.0
   coexist_counter = 0.0
@@ -55,25 +53,18 @@ program ssa
            j = j+1
         end do
 
-!!$        if ( x(4) .ne. 0) then
-!!$           mtime = mtime + delta_t
-!!$        end if
-
         x = x + nu(:, j)
-!!$        if (j.eq.16) then
-!!$           print *, x
-!!$           read(*,*)
-!!$        end if
+
         call checkx(x, is_nag)
         if (is_nag .eq. 1) then
            print *, 'nag'
            pause
         end if
         
-!!$        if(t > tp) then
-!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
-!!$           tp =  tp + 1.0
-!!$        end if
+        if(t > tp) then
+           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
+           tp =  tp + 1.0
+        end if
 
         if(t > td) then
            if ( x(4) .eq. 0 ) then
@@ -82,23 +73,22 @@ program ssa
            td =  td + 400000.0
         end if
 
-        if ( x(1) .gt. max_SCnum ) then
-           max_SCnum = x(1)
-        end if
-        if ( x(1)+x(2)+x(3).eq.0 ) then
-           takeover_counter = takeover_counter + 1.0
-           takeover_flag = 1.0
-           exit
-        end if
-
-        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
-           nottakeover_counter = nottakeover_counter + 1.0
-           nottakeover_flag = 1.0
-           exit
-        end if
+!!$        if ( x(1) .gt. max_SCnum ) then
+!!$           max_SCnum = x(1)
+!!$        end if
+!!$        if ( x(1)+x(2)+x(3).eq.0 ) then
+!!$           takeover_counter = takeover_counter + 1.0
+!!$           takeover_flag = 1.0
+!!$           exit
+!!$        end if
+!!$
+!!$        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
+!!$           nottakeover_counter = nottakeover_counter + 1.0
+!!$           nottakeover_flag = 1.0
+!!$           exit
+!!$        end if
 
      end do
-!     xbar = xbar + x
      if ( takeover_flag .eq. 0.0 .and. nottakeover_flag .eq. 0.0 ) then
         coexist_counter = coexist_counter + 1.0
      end if
@@ -106,10 +96,10 @@ program ssa
      !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
-  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
-       coexist_counter, average_max_SCnum 
-  end do 
-  end do
+!  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
+!       coexist_counter, average_max_SCnum 
+!  end do 
+!  end do
 end program ssa
 
 subroutine checkx(x, is_nag)

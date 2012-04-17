@@ -2,10 +2,10 @@
 % test
 % ===========
 load tr
-clf;
+%clf;
 tr = tr;
 plot(tr(:,1), tr(:,2), '-r')
-%xlim([150, 350])
+xlim([150, 350])
 hold on
 plot(tr(:,1), tr(:,3), '-b')
 plot(tr(:,1), tr(:,4), '-g')
@@ -15,8 +15,10 @@ plot(tr(:,1), tr(:,7), '-m')
 xlabel('t','fontsize', 18);
 ylabel('cell population','fontsize',18)
 legend('SC', 'TAC', 'TDC', 'MC', 'Total')
+print('-depsc','tac_pm1vm1_6.eps')
 
-% figure
+figure
+plot(tr(:,1), tr(:,8), '-b')
 
 % % ===========
 % % test

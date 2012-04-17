@@ -18,11 +18,11 @@ program ssa
 
   call ran_seed(sequence=1234)
   te = 2000.0
-  pm = 0.97
-  vm = 1.2
+!  pm = 0.9
+!  vm = 1.0
 
-!  do pm = 0.0, 1.0001, 0.01
-!  do vm = 0.1, 3.01, 0.01
+  do pm = 0.5, 1.0001, 0.01
+  do vm = 0.1, 3.01, 0.01
   takeover_counter = 0.0
   nottakeover_counter = 0.0
   coexist_counter = 0.0
@@ -38,7 +38,7 @@ program ssa
      nottakeover_flag = 0.0
      max_SCnum = 0.0
      do while(t < te)
-        call getrate(x, a, pm)
+        call getrate(x, a)
         cuma = a
         do j=2, NReac
            cuma(j) = cuma(j-1) + a(j)
@@ -61,10 +61,10 @@ program ssa
            pause
         end if
         
-        if(t > tp) then
-           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
-           tp =  tp + 1.0
-        end if
+!!$        if(t > tp) then
+!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), p1, v1
+!!$           tp =  tp + 1.0
+!!$        end if
 
         if(t > td) then
            if ( x(4) .eq. 0 ) then
@@ -73,20 +73,20 @@ program ssa
            td =  td + 400000.0
         end if
 
-!!$        if ( x(1) .gt. max_SCnum ) then
-!!$           max_SCnum = x(1)
-!!$        end if
-!!$        if ( x(1)+x(2)+x(3).eq.0 ) then
-!!$           takeover_counter = takeover_counter + 1.0
-!!$           takeover_flag = 1.0
-!!$           exit
-!!$        end if
-!!$
-!!$        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
-!!$           nottakeover_counter = nottakeover_counter + 1.0
-!!$           nottakeover_flag = 1.0
-!!$           exit
-!!$        end if
+        if ( x(1) .gt. max_SCnum ) then
+           max_SCnum = x(1)
+        end if
+        if ( x(1)+x(2)+x(3).eq.0 ) then
+           takeover_counter = takeover_counter + 1.0
+           takeover_flag = 1.0
+           exit
+        end if
+
+        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
+           nottakeover_counter = nottakeover_counter + 1.0
+           nottakeover_flag = 1.0
+           exit
+        end if
 
      end do
      if ( takeover_flag .eq. 0.0 .and. nottakeover_flag .eq. 0.0 ) then
@@ -96,10 +96,10 @@ program ssa
      !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
-!  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
-!       coexist_counter, average_max_SCnum 
-!  end do 
-!  end do
+  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
+       coexist_counter, average_max_SCnum 
+  end do 
+  end do
 end program ssa
 
 subroutine checkx(x, is_nag)

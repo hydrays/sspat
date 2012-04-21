@@ -23,7 +23,7 @@ program main
 
   t = 0.0
   tp = 0.0
-  tm = 100.0
+  tm = 100000.0
   output_index = 0
   do while (t < tend)
      if (t .ge. tp) then

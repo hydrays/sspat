@@ -29,7 +29,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 200
+  integer(I4B) :: NSample = 100
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
   real(kind=8) ap, p0, v0
@@ -97,8 +97,8 @@ contains
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8) TGFbeta 
 
-    TGFbeta = x(3) + x(5)
-    !TGFbeta = x(3)
+    !TGFbeta = x(3) + x(5)
+    TGFbeta = x(3)
 
     v0max = 3.0
     v0min = 0.5
@@ -108,13 +108,13 @@ contains
     v0 = v0max/(1.0 + ksc2*TGFbeta/L)
     !v0 = 0.65
 
-    v1max = 1.3
-    v1min = 0.7
+    v1max = 3.0
+    v1min = 0.5
     ktac1 = 0.8
     ktac2 = v1max/v1min - 1.0
-    p1 = 0.6/(1.01 + ktac1*TGFbeta/L)
+    p1 = 0.8/(1.01 + ktac1*TGFbeta/L)
     v1 = v1max/(1.0 + ktac2*TGFbeta/L)    
-    !p1 = 0.37
+    !p1 = 0.4
     !v1 = 1.0
 
     !vmmax = 3.0
@@ -168,6 +168,9 @@ contains
     else
        ap = 0.0
     end if
+
+!!$    ap = 0.2*sum(x)
+
     a(1) = q1*v0*x(1)
     a(2) = q2*v0*x(1)
     a(3) = q3*v0*x(1)

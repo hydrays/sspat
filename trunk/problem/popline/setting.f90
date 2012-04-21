@@ -3,7 +3,7 @@ module setting
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
   real, parameter :: delta_t = 0.001
-  real, parameter :: tend = 100000.0
+  real, parameter :: tend = 200.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
   real, parameter :: D = 1.0

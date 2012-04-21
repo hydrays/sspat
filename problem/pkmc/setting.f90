@@ -5,7 +5,7 @@ module setting
   real, parameter :: tend = 10000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: stem_fix = 0.96
+  real, parameter :: stem_fix = 0.00
   type cell
      integer type
      real gene1

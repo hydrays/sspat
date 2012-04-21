@@ -1,14 +1,18 @@
 ms = 6;
 lw = 1;
+% mycmap = [1     1    1
+%      1     0     0
+%      0     0     1
+%      0     1     0
+%      0     0     0];
 mycmap = [1     1    1
      1     0     0
      0     0     1
-     0     1     0
-     0     0     0];
+     0     1     0];
 colormap(mycmap)
 
 j = 1;
-for index =0:1:3000
+for index =0:1:39
 clf
 s1 = ['0000000' num2str(index)];
 s = s1((length(s1)-4):length(s1));
@@ -36,10 +40,10 @@ shading flat
 % s1 = ['0000000' num2str(index)];
 % s = s1((length(s1)-4):length(s1));
 % s = s;
-eval(['print(''-dpng'',''slice',s,''');'])
+% eval(['print(''-dpng'',''slice',s,''');'])
 % eval(['print(''-depsc'',''select',s,''');'])
 % genemean(j) = mean(popgene(:,2));
-% pause(0.5)
+pause(0.5)
 j = j + 1;
 end
 

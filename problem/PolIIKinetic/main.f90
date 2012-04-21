@@ -7,20 +7,25 @@ program ssa
   real(kind=8) x(NSpec)
   real(kind=8) te, u
   real(kind=8) tau, t, tp, td
+  real(kind=8) Emean
   integer(I4B) is_nag
-  integer(I4B) i, j, k, index
+  integer(I4B) i, j, k, index, s_trail
+
 
   call ran_seed(sequence=12341)
   !te = huge(1.0)
-  te = 20000.0
+  te = 5000.0
   td = 5000.0
+
+  do s_trail = 1, Ntrail
+  Emean = 0.0
   do index = 1.0, NSample
      x = xinit
      t = 0.0
      tp = 0.0
-     s1 = 1.0
+     s1 = 1.0!s_trail/real(Ntrail)
      s2 = 1.0
-     s3 = 0.005
+     s3 = s_trail/real(Ntrail)
 
      NP = 0.0
      NT = 0.0
@@ -32,31 +37,31 @@ program ssa
 
      do while( .true. )
 
-        if (t .ge. tp) then
-           !call output_to_file(output_index)
-           !call cell_stat(t)
-           write(*, '((F12.4))', advance='no'), x(3)
-           !output_index = output_index + 1
-           tp = tp + 10.0
-        end if
+!!$        if (t .ge. tp) then
+!!$           !call output_to_file(output_index)
+!!$           !call cell_stat(t)
+!!$           write(*, '((F12.4))', advance='no'), x(3)
+!!$           !output_index = output_index + 1
+!!$           tp = tp + 10.0
+!!$        end if
 
-        if (t .ge. td) then
-           !if ( mod(t-td, 1600.0) < 800 ) then
-           !   s3 = 0.0
-           !else
-           !   s3 = 1.0
-           !end if
-           s1 = 0.0
-           !s2 = 1.0
-           !s3 = 1.0
-        end if
+!!$        if (t .ge. td) then
+!!$           !if ( mod(t-td, 1600.0) < 800 ) then
+!!$           !   s3 = 0.0
+!!$           !else
+!!$           !   s3 = 1.0
+!!$           !end if
+!!$           s1 = 0.0
+!!$           !s2 = 1.0
+!!$           !s3 = 1.0
+!!$        end if
 
         call Next_Reaction(k, tau)
 
         t = t + tau
         if ( t > te ) then
            !write(*, '(5(F12.4))'), t, x
-           write(*,*)
+           !write(*,*)
            exit
         end if
 
@@ -86,7 +91,11 @@ program ssa
 !!$        end if
 
      end do
+     Emean = Emean + x(3)
   end do
+  Emean = Emean/real(Nsample)  
+  write(*, '(2(F12.4))'), s3, Emean
+end do
 end program ssa
 
 subroutine checkx(x, is_nag)

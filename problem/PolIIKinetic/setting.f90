@@ -19,10 +19,11 @@ module chem_data
   use nrtype
   implicit none
   integer(I4B) :: NSample = 1000
+  integer(I4B) :: Ntrail = 10000
   integer(I4B), parameter :: NSpec=4
   integer(I4B), parameter :: NReac=7
   real(kind=8) s1, s2, s3
-  real(kind=8), parameter :: ep = 0.02
+  real(kind=8), parameter :: ep = 0.01
   real NT(NReac)
   real NP(NReac)
   real(kind=8) a(NReac)

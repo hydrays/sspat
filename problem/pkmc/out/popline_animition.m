@@ -7,7 +7,7 @@ mycmap = [1     1    1
 colormap(mycmap)
 
 j = 1;
-for index =99:1:99
+for index =1000:1:1110
 clf
 s1 = ['0000000' num2str(index)];
 s = s1((length(s1)-4):length(s1));
@@ -22,11 +22,12 @@ i = index + 1
 hold on
 %box on;
 % xlim([1,L])
-%ylim([0,100])
+ylim([0,50])
 
-pcolor(popline(1:L,1:200)')
+pcolor(popline(1:1000,1:100)')
 axis equal
 shading flat
+box on
 %plot(popgene(:,1), 0.5*D*(popgene(:,2)-1),'-+')
 
 %plot(1:L, 0.1*popline(1:L, D+1),'m', 'linewidth', lw)
@@ -36,7 +37,8 @@ shading flat
 % s = s1((length(s1)-4):length(s1));
 % s = s;
 % eval(['print(''-dpng'',''slice',s,''');'])
-% eval(['print(''-depsc'',''select',s,''');'])
+text(400, 115, ['t=' num2str(index*1)],'fontsize', 18);
+eval(['print(''-depsc'',''select',s,''');'])
 % genemean(j) = mean(popgene(:,2));
 pause(0.5)
 j = j + 1;

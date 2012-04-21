@@ -12,7 +12,7 @@ program main
   integer :: grainsize = 32
   integer, allocatable :: seed(:)
 
-  npar = 2
+  npar = 4
   allocate(seed(npar))
   do i = 1,npar
      call random_number(r)
@@ -38,7 +38,21 @@ program main
         call output_to_file(output_index)
         call cell_stat(t)
         output_index = output_index + 1
-        tp = tp + 2.0
+        tp = tp + 1.0
+     end if
+
+     if (t .ge. tm) then
+        do i = 300, 600
+              do j = 1, npack(i)
+                 cmat(i,j)%type = 0
+              end do
+              npack(i) = 0
+              TDC(i) = 0
+              call Update_Rate(i)
+              call Update_Rate(i+1)
+              call Update_Rate(i-1)
+           end do
+           tm = huge(1.0)
      end if
 
      do iredblack = 0, 1
@@ -53,7 +67,7 @@ program main
      private_t = t
      !print *, nthread, private_t, t
      !read(*,*)
-     do while ( private_t < t + 0.1)
+     do while ( private_t < t + 0.01)
         call Next_Reaction(k, tau, ilow, iup)
         call cell_event(k, nthread)
         if ( (k .le. 2).or.(k .ge. L-1) ) then
@@ -86,7 +100,7 @@ program main
      !$OMP barrier
   end do
   !read(*,*)
-  t = t + 0.1
+  t = t + 0.01
   end do
   close(unit=100)
 end program main

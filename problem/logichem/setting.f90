@@ -108,11 +108,11 @@ contains
     v0 = v0max/(1.0 + ksc2*TGFbeta/L)
     !v0 = 0.65
 
-    v1max = 3.0
-    v1min = 0.5
+    v1max = 1.3
+    v1min = 0.7
     ktac1 = 0.8
     ktac2 = v1max/v1min - 1.0
-    p1 = 0.8/(1.01 + ktac1*TGFbeta/L)
+    p1 = 0.6/(1.01 + ktac1*TGFbeta/L)
     v1 = v1max/(1.0 + ktac2*TGFbeta/L)    
     !p1 = 0.4
     !v1 = 1.0

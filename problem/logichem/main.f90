@@ -15,6 +15,8 @@ program ssa
   integer(I4B) i, j, k, index
   real(kind=8) N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
+  real(kind=8) x1_peak, t1_peak
+  real(kind=8) x2_peak, t2_peak
 
   call ran_seed(sequence=1234)
   te = 400.0
@@ -37,6 +39,10 @@ program ssa
      takeover_flag = 0.0
      nottakeover_flag = 0.0
      max_SCnum = 0.0
+     x1_peak = 0.0
+     t1_peak = 0.0
+     x2_peak = 0.0
+     t2_peak = 0.0
      do while(t < te)
         call getrate(x, a)
         cuma = a
@@ -73,9 +79,21 @@ program ssa
            td =  td + 400000.0
         end if
 
-!!$        if ( x(1) .gt. max_SCnum ) then
-!!$           max_SCnum = x(1)
-!!$        end if
+        !if (x(1) .gt. max_SCnum ) then
+        !   max_SCnum = x(1)
+        !end if
+        
+        if ( t>201 .and. x1_peak < x(1) ) then
+           x1_peak = x(1)
+           t1_peak = t
+        end if
+
+        if ( t>201 .and. x2_peak < x(4) ) then
+           x2_peak = x(4)
+           t2_peak = t
+        end if
+
+
 !!$        if ( x(1)+x(2)+x(3).eq.0 ) then
 !!$           takeover_counter = takeover_counter + 1.0
 !!$           takeover_flag = 1.0
@@ -93,7 +111,7 @@ program ssa
         coexist_counter = coexist_counter + 1.0
      end if
      average_max_SCnum = average_max_SCnum + max_SCnum
-     !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
+!     write (*, '(F10.2, 10F8.2)'), t1_peak, x1_peak, t2_peak, x2_peak 
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
 !!$  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &

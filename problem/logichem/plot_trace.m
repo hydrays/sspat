@@ -1,15 +1,15 @@
 % ===========
 % test
 % ===========
-figure
+%figure
 load tr
 %clf;
 tr = tr;
-%plot(tr(:,1), tr(:,2), '-r')
+%plot(tr(:,1), tr(:,2), '.r')
 xlim([150, 250])
 hold on
-%plot(tr(:,1), tr(:,3), '-b')
-plot(tr(:,1), tr(:,4), '-g')
+plot(tr(:,1), tr(:,3), '.b')
+%plot(tr(:,1), tr(:,4), '-g')
 %plot(tr(:,1), tr(:,5), '-k')
 %plot(tr(:,1), tr(:,7), '-m')
 xlabel('t','fontsize', 18);
@@ -24,11 +24,11 @@ legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 load tr2
 %clf;
 tr = tr2;
-%plot(tr(:,1), tr(:,2), '-r')
+%plot(tr(:,1), tr(:,2), '.k')
 xlim([150, 250])
 hold on
-%plot(tr(:,1), tr(:,3), '-b')
-plot(tr(:,1), tr(:,4), '-k')
+%plot(tr(:,1), tr(:,3), '.k')
+%plot(tr(:,1), tr(:,4), '-k')
 %plot(tr(:,1), tr(:,5), '-k')
 %plot(tr(:,1), tr(:,7), '-m')
 xlabel('t','fontsize', 18);

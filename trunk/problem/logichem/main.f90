@@ -18,7 +18,7 @@ program ssa
   real(kind=8) x1_peak, t1_peak
   real(kind=8) x2_peak, t2_peak
 
-  call ran_seed(sequence=1234)
+  call ran_seed(sequence=12341)
   te = 400.0
   pm = 1.0
   vm = 1.0
@@ -33,7 +33,7 @@ program ssa
      x = xinit
      t = 0.0
      tp = 0.0
-     td = 200.0
+     td = 150.0
      tbar = 0.0
      xbar_counter = 0.0
      takeover_flag = 0.0
@@ -68,7 +68,7 @@ program ssa
         end if
         
         if(t > tp) then
-           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), p1, v1
+           write (*, '(F10.2, 10F10.2)'), t, x, sum(x), p1, v1
            tp =  tp + 1.0
         end if
 
@@ -83,15 +83,15 @@ program ssa
         !   max_SCnum = x(1)
         !end if
         
-        if ( t>201 .and. x1_peak < x(1) ) then
-           x1_peak = x(1)
-           t1_peak = t
-        end if
-
-        if ( t>201 .and. x2_peak < x(4) ) then
-           x2_peak = x(4)
-           t2_peak = t
-        end if
+!!$        if ( t>201 .and. x1_peak < x(1) ) then
+!!$           x1_peak = x(1)
+!!$           t1_peak = t
+!!$        end if
+!!$
+!!$        if ( t>201 .and. x2_peak < x(4) ) then
+!!$           x2_peak = x(4)
+!!$           t2_peak = t
+!!$        end if
 
 
 !!$        if ( x(1)+x(2)+x(3).eq.0 ) then

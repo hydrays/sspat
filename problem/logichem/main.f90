@@ -18,12 +18,12 @@ program ssa
   real(kind=8) x1_peak, t1_peak
   real(kind=8) x2_peak, t2_peak
 
-  call ran_seed(sequence=12341)
-  te = 400.0
+  call ran_seed(sequence=1234)
+  te = 500.0
   pm = 1.0
   vm = 1.0
 
-  !do pm = 0.5, 1.0001, 0.01
+  do ksc1 = 0.5, 2.0001, 0.001
   !do vm = 0.1, 3.01, 0.01
   takeover_counter = 0.0
   nottakeover_counter = 0.0
@@ -32,9 +32,10 @@ program ssa
   do index = 1.0, NSample
      x = xinit
      t = 0.0
-     tp = 0.0
-     td = 150.0
+     tp = 200.0
+     td = 2500.0
      tbar = 0.0
+     xbar = 0.0
      xbar_counter = 0.0
      takeover_flag = 0.0
      nottakeover_flag = 0.0
@@ -68,14 +69,17 @@ program ssa
         end if
         
         if(t > tp) then
-           write (*, '(F10.2, 10F10.2)'), t, x, sum(x), p1, v1
+           !write (*, '(F12.4, 10F10.2)'), t, x, sum(x), p0, v0
            tp =  tp + 1.0
+           xbar = xbar + x
+           xbar_counter = xbar_counter + 1
         end if
 
         if(t > td) then
            if ( x(4) .eq. 0 ) then
               x(4) = 10
            end if
+!           x(3) = x(3) - 120
            td =  td + 400000.0
         end if
 
@@ -111,12 +115,13 @@ program ssa
         coexist_counter = coexist_counter + 1.0
      end if
      average_max_SCnum = average_max_SCnum + max_SCnum
-!     write (*, '(F10.2, 10F8.2)'), t1_peak, x1_peak, t2_peak, x2_peak 
+     xbar = xbar / xbar_counter
+     write (*, '(F14.4, 10F8.2)'), ksc1, xbar
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
 !!$  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
 !!$       coexist_counter, average_max_SCnum 
-!!$  end do 
+  end do 
 !!$  end do
 end program ssa
 

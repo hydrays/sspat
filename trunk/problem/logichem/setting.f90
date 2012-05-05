@@ -40,7 +40,7 @@ module chem_data
   real(kind=8) qq1, qq2, qq3
   real(kind=8) qm1, qm2, qm3
   real(kind=8), parameter :: L = 200
-  real(kind=8), parameter :: xi = 2000.0
+  real(kind=8), parameter :: xi = 20.0
   real(kind=8), parameter :: mu = 0.0
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
@@ -103,11 +103,11 @@ contains
 
     v0max = 3.0
     v0min = 0.5
-    ksc1 = 1.0
+    !ksc1 = 0.6
     ksc2 = v0max/v0min - 1.0
     p0 = 1.0/(1.01 + ksc1*TGFbeta/L)
     v0 = v0max/(1.0 + ksc2*TGFbeta/L)
-    !v0 = 0.65
+    !v0 = 1.0!0.65
 
     !v1max = 1.3
     !v1min = 0.7

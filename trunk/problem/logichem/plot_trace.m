@@ -15,7 +15,7 @@ plot(tr(:,1), tr(:,7), '-m')
 xlabel('t','fontsize', 18);
 ylabel('cell population','fontsize',18)
 legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-% print('-depsc','tac_pm1vm1_6.eps')
+print('-depsc','damp.eps')
 % 
 % figure
 % plot(tr(:,1), tr(:,8), '-b')

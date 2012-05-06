@@ -1,71 +1,50 @@
-% ===========
-% test
-% ===========
-%figure
-load tr
-clf;
-tr = tr;
-plot(tr(:,1), tr(:,2), '-r')
-xlim([0, 300])
-hold on
-plot(tr(:,1), tr(:,3), '-b')
-plot(tr(:,1), tr(:,4), '-g')
-plot(tr(:,1), tr(:,5), '-k')
-plot(tr(:,1), tr(:,7), '-m')
-xlabel('t','fontsize', 18);
-ylabel('cell population','fontsize',18)
-legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-print('-depsc','damp.eps')
-% 
-% figure
-% plot(tr(:,1), tr(:,8), '-b')
-
-% %figure
-% load tr2
-% %clf;
-% tr = tr2;
-% %plot(tr(:,1), tr(:,2), '.k')
-% xlim([150, 250])
+% % ===========
+% % test
+% % ===========
+% load tr
+% clf;
+% tr = tr;
+% plot(tr(:,1), tr(:,2), '.r')
+% %xlim([150, 350])
 % hold on
-% %plot(tr(:,1), tr(:,3), '.k')
-% %plot(tr(:,1), tr(:,4), '-k')
-% %plot(tr(:,1), tr(:,5), '-k')
-% %plot(tr(:,1), tr(:,7), '-m')
+% plot(tr(:,1), tr(:,3), '.b')
+% plot(tr(:,1), tr(:,4), '.g')
+% plot(tr(:,1), tr(:,5), '.k')
+% % figure
+% plot(tr(:,1), tr(:,7), '.m')
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-% % print('-depsc','tac_pm1vm1_6.eps')
+% 
+% figure
 
 % % ===========
 % % test
 % % ===========
-% load test2
-% data = test2;
+% load test
+% data = test;
 % vm = 0.1:.1:3.009;
 % pm = 0.0:0.02:1.0001;
 % [X,Y] = meshgrid(pm, vm);
-% wg_barmap = reshape(data(:,3), length(vm), length(pm));
-% pcolor(X, Y, wg_barmap);
-% xlabel('p_m','fontsize', 18);
-% ylabel('v_m','fontsize',18);
-% zlabel('ratio of mutant cell','fontsize',18);
-% print('-depsc','pmvm_response_nf_ayms.eps')
-% 
-% figure
 % wg_barmap = reshape(data(:,6), length(vm), length(pm));
 % pcolor(X, Y, wg_barmap);
 % xlabel('p_m','fontsize', 18);
 % ylabel('v_m','fontsize',18);
 % zlabel('ratio of mutant cell','fontsize',18);
 % print('-depsc','pmvm_response_nf_ayms.eps')
+% 
+% figure
+% pmvmmult = max(0, vm'*(pm-0.5));
+% pcolor(X, Y, pmvmmult);
+% print('-depsc','pmvm_product.eps')
 
 
-% load test2
-% data = test2;
-% hold on
-% for i=1: length(data)
-%     plot(data(i, 2)*(data(i,1)-0.5), data(i, 6),'*')
-% end
+load test
+data = test;
+hold on
+for i=1: length(data)
+    plot(data(i, 2)*(data(i,1)-0.5), data(i, 6),'*')
+end
 
 % % ===========
 % % script for 2 feedback, self-recovery, asym/asym

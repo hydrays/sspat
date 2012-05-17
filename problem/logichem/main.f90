@@ -17,13 +17,13 @@ program ssa
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
   call ran_seed(sequence=12342)
-  te = 5000.0
+  te = 1000.0
   !te = huge(1.0)
 !  pm = 1.0
 !  vm = 2.9
 
-  do pm = 0.0, 1.0001, 0.01
-  do vm = 0.1, 3.01, 0.01
+  do pm = 0.0, 1.0001, 0.02
+  do vm = 0.1, 3.01, 0.05
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0

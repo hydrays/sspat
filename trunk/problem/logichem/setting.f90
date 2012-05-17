@@ -29,7 +29,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1000
+  integer(I4B) :: NSample = 200
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
   real(kind=8) ap, p0, p1, v0
@@ -38,7 +38,7 @@ module chem_data
   real(kind=8) q1, q2, q3
   real(kind=8) qq1, qq2, qq3
   real(kind=8) qm1, qm2, qm3
-  real(kind=8), parameter :: L = 200
+  real(kind=8), parameter :: L = 20000
   real(kind=8), parameter :: mu = 0.0
 
 !!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
@@ -142,7 +142,7 @@ contains
 !!$    qm3 = 1.0 - qm1
 
     if (sum(x) > L) then
-       ap = 0.1*(sum(x) - L)
+       ap = 0.001*(sum(x) - L)
     else
        ap = 0.0
     end if

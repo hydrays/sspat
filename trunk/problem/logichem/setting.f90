@@ -29,7 +29,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 100
+  integer(I4B) :: NSample = 1000
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
   real(kind=8) ap, p0, v0
@@ -39,24 +39,25 @@ module chem_data
   real(kind=8) q1, q2, q3
   real(kind=8) qq1, qq2, qq3
   real(kind=8) qm1, qm2, qm3
-  real(kind=8), parameter :: L = 200
+  real(kind=8), parameter :: L = 100
+  real(kind=8), parameter :: xi = 20.0
   real(kind=8), parameter :: mu = 0.0
 
-!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
-!!$       10, & !SC
-!!$       0, & !TA
-!!$       0, & !TC
-!!$       00, & !MC
-!!$       00 & !TMC
-!!$       /)
-
   integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       30, & !SC
-       50, & !TA
-       120, & !TC
+       20, & !SC
+       30, & !TA
+       150, & !TC
        00, & !MC
        00 & !TMC
        /)
+
+!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
+!!$       30, & !SC
+!!$       50, & !TA
+!!$       120, & !TC
+!!$       00, & !MC
+!!$       00 & !TMC
+!!$       /)
 
 !!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
 !!$       100, & !SC
@@ -97,8 +98,8 @@ contains
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8) TGFbeta 
 
-    !TGFbeta = x(3) + x(5)
-    TGFbeta = x(3)
+    TGFbeta = x(3) + x(5)
+    !TGFbeta = x(3)
 
     v0max = 3.0
     v0min = 0.5
@@ -108,14 +109,14 @@ contains
     v0 = v0max/(1.0 + ksc2*TGFbeta/L)
     !v0 = 0.65
 
-    v1max = 1.3
-    v1min = 0.7
-    ktac1 = 0.8
-    ktac2 = v1max/v1min - 1.0
-    p1 = 0.6/(1.01 + ktac1*TGFbeta/L)
-    v1 = v1max/(1.0 + ktac2*TGFbeta/L)    
-    !p1 = 0.4
-    !v1 = 1.0
+    !v1max = 1.3
+    !v1min = 0.7
+    !ktac1 = 0.8
+    !ktac2 = v1max/v1min - 1.0
+    !p1 = 0.6/(1.01 + ktac1*TGFbeta/L)
+    !v1 = v1max/(1.0 + ktac2*TGFbeta/L)    
+    p1 = 0.4
+    v1 = 1.0
 
     !vmmax = 3.0
     !vmmin = 0.5
@@ -137,7 +138,7 @@ contains
 !!$    q1 = p0
 !!$    q2 = 0.0
 !!$    q3 = 1.0 - q1
-
+!!$
     if ( p1 .le. 0.5 ) then
        qq2 = 2.0*p1
     else
@@ -164,7 +165,7 @@ contains
 !!$    qm3 = 1.0 - qm1
 
     if (sum(x) > L) then
-       ap = 0.1*(sum(x) - L)
+       ap = xi*(sum(x)/L - 1.0)
     else
        ap = 0.0
     end if

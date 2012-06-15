@@ -39,33 +39,10 @@ module chem_data
   real(kind=8) q1, q2, q3
   real(kind=8) qq1, qq2, qq3
   real(kind=8) qm1, qm2, qm3
-  real(kind=8), parameter :: L = 100
+  real(kind=8) L
   real(kind=8), parameter :: xi = 20.0
   real(kind=8), parameter :: mu = 0.0
-
-  integer(I4B), parameter :: Xinit(NSpec)=(/ &
-       20, & !SC
-       30, & !TA
-       150, & !TC
-       00, & !MC
-       00 & !TMC
-       /)
-
-!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
-!!$       30, & !SC
-!!$       50, & !TA
-!!$       120, & !TC
-!!$       00, & !MC
-!!$       00 & !TMC
-!!$       /)
-
-!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
-!!$       100, & !SC
-!!$       300, & !TA
-!!$       1600, & !TC
-!!$       00, & !MC
-!!$       00 & !TMC
-!!$       /)
+  integer(I4B) Xinit(NSpec)
 
   integer(I4B), parameter, dimension(NSpec,NReac) :: nu = reshape( &
        ! 1   2   3   4   5
@@ -198,5 +175,14 @@ contains
     a(18) = mu*x(2)
 
   end subroutine getrate
+
+  subroutine prepare_output_files(BaseName, RunningPara, FileUnit)
+    character(len=7), intent(in) :: BaseName
+    Integer, intent(in) :: RunningPara
+    Integer, intent(in) :: FileUnit
+    character(len=60) :: FileName
+    WRITE(FileName,'(A7,I3.3)'), BaseName, RunningPara
+    open(unit=FileUnit, file=FileName, action="write")
+  end subroutine prepare_output_files
 
 end module chem_data

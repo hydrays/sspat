@@ -19,11 +19,11 @@ program ssa
   call ran_seed(sequence=12343)
   te = 1000.0
   !te = huge(1.0)
-  pm = 0.9
-  vm = 1.1
+  !pm = 0.9
+  !vm = 1.1
 
-!  do pm = 0.5, 1.0001, 0.02
-!  do vm = 0.1, 3.01, 0.03
+  do pm = 0.5, 1.0001, 0.02
+  do vm = 0.1, 3.01, 0.03
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0
@@ -70,10 +70,10 @@ program ssa
            pause
         end if
         
-        if(t > tp) then
-           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
-           tp =  tp + 1.0
-        end if
+!!$        if(t > tp) then
+!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
+!!$           tp =  tp + 1.0
+!!$        end if
 
         if(t > td) then
            if ( x(4) .eq. 0 ) then
@@ -106,10 +106,10 @@ program ssa
      !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
-!  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
-!       coexist_counter, average_max_SCnum 
-!  end do 
-!  end do
+  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
+       coexist_counter, average_max_SCnum 
+  end do 
+  end do
 end program ssa
 
 subroutine checkx(x, is_nag)

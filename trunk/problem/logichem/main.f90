@@ -17,13 +17,13 @@ program ssa
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
   call ran_seed(sequence=1234)
-  te = 1000.0
+  te = 300.0
   !te = huge(1.0)
 
 !  km1 = 1.9
 !  vmmax = 0.6
-  do km1 = 0.1, 2.0001, 0.05
-  do vmmax = 0.5, 5.01, 0.1
+!  do km1 = 0.1, 1.5001, 0.01
+!  do r = 0.1, 1.5, 0.01
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0
@@ -70,15 +70,16 @@ program ssa
            pause
         end if
         
-!!$        if(t > tp) then
-!!$           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
-!!$           tp =  tp + 1.0
-!!$        end if
+        if(t > tp) then
+           write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
+           tp =  tp + 0.1
+        end if
 
         if(t > td) then
-           if ( x(4) .eq. 0 ) then
-              x(4) = 10
-           end if
+           !if ( x(4) .eq. 0 ) then
+           !   x(4) = 10
+           !end if
+           x(3) = int(0.2*x(3))
            td =  td + 400000.0
         end if
 
@@ -107,10 +108,10 @@ program ssa
      !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
-  write (*, '(10F12.2)'), km1, vmmax, takeover_counter, nottakeover_counter, &
-       coexist_counter, average_max_SCnum 
-  end do 
-  end do
+!  write (*, '(10F12.2)'), km1, r, takeover_counter, nottakeover_counter, &
+!       coexist_counter, average_max_SCnum 
+!  end do 
+!  end do
 end program ssa
 
 subroutine checkx(x, is_nag)

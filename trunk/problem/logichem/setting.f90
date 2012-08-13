@@ -29,11 +29,11 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 100
+  integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
   real(kind=8) ap, p0, p1, v0, v1
-  real(kind=8) pm, vm
+  real(kind=8) pm, vm, r
   real(kind=8) k1, k2, v0max, v0min, km1, km2, vmmax, vmmin
   real(kind=8) q1, q2, q3
   real(kind=8) qq1, qq2, qq3
@@ -101,12 +101,12 @@ contains
 
     v0max = 3.0
     v0min = 0.5
-    !vmmax = 2.0
-    vmmin = 0.5
+    !vmmax = 3.0
+    !vmmin = 0.5
     k1 = 1.0
     !km1 = 0.6
     k2 = v0max/v0min - 1.0
-    km2 = vmmax/vmmin - 1.0
+    !km2 = vmmax/vmmin - 1.0
     p1 = 0.4
     v1 = 1.0
 
@@ -115,13 +115,8 @@ contains
     !v0 = 0.65
 
     pm = 1.0/(1.01 + km1*TGFbeta/L)
-    vm = vmmax/(1.0 + km2*TGFbeta/L)
+    vm = r*v0!vmmax/(1.0 + km2*TGFbeta/L)
     !vm = 0.85
-
-
-    !v0 = 0.65
-    !v0 = 1.0
-!!$
 
     if ( p0 .le. 0.5 ) then
        q2 = 2.0*p0

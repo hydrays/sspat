@@ -40,7 +40,7 @@ module chem_data
   real(kind=8) qq1, qq2, qq3
   real(kind=8) qm1, qm2, qm3
   real(kind=8), parameter :: L = 200
-  real(kind=8), parameter :: xi = 2000.0
+  real(kind=8), parameter :: xi = 2.0
   real(kind=8), parameter :: mu = 0.0
 
   integer(I4B), parameter :: Xinit(NSpec)=(/ &

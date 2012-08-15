@@ -1,40 +1,22 @@
 % ===========
 % test
 % ===========
-%figure
 load tr
 clf;
 tr = tr;
 plot(tr(:,1), tr(:,2), '-r')
-xlim([0, 300])
+%xlim([150, 350])
 hold on
 plot(tr(:,1), tr(:,3), '-b')
 plot(tr(:,1), tr(:,4), '-g')
 plot(tr(:,1), tr(:,5), '-k')
+% figure
 plot(tr(:,1), tr(:,7), '-m')
 xlabel('t','fontsize', 18);
 ylabel('cell population','fontsize',18)
 legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-% print('-depsc','tac_pm1vm1_6.eps')
 % 
 % figure
-% plot(tr(:,1), tr(:,8), '-b')
-
-% %figure
-% load tr2
-% %clf;
-% tr = tr2;
-% %plot(tr(:,1), tr(:,2), '.k')
-% xlim([150, 250])
-% hold on
-% %plot(tr(:,1), tr(:,3), '.k')
-% %plot(tr(:,1), tr(:,4), '-k')
-% %plot(tr(:,1), tr(:,5), '-k')
-% %plot(tr(:,1), tr(:,7), '-m')
-% xlabel('t','fontsize', 18);
-% ylabel('cell population','fontsize',18)
-% legend('SC', 'TAC', 'TDC', 'MC', 'Total')
-% % print('-depsc','tac_pm1vm1_6.eps')
 
 % % ===========
 % % test
@@ -291,9 +273,9 @@ legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % % ===========
 % % script for stable solution
 % % ===========
-% load pr2_stable_ss06
+% load pr2_stable_ss10
 % clf;
-% tr = pr2_stable_ss06;
+% tr = pr2_stable_ss10;
 % plot(tr(:,1), tr(:,2), 'r','linewidth', 2)
 % xlim([0, 200])
 % ylim([0, 250])
@@ -306,7 +288,7 @@ legend('SC', 'TAC', 'TDC', 'MC', 'Total')
 % xlabel('t','fontsize', 18);
 % ylabel('cell population','fontsize',18)
 % legend('SC', 'TAC', 'TDC', 'Total')
-% print('-depsc','fig_logi_stable_ss06.eps')
+% print('-depsc','fig_logi_stable_ss10.eps')
 
 % % ===========
 % % plot the average MC vs pm

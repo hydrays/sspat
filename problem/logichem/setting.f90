@@ -102,19 +102,19 @@ contains
     v0max = 3.0
     v0min = 0.5
     !vmmax = 2.0
-    vmmin = 0.5
+    !vmmin = 0.5
     k1 = 1.0
     !km1 = 0.6
     k2 = v0max/v0min - 1.0
-    km2 = vmmax/vmmin - 1.0
+    !km2 = vmmax/vmmin - 1.0
     p1 = 0.4
 
     p0 = 1.0/(1.01 + k1*TGFbeta/L)
     v0 = v0max/(1.0 + k2*TGFbeta/L)
     !v0 = 0.65
 
-    pm = 1.0/(1.01 + km1*TGFbeta/L)
-    vm = vmmax/(1.0 + km2*TGFbeta/L)
+    !pm = 1.0/(1.01 + km1*TGFbeta/L)
+    !vm = vmmax/(1.0 + km2*TGFbeta/L)
     !vm = 0.85
 
     !v0 = 0.65
@@ -141,17 +141,17 @@ contains
 !!$    qq2 = 0.0
 !!$    qq3 = 1.0 - qq1 - qq2
 
-    if ( pm .le. 0.5 ) then
-       qm2 = 2.0*pm
-    else
-       qm2 = -2.0*(pm - 1.0)
-    end if
-    qm1 = pm - qm2*0.5
-    qm3 = 1.0 - qm1 - qm2
-
-!!$    qm1 = pm
-!!$    qm2 = 0.0
-!!$    qm3 = 1.0 - qm1
+!!$    if ( pm .le. 0.5 ) then
+!!$       qm2 = 2.0*pm
+!!$    else
+!!$       qm2 = -2.0*(pm - 1.0)
+!!$    end if
+!!$    qm1 = pm - qm2*0.5
+!!$    qm3 = 1.0 - qm1 - qm2
+!!$
+    qm1 = pm
+    qm2 = 0.0
+    qm3 = 1.0 - qm1
 
     if (sum(x) > L) then
        ap = 0.1*(sum(x) - L)

@@ -17,11 +17,11 @@ program ssa
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
   call ran_seed(sequence=1234)
-  te = 2000.0
+  te = 400.0
   !te = huge(1.0)
   
-  do km1 = 0.1, 2.0001, 0.01
-  do vmmax = 0.5, 3.01, 0.05
+  do pm = 0.0, 1.0001, 0.01
+  do vm = 0.1, 3.01, 0.01
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0
@@ -31,7 +31,7 @@ program ssa
      x = xinit
      t = 0.0
      tp = 0.0
-     td = 200.0
+     td = 100.0
      tbar = 0.0
      xbar_counter = 0.0
      takeover_flag = 0.0
@@ -75,7 +75,7 @@ program ssa
 
         if(t > td) then
            if ( x(4) .eq. 0 ) then
-              x(4) = 10
+              x(4) = 1
            end if
            td =  td + 400000.0
         end if
@@ -104,7 +104,7 @@ program ssa
      !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
-  write (*, '(10F12.2)'), km1, vmmax, takeover_counter, nottakeover_counter, &
+  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
        coexist_counter, average_max_SCnum 
   end do 
   end do

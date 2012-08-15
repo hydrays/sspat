@@ -16,14 +16,14 @@ program ssa
   real(kind=8) N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
-  call ran_seed(sequence=1234)
-  te = 300.0
+  call ran_seed(sequence=12343)
+  te = 1000.0
   !te = huge(1.0)
+  pm = 0.9
+  vm = 1.1
 
-!  km1 = 1.9
-!  vmmax = 0.6
-!  do km1 = 0.1, 1.5001, 0.01
-!  do r = 0.1, 1.5, 0.01
+!  do pm = 0.5, 1.0001, 0.02
+!  do vm = 0.1, 3.01, 0.03
 !  xbar = 0.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0
@@ -40,7 +40,7 @@ program ssa
      nottakeover_flag = 0.0
      max_SCnum = 0.0
      do while(t < te)
-        call getrate(x, a)
+        call getrate(x, a, pm)
         cuma = a
         do j=2, NReac
            cuma(j) = cuma(j-1) + a(j)
@@ -72,27 +72,25 @@ program ssa
         
         if(t > tp) then
            write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
-           tp =  tp + 0.1
+           tp =  tp + 1.0
         end if
 
         if(t > td) then
-           !if ( x(4) .eq. 0 ) then
-           !   x(4) = 10
-           !end if
-           x(3) = int(0.2*x(3))
+           if ( x(4) .eq. 0 ) then
+              x(4) = 1
+           end if
            td =  td + 400000.0
         end if
 
-        if ( x(1) .gt. max_SCnum ) then
-           max_SCnum = x(1)
-        end if
-        !if ( x(1)+x(2)+x(3).eq.0 ) then
-        if ( x(1).eq.0 ) then
-           takeover_counter = takeover_counter + 1.0
-           takeover_flag = 1.0
-           exit
-        end if
-
+!!$        if ( x(1) .gt. max_SCnum ) then
+!!$           max_SCnum = x(1)
+!!$        end if
+!!$        if ( x(1)+x(2)+x(3).eq.0 ) then
+!!$           takeover_counter = takeover_counter + 1.0
+!!$           takeover_flag = 1.0
+!!$           exit
+!!$        end if
+!!$
 !!$        if ( t > 201.0 .and. x(4)+x(5).eq.0 ) then
 !!$           nottakeover_counter = nottakeover_counter + 1.0
 !!$           nottakeover_flag = 1.0
@@ -108,7 +106,7 @@ program ssa
      !write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
   end do
   average_max_SCnum = average_max_SCnum/real(NSample)
-!  write (*, '(10F12.2)'), km1, r, takeover_counter, nottakeover_counter, &
+!  write (*, '(10F12.2)'), pm, vm, takeover_counter, nottakeover_counter, &
 !       coexist_counter, average_max_SCnum 
 !  end do 
 !  end do

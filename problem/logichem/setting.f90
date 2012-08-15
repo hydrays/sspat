@@ -32,9 +32,9 @@ module chem_data
   integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
-  real(kind=8) ap, p0, p1, v0, v1
-  real(kind=8) pm, vm, r
-  real(kind=8) k1, k2, v0max, v0min, km1, km2, vmmax, vmmin
+  real(kind=8) ap, p0, p1, v0
+  real(kind=8) pm, vm
+  real(kind=8) k1, k2, v0max, v0min
   real(kind=8) q1, q2, q3
   real(kind=8) qq1, qq2, qq3
   real(kind=8) qm1, qm2, qm3
@@ -90,33 +90,25 @@ module chem_data
        )
 
 contains
-  subroutine getrate(x, a)
+  subroutine getrate(x, a, pm)
     implicit none
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
-    real(kind=8) TGFbeta, g1
-    
-    TGFbeta = x(3) + x(5)
-    !TGFbeta = x(3)
+    real(kind=8), intent(in) :: pm
+    real(kind=8) TGFbeta 
+
+    !TGFbeta = x(3) + 0.1*x(5)
+    TGFbeta = x(3)
 
     v0max = 3.0
     v0min = 0.5
-    !vmmax = 3.0
-    !vmmin = 0.5
     k1 = 1.0
-    !km1 = 0.6
     k2 = v0max/v0min - 1.0
-    !km2 = vmmax/vmmin - 1.0
     p1 = 0.4
-    v1 = 1.0
-
     p0 = 1.0/(1.01 + k1*TGFbeta/L)
     v0 = v0max/(1.0 + k2*TGFbeta/L)
     !v0 = 0.65
-
-    pm = 1.0/(1.01 + km1*TGFbeta/L)
-    vm = r*v0!vmmax/(1.0 + km2*TGFbeta/L)
-    !vm = 0.85
+!!$
 
     if ( p0 .le. 0.5 ) then
        q2 = 2.0*p0
@@ -159,9 +151,9 @@ contains
     a(2) = q2*v0*x(1)
     a(3) = q3*v0*x(1)
 
-    a(4) = qq1*v1*x(2)
-    a(5) = qq2*v1*x(2)
-    a(6) = qq3*v1*x(2)
+    a(4) = qq1*x(2)
+    a(5) = qq2*x(2)
+    a(6) = qq3*x(2)
 
     a(7) = qm1*vm*x(4)
     a(8) = qm2*vm*x(4)

@@ -51,20 +51,20 @@
 % 
 % t = 0:15;
 % 
-% load re_hist0
-% re_hist = re_hist0;
-% x(1) = 0;
-% x(2) = sum(re_hist(:, 3));
-% x(3:16) = sum(re_hist(:, 4))/7;
-% plot(t, x,'r','linewidth', 1);
-% hold on;
+load re_hist0
+re_hist = re_hist0;
+x(1) = 0;
+x(2) = sum(re_hist(:, 2));
+x(3:16) = sum(re_hist(:, 3))/7;
+plot(t, x,'r','linewidth', 1);
+hold on;
 % 
-% load re_hist005
-% re_hist = re_hist005;
-% x(1) = 0;
-% x(2) = sum(re_hist(:, 3));
-% x(3:16) = sum(re_hist(:, 4))/7;
-% plot(t, x,'k','linewidth', 2);
+load re_hist01
+re_hist = re_hist01;
+x(1) = 0;
+x(2) = sum(re_hist(:, 2));
+x(3:16) = sum(re_hist(:, 3))/7;
+plot(t, x,'b','linewidth', 2);
 % hold on;
 % 
 % load re_hist01
@@ -80,28 +80,28 @@
 % x(2) = sum(re_hist(:, 3));
 % x(3:16) = sum(re_hist(:, 4))/7;
 % plot(t, x,'b','linewidth', 1);
-% % 
-% % load re_hist02
-% % re_hist = re_hist02;
-% % x(1) = 0;
-% % x(2) = sum(re_hist(:, 3));
-% % x(3:16) = sum(re_hist(:, 4))/7;
-% % plot(t, x,'m','linewidth', 1);
-% % 
-% % load re_hist025
-% % re_hist = re_hist025;
-% % x(1) = 0;
-% % x(2) = sum(re_hist(:, 3));
-% % x(3:16) = sum(re_hist(:, 4))/7;
-% % plot(t, x,'r','linewidth', 1);
-% % 
-% % load re_hist03
-% % re_hist = re_hist03;
-% % x(1) = 0;
-% % x(2) = sum(re_hist(:, 3));
-% % x(3:16) = sum(re_hist(:, 4))/7;
-% % plot(t, x,'c','linewidth', 1);
-% % 
+% 
+% load re_hist02
+% re_hist = re_hist02;
+% x(1) = 0;
+% x(2) = sum(re_hist(:, 3));
+% x(3:16) = sum(re_hist(:, 4))/7;
+% plot(t, x,'m','linewidth', 1);
+% 
+% load re_hist025
+% re_hist = re_hist025;
+% x(1) = 0;
+% x(2) = sum(re_hist(:, 3));
+% x(3:16) = sum(re_hist(:, 4))/7;
+% plot(t, x,'r','linewidth', 1);
+% 
+% load re_hist03
+% re_hist = re_hist03;
+% x(1) = 0;
+% x(2) = sum(re_hist(:, 3));
+% x(3:16) = sum(re_hist(:, 4))/7;
+% plot(t, x,'c','linewidth', 1);
+% 
 % 
 % xlabel('DNA position')
 % ylabel('number counted')
@@ -125,45 +125,45 @@
 % plot(t, x,'g');
 % 
 
-% ============
-% Response Time
-% ============
-clear all
-load re_expression_p01
-n = size(re_expression_p01);
-x = zeros(n(2),1);
-y = zeros(n(2),1);
-for i=1: n(2) 
-    x(i) = sum(re_expression_p01(:,i));
-    %y(i) = 50*abs(sin(0.01*10*i));
-end
-plot(10*(1:n(2)), x,'b');
-hold on;
-load re_expression_p02
-n = size(re_expression_p02);
-x = zeros(n(2),1);
-y = zeros(n(2),1);
-for i=1: n(2) 
-    x(i) = sum(re_expression_p02(:,i));
-    %y(i) = 50*abs(sin(0.01*10*i));
-end
-plot(10*(1:n(2)), x,'r');
-load re_expression_p005
-n = size(re_expression_p005);
-x = zeros(n(2),1);
-y = zeros(n(2),1);
-for i=1: n(2) 
-    x(i) = sum(re_expression_p005(:,i));
-    %y(i) = 50*abs(sin(0.01*10*i));
-end
-plot(10*(1:n(2)), x,'g');
-xlabel('time')
-ylabel('number of E')
-legend('p=0.01', 'p=0.02', 'p=0.005')
-% %plot(y, 'k')
-%text(3000, 500, 'Brg off','fontsize', 18)
-annotation('textarrow',[0.4,0.331],[0.85, 0.8],'String','Brg off','FontSize',14)
-print('-depsc','fig_brg_off.eps')
+% % ============
+% % Response Time
+% % ============
+% clear all
+% load re_expression_p01
+% n = size(re_expression_p01);
+% x = zeros(n(2),1);
+% y = zeros(n(2),1);
+% for i=1: n(2) 
+%     x(i) = sum(re_expression_p01(:,i));
+%     %y(i) = 50*abs(sin(0.01*10*i));
+% end
+% plot(10*(1:n(2)), x,'b');
+% hold on;
+% load re_expression_p02
+% n = size(re_expression_p02);
+% x = zeros(n(2),1);
+% y = zeros(n(2),1);
+% for i=1: n(2) 
+%     x(i) = sum(re_expression_p02(:,i));
+%     %y(i) = 50*abs(sin(0.01*10*i));
+% end
+% plot(10*(1:n(2)), x,'r');
+% load re_expression_p005
+% n = size(re_expression_p005);
+% x = zeros(n(2),1);
+% y = zeros(n(2),1);
+% for i=1: n(2) 
+%     x(i) = sum(re_expression_p005(:,i));
+%     %y(i) = 50*abs(sin(0.01*10*i));
+% end
+% plot(10*(1:n(2)), x,'g');
+% xlabel('time')
+% ylabel('number of E')
+% legend('p=0.01', 'p=0.02', 'p=0.005')
+% % %plot(y, 'k')
+% %text(3000, 500, 'Brg off','fontsize', 18)
+% annotation('textarrow',[0.4,0.331],[0.85, 0.8],'String','Brg off','FontSize',14)
+% print('-depsc','fig_brg_off.eps')
 
 %print('-depsc','fig_express.eps')
 % 

@@ -18,12 +18,12 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1000
-  integer(I4B) :: Ntrail = 10000
+  integer(I4B) :: NSample = 1
+  integer(I4B) :: Ntrail = 1
   integer(I4B), parameter :: NSpec=4
   integer(I4B), parameter :: NReac=7
   real(kind=8) s1, s2, s3
-  real(kind=8), parameter :: ep = 0.01
+  real(kind=8), parameter :: ep = 0.1
   real NT(NReac)
   real NP(NReac)
   real(kind=8) a(NReac)
@@ -44,7 +44,7 @@ module chem_data
        (/0.01, 0.0, 1.0, 0.0, 10.0, 0.1, -1.0/)
 
   real(kind=8), parameter, dimension(NSpec) :: xinit =  &
-       (/0.0, 0.0, 0.0, 0.0/)
+       (/0.0, 1.0, 0.0, 0.0/)
 
 contains
   subroutine getrate(x, a)

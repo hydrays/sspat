@@ -17,7 +17,7 @@ program ssa
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
   call ran_seed(sequence=12341)
-  te = 300.0
+  te = 1000.0
   pm = 1.0
   vm = 1.0
 

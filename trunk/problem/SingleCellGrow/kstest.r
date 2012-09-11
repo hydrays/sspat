@@ -19,7 +19,7 @@ mcell <- mcell[mcell>=50]
 Fn <- ecdf(x)
 Fe <- ecdf(mcell)
 
-plot(Fn)
+plot(Fn, xlim=c(0, 300))
 lines(Fe, col='red')
 
 dis <- ks.test(mcell, x)

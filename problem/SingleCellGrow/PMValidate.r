@@ -1,3 +1,6 @@
+PMValidate <-
+function(){
+
 Nsample = 1000
 T = 8
 r1 = 0.8
@@ -11,7 +14,7 @@ for (i in seq(Nsample)){
   x[i] <- sum(y)
 }
 
-data7 <- read.csv('8day.csv')
+data7 <- read.csv('data/8dayfast.csv')
 mcell <- as.numeric(data7[8,3:ncol(data7[1,])])
 mcell[is.na(mcell)] <- 0
 mcell <- mcell[mcell>=50]
@@ -24,3 +27,4 @@ lines(Fe, col='red')
 
 dis <- ks.test(mcell, x)
 cat(dis$p.value)
+}

@@ -35,5 +35,17 @@ filled.contour(x = seq(0, 1.4, length.out=71),
 		 plot.axes={ axis(1); axis(2); points(0.84,0.44,pch=17) },
 		 level=c(0, 0.12, 0.15, 0.2, 0.3, 0.4, 0.5, 0.7, 1))
 
-mtext(paste("By BJZ @", date()), side=1, line=4, adj=1, cex=.66)		 
+mtext(paste("@", date()), side=1, line=4, adj=1.04, cex=.66)
 
+text(0.4, 1.3, "Grid search for best fit using one-species model.")
+text(0.4, 1.25, "The best fit is located at")
+text(0.4, 1.2, "r1 = 0.84, d1 = 0.44 (triangle)")
+
+if( require(png) ) {
+  img <- readPNG("bear2.png")
+  my.symbols( 1.04, -0.36, ms.image, MoreArgs=list(img=img),
+             inches=0.2, symb.plots=TRUE, add=TRUE)
+}
+
+dev.copy(pdf,'search5.pdf')
+dev.off()

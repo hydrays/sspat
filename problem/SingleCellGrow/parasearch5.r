@@ -42,7 +42,7 @@ text(0.4, 1.25, "The best fit is located at")
 text(0.4, 1.2, "r1 = 0.84, d1 = 0.44 (triangle)")
 
 if( require(png) ) {
-  img <- readPNG("bear2.png")
+  img <- readPNG("bear.png")
   my.symbols( 1.04, -0.36, ms.image, MoreArgs=list(img=img),
              inches=0.2, symb.plots=TRUE, add=TRUE)
 }

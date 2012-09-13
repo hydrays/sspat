@@ -3,11 +3,12 @@ lw = 1;
 mycmap = [1     1    1
      1     0     0
      0     0     1
-     0     1     0];
+     0     1     0
+     0     0     0];
 colormap(mycmap)
 
 j = 1;
-for index =1000:1:1110
+for index =100:1:186
 clf
 s1 = ['0000000' num2str(index)];
 s = s1((length(s1)-4):length(s1));
@@ -22,9 +23,9 @@ i = index + 1
 hold on
 %box on;
 % xlim([1,L])
-ylim([0,50])
+%ylim([0,50])
 
-pcolor(popline(1:1000,1:100)')
+pcolor(popline(1:1000,1:200)')
 axis equal
 shading flat
 box on

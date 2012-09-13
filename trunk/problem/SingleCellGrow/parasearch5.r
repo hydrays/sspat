@@ -80,8 +80,8 @@ Fn <- ecdf(x)
 Fe <- ecdf(mcell)
 plot(Fn, xlim=c(0,300),
      main = "ECDF: simulation vs data",
-     xlab = "Cumulative probability",
-     ylab = "8-day Cell number ")
+     ylab = "Cumulative probability",
+     xlab = "8-day Cell number ")
 lines(Fe, col='red')
 
 text(200, 0.6, "Goodness of fit")
@@ -101,5 +101,6 @@ if( require(png) ) {
 }
 mtext(paste("@", date()), side=1, line=4, adj=1.04, cex=.66)
 
-dev.copy(pdf,'search5.pdf')
+#dev.copy(pdf,'search5.pdf')
+dev.copy(jpeg,'search5_2.jpg')
 dev.off()

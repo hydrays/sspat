@@ -1,16 +1,21 @@
 module setting
-  integer, parameter :: L = 1000
+  integer, parameter :: L = 600
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
+  real, parameter :: bd10 = 10.0/b
   real, parameter :: tend = 1000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: stem_fix = 0.96
+  real, parameter :: D = 20.0
+  real, parameter :: mv = 0.0
   type cell
      integer type
      real gene1
+     real gene2
+     real gene3
+     real gene4
   end type cell
-  type(cell) cmat(0:L+1,H+50)
+  type(cell) cmat(0:L+1,H)
   real a(1:L)
   real NT(1:L)
   real NP(1:L)
@@ -28,9 +33,15 @@ contains
     integer i, j
 
     cmat(1:L, 1)%type = 1
-    cmat(1:L, 1)%gene1 = 0.01
     cmat(1:L, 2:3)%type = 2
     cmat(1:L, 3:4)%type = 3
+    do i = 1, L
+       u = par_uni(0)
+       cmat(i, 1)%gene1 = 0.98
+       cmat(i, 1)%gene2 = 0.2
+       cmat(i, 1)%gene3 = 0.02! + 0.01*(u-0.5)
+       cmat(i, 1)%gene4 = 10+2.0*(u-0.5)
+    end do
     cmat(0, :) = cmat(L, :)
     cmat(L+1, :) = cmat(1, :)
 
@@ -70,9 +81,9 @@ contains
     integer i, j
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
-    !    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
+    WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
-    !    open (unit = 12, file=filename2, action="write")
+    open (unit = 12, file=filename2, action="write")
 
     do i = 1, L+1
        do j = 1, H
@@ -83,105 +94,42 @@ contains
        write(11, '(I6)', advance="no"), SC(i)
        write(11, *)
     end do
-!!$    do i = 1, L
-!!$       do j = 1, H
-!!$          if (cmat(i,j)%type.eq.1) then
-!!$             write(12, '(I10, (F15.5))'), i, cmat(i,j)%gene1
-!!$          end if
-!!$       end do
-!!$    end do
+    do i = 1, L
+       do j = 1, H
+          if (cmat(i,j)%type.eq.1) then
+             write(12, '(I10, 4(F15.5))'), i, &
+                  cmat(i,j)%gene1, cmat(i,j)%gene2, &
+                  cmat(i,j)%gene3, cmat(i,j)%gene4
+          end if
+       end do
+    end do
     close(11)
-    !    close(12)
+    close(12)
   end subroutine output_to_file
 
   subroutine cell_event(i, kpar)
     use par_zig_mod
     implicit none
     integer, intent(in) :: i, kpar
-    integer j, k, m, shift_i
-    real u, u1, p0, TGFbeta
+    integer j, k, kk, m, shift_i, shift_j
+    real u, u1, p0, TGFbeta, distance
     real vr, vl
     type(cell) new_cell
     u = par_uni(kpar)
     u = u*a(i)
     if (npack(i).ne.0) then
-       vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
-       vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
+       vr = max(0.0, D*real(npack(i)-npack(i+1)))
+       vl = max(0.0, D*real(npack(i)-npack(i-1)))
     else
        vr = 0.0
        vl = 0.0
     end if
-!!$    print *, 'event happen at ', i
-!!$    print *, 'u', u
-!!$    print *, 'a(i)', a(i)
-!!$    print *, 'npack(i)', npack(i-1:i+1)
-!!$    print *, 'vr, vl', vr, vl
-    do j = 1, npack(i)
-       u = u - v
-       if ( u < 0 ) then
-          if ( (cmat(i,j)%type .eq. 1) ) then
-             TGFbeta = 0.0
-             do k = -b, b
-                shift_i = k + i
-                if ( shift_i .le. 0 ) then
-                   shift_i = shift_i + L
-                else if ( shift_i > L ) then
-                   shift_i = shift_i - L
-                end if
-                TGFbeta = TGFbeta + TDC(shift_i)*exp(-real(abs(k))/b)
-             end do
-             p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
-             !print *, 'p0', p0
-             ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
-             end do
-             u1 = par_uni(kpar)
-             if ( u1 < p0 ) then
-                ! SC -> 2SC
-                cmat(i,j+1) = cmat(i,j)
-             else
-                ! SC -> 2TAC
-                cmat(i,j)%type = 2
-                cmat(i,j+1) = cmat(i,j) 
-             end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 2 ) then
-             ! division
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
-             end do
-             u1 = par_uni(kpar)
-             if ( u1 < p1 ) then
-                ! TAC -> 2TAC
-                cmat(i, j+1) = cmat(i,j)
-             else
-                ! TAC -> 2TDC
-                cmat(i, j)%type = 3
-                cmat(i, j+1) = cmat(i,j)
-                TDC(i) = TDC(i) + 2
-             end if
-             npack(i) = npack(i) + 1
-          else if ( cmat(i,j)%type .eq. 3 ) then
-             ! death
-             do k=j, H-1
-                cmat(i, k) = cmat(i, k+1)
-             end do
-             TDC(i) = TDC(i) - 1
-             npack(i) = npack(i) - 1
-          else if ( (cmat(i,j)%type .eq. 4) ) then
-             p0 = 1.0
-             do k=H, j+2, -1
-                cmat(i, k) = cmat(i, k-1)
-             end do
-             cmat(i,j+1) = cmat(i,j)
-             npack(i) = npack(i) + 1
-          else
-             ! do nothing
-          end if
-          return
-       end if
-    end do
+!!$ print *, 'event happen at ', i
+!!$ print *, 'u', u
+!!$ print *, 'a(i)', a(i)
+!!$ print *, 'npack(i)', npack(i-1:i+1)
+!!$ print *, 'vr, vl', vr, vl
+
     u = u - vr
     if ( u < 0 ) then
        u1 = par_uni(kpar)
@@ -191,9 +139,9 @@ contains
           read(*,*)
        end if
 
-       if ( (cmat(i,j)%type .eq. 1) .or. (cmat(i,j)%type .eq. 4)) then
+       if ( cmat(i, j)%type .eq. 1 ) then
           u1 = par_uni(kpar)
-          if (u1 < stem_fix) then
+          if ( u1 < cmat(i,j)%gene1 ) then
              return
           end if
        end if
@@ -229,9 +177,9 @@ contains
           read(*,*)
        end if
        !print *, 'move left at height j', i, j
-       if ( (cmat(i,j)%type .eq. 1) .or. (cmat(i,j)%type .eq. 4)) then
+       if ( cmat(i, j)%type .eq. 1 ) then
           u1 = par_uni(kpar)
-          if (u1 < stem_fix) then
+          if ( u1 < cmat(i,j)%gene1 ) then
              return
           end if
        end if
@@ -256,38 +204,126 @@ contains
           TDC(m) = TDC(m) + 1
        end if
        return
-    else
-       print *, 'event at', i
-       print *, 'npack', npack(i-1:i+1)
-       print *, 'cell', cmat(i, 1:npack(i))%type
-       print *, 'u', u
-       print *, 'vl', vl
-       print *, 'a', a(i)
-       write(*,*) 'error 2'
-       read(*,*)
     end if
-  end subroutine cell_event
-
-  subroutine cell_cuttop
-    integer i, j, k
-    do i = 1, L
-       if ( npack(i) > H ) then
-          do k = H+1, npack(i)
-             if ( cmat(i,j)%type .eq. 1 ) then
-                SC(i) = SC(i) - 1
-             else if ( cmat(i,j)%type .eq. 2 ) then
-                TAC(i) = TAC(i) - 1
-             else if ( cmat(i,j)%type .eq. 3 ) then
-                TDC(i) = TDC(i) - 1
-             else if ( cmat(i,j)%type .eq. 4 ) then
-                !MC(i) = MC(i) - 1
+    do j = 1, npack(i)
+       u = u - v
+       if ( u < 0 ) then
+          if ( cmat(i,j)%type .eq. 1 ) then
+             TGFbeta = 0.0
+             do k = -b, b
+                shift_i = k + i
+                if ( shift_i .le. 0 ) then
+                   shift_i = shift_i + L
+                else if ( shift_i > L ) then
+                   shift_i = shift_i - L
+                end if
+                do kk = -b, b
+                   shift_j = k + j
+                   if ( (shift_j .ge. 1) .and. shift_j .le. H) then
+                      if ( cmat(shift_i, shift_j)%type .eq. 1 ) then
+                         distance = kk*kk + k*k
+                         TGFbeta = TGFbeta + bd10*exp(-real(distance)/b)
+                      end if
+                   end if
+                end do
+             end do
+             p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
+                  / (1.0 + cmat(i,j)%gene3*TGFbeta)
+             !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+             p0 = p0*(1.0-real(j)/20.0)
+             !print *, 'p0', p0
+             ! division
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             u1 = par_uni(kpar)
+             if ( u1 < p0 ) then
+                ! SC -> 2SC
+                cmat(i,j+1) = cmat(i,j)
+             else
+                ! SC -> 2TAC
+                cmat(i,j)%type = 2
+                cmat(i,j+1) = cmat(i,j)
              end if
+             npack(i) = npack(i) + 1
+          else if ( cmat(i,j)%type .eq. 2 ) then
+             ! division
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             u1 = par_uni(kpar)
+             if ( u1 < p1 ) then
+                ! TAC -> 2TAC
+                cmat(i, j+1) = cmat(i,j)
+             else
+                ! TAC -> 2TDC
+                cmat(i, j)%type = 3
+                cmat(i, j+1) = cmat(i,j)
+                TDC(i) = TDC(i) + 2
+             end if
+             npack(i) = npack(i) + 1
+          else if ( cmat(i,j)%type .eq. 3 ) then
+             ! death
+             do k=j, H-1
+                cmat(i, k) = cmat(i, k+1)
+             end do
+             TDC(i) = TDC(i) - 1
              npack(i) = npack(i) - 1
-             cmat(i,k)%type = 0
-          end do
+          else
+             ! do nothing
+          end if
+          return
        end if
     end do
-  end subroutine cell_cuttop
+    if ( mv .ne. 0.0 ) then
+       do j = 1, npack(i)
+          u = u - mv
+          if ( u < 0 ) then
+             if ( cmat(i,j)%type .eq. 1 ) then
+                ! mutation
+                u1 = par_uni(kpar)
+                cmat(i,j)%gene1 = cmat(i,j)%gene1 + (u1-0.5)*0.1
+                if ( cmat(i,j)%gene1 > 0.995) then
+                   cmat(i,j)%gene1 = 0.995
+                else if ( cmat(i,j)%gene1 < 0.0) then
+                   cmat(i,j)%gene1 = 0.0
+                end if
+!!$ u1 = par_uni(kpar)
+!!$ cmat(i,j)%gene2 = cmat(i,j)%gene2 + (u1-0.5)*0.01
+!!$ if ( cmat(i,j)%gene2 > 0.5) then
+!!$ cmat(i,j)%gene2 = 1.0
+!!$ else if ( cmat(i,j)%gene2 < 0.0) then
+!!$ cmat(i,j)%gene2 = 0.0
+!!$ end if
+!!$ u1 = par_uni(kpar)
+!!$ cmat(i,j)%gene3 = cmat(i,j)%gene3 + (u1-0.5)*0.0001
+!!$ if ( cmat(i,j)%gene2 > 0.5) then
+!!$ cmat(i,j)%gene2 = 1.0
+!!$ else if ( cmat(i,j)%gene2 < 0.0) then
+!!$ cmat(i,j)%gene2 = 0.0
+!!$ end if
+             end if
+             return
+          end if
+       end do
+    end if
+    print *, "not suppose to be here!"
+    stop
+  end subroutine cell_event
+
+  subroutine cell_restack(i)
+    implicit none
+    integer, intent(in) :: i
+    integer j
+    type(cell) temp
+    do j = npack(i), 2, -1
+       if ( cmat(i,j)%type .eq. 1 ) then
+          temp = cmat(i,j-1)
+          cmat(i,j-1) = cmat(i,j)
+          cmat(i,j) = temp
+       end if
+    end do
+  end subroutine cell_restack
 
   subroutine cell_stat(t)
     implicit none
@@ -295,42 +331,31 @@ contains
     real, intent(in) :: t
     integer i, j, k
     integer num_sc, num_tac, num_tdc, num_mc
-    integer inum_sc, inum_tac, inum_tdc, inum_mc
 
     num_sc = 0
     num_tac = 0
     num_tdc = 0
     num_mc = 0
     do i = 1, L
-       inum_sc = 0
-       inum_tac = 0
-       inum_tdc = 0
-       inum_mc = 0
        do j = 1, H
           if (cmat(i,j)%type.eq.1) then
              num_sc = num_sc + 1
-             inum_sc = inum_sc + 1
           elseif (cmat(i,j)%type.eq.2) then
              num_tac = num_tac + 1
-             inum_tac = inum_tac + 1
           elseif (cmat(i,j)%type.eq.3) then
              num_tdc = num_tdc + 1
-             inum_tdc = inum_tdc + 1
           elseif (cmat(i,j)%type.eq.4) then
              num_mc = num_mc + 1
-             inum_mc = inum_mc + 1
           end if
        end do
-       SC(i) = inum_sc
-       TAC(i) = inum_tac
     end do
 
     write(*, '(5(F10.2))'), t, real(num_sc)/L, &
          real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
-!!$  do i = -b, L+1+b
-!!$     write(*, '(F8.2)', advance="no"), TGFbeta(i)
-!!$  end do
-!!$  write(*, *)
+!!$ do i = -b, L+1+b
+!!$ write(*, '(F8.2)', advance="no"), TGFbeta(i)
+!!$ end do
+!!$ write(*, *)
     write(100, '(5(F10.2))'), t, real(num_sc)/L, &
          real(num_tac)/L, real(num_tdc)/L, real(num_mc)/L
   end subroutine cell_stat
@@ -385,17 +410,17 @@ contains
              k = i
           end if
        else
-!          print *, 'no reaction -------------- ', i, k, a(i)
-!          read(*,*)
+          ! print *, 'no reaction -------------- ', i, k, a(i)
+          ! read(*,*)
        end if
     end do
-!    print *, 'k', k
-!    print *, 'a', a
+    ! print *, 'k', k
+    ! print *, 'a', a
     if ( k .le. 0 ) then
        write(*,*), 'error'
        read(*,*)
     end if
-    if ( tau .le. 0 ) then
+    if ( tau < 0 ) then
        write(*,*), 'error', 'tau', tau
        print *, 'NP-NT', NP - NT
        read(*,*)
@@ -406,12 +431,12 @@ contains
     implicit none
     integer, intent(in) :: i
     real vr, vl
-    vr = max(0.0, 200.0*real(npack(i)-npack(i+1)))
-    vl = max(0.0, 200.0*real(npack(i)-npack(i-1)))
+    vr = max(0.0, D*real(npack(i)-npack(i+1)))
+    vl = max(0.0, D*real(npack(i)-npack(i-1)))
     if (npack(i).eq.0) then
-!       print *, vr, vl
+       ! print *, vr, vl
     end if
-    a(i) = vr + vl + npack(i)*v
+    a(i) = vr + vl + npack(i)*(v+mv)
   end subroutine Update_Rate
 
 end module setting

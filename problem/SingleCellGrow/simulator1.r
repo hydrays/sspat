@@ -1,11 +1,11 @@
-simulator1 <- function(T, r1, r2, d1, d2, p, w){
+simulator1 <- function(T, r1, r2, d1, d2, v, w){
   ## x is the system state
   x <- c(0, 0)
 
   ## define reaction system
   nr <- 5
   ns <- 2
-  c <- c(r1, r2, d1, d2, p)
+  c <- c(r1, r2, d1, d2, v)
   nu <- matrix(0, ns, nr)
   nu[,1] = c(1, 0)
   nu[,2] = c(0, 1)

@@ -1,5 +1,4 @@
 program main
-  use omp_lib
   use nrtype
   use random
   use setting

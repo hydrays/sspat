@@ -1,5 +1,5 @@
 module setting
-  integer, parameter :: L = 2000
+  integer, parameter :: L = 200
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
   real, parameter :: bd10 = 10.0/b
@@ -112,9 +112,11 @@ contains
     implicit none
     integer, intent(in) :: i
     integer j, k, m, shift_i
-    real u, u1, p0, TGFbeta
+    real u, p0, TGFbeta
     real vr, vl
     type(cell) new_cell
+    real u1
+
     call ran2(u)
     u = u*a(i)
     if (npack(i).ne.0) then

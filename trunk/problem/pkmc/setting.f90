@@ -1,16 +1,16 @@
 module setting
-  integer, parameter :: L = 2000
+  integer, parameter :: L = 1000
   integer, parameter :: H = 200
   real, parameter :: b = 8.0
-  real, parameter :: tend = 10000.0
+  real, parameter :: tend = 1000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
-  real, parameter :: stem_fix = 0.00
+  real, parameter :: stem_fix = 0.96
   type cell
      integer type
      real gene1
   end type cell
-  type(cell) cmat(0:L+1,H)
+  type(cell) cmat(0:L+1,H+50)
   real a(1:L)
   real NT(1:L)
   real NP(1:L)
@@ -28,6 +28,7 @@ contains
     integer i, j
 
     cmat(1:L, 1)%type = 1
+    cmat(1:L, 1)%gene1 = 0.01
     cmat(1:L, 2:3)%type = 2
     cmat(1:L, 3:4)%type = 3
     cmat(0, :) = cmat(L, :)
@@ -118,7 +119,7 @@ contains
     do j = 1, npack(i)
        u = u - v
        if ( u < 0 ) then
-          if ( cmat(i,j)%type .eq. 1 ) then
+          if ( (cmat(i,j)%type .eq. 1) ) then
              TGFbeta = 0.0
              do k = -b, b
                 shift_i = k + i
@@ -168,6 +169,13 @@ contains
              end do
              TDC(i) = TDC(i) - 1
              npack(i) = npack(i) - 1
+          else if ( (cmat(i,j)%type .eq. 4) ) then
+             p0 = 1.0
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             cmat(i,j+1) = cmat(i,j)
+             npack(i) = npack(i) + 1
           else
              ! do nothing
           end if
@@ -183,7 +191,7 @@ contains
           read(*,*)
        end if
 
-       if ( cmat(i, j)%type .eq. 1 ) then
+       if ( (cmat(i,j)%type .eq. 1) .or. (cmat(i,j)%type .eq. 4)) then
           u1 = par_uni(kpar)
           if (u1 < stem_fix) then
              return
@@ -221,7 +229,7 @@ contains
           read(*,*)
        end if
        !print *, 'move left at height j', i, j
-       if ( cmat(i, j)%type .eq. 1 ) then
+       if ( (cmat(i,j)%type .eq. 1) .or. (cmat(i,j)%type .eq. 4)) then
           u1 = par_uni(kpar)
           if (u1 < stem_fix) then
              return
@@ -260,19 +268,26 @@ contains
     end if
   end subroutine cell_event
 
-  subroutine cell_restack(i)
-    implicit none
-    integer, intent(in) :: i
-    integer j
-    type(cell) temp
-    do j = npack(i), 2, -1
-       if ( cmat(i,j)%type .eq. 1 ) then
-          temp = cmat(i,j-1)
-          cmat(i,j-1) = cmat(i,j)
-          cmat(i,j) = temp
+  subroutine cell_cuttop
+    integer i, j, k
+    do i = 1, L
+       if ( npack(i) > H ) then
+          do k = H+1, npack(i)
+             if ( cmat(i,j)%type .eq. 1 ) then
+                SC(i) = SC(i) - 1
+             else if ( cmat(i,j)%type .eq. 2 ) then
+                TAC(i) = TAC(i) - 1
+             else if ( cmat(i,j)%type .eq. 3 ) then
+                TDC(i) = TDC(i) - 1
+             else if ( cmat(i,j)%type .eq. 4 ) then
+                !MC(i) = MC(i) - 1
+             end if
+             npack(i) = npack(i) - 1
+             cmat(i,k)%type = 0
+          end do
        end if
     end do
-  end subroutine cell_restack
+  end subroutine cell_cuttop
 
   subroutine cell_stat(t)
     implicit none

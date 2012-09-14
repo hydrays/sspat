@@ -2,17 +2,25 @@ for (j in seq(7)){
   N <- 100
   m <- c(0, 50, 100, 200, 800, 1000, 10000)
   T <- 14
-  x <- c(100, m[j])
+  x <- c(10, m[j])
   r <- seq(T+1)
-  r[1] = x[1]/sum(x)
+  r[1] <- x[1]/sum(x)
+
+  #model parameters
+  l1 <- 1
+  l2 <- 0.6
+  d1 <- 0.3
+  d2 <- 0.3
+  u <- 0.3
+
   for (i in seq(T)){
     tempx <- c(0, 0)
     for (k in seq(x[1])){
-      y <- simulator1(1, 1, 0.6, 0.4, 0.3, 0.3, 1)
+      y <- simulator1(1, l1, l2, d1, d2, u, 1)
       tempx <- tempx + y
     }
     for (k in seq(x[2])){
-      y <- simulator1(1, 1, 0.6, 0.4, 0.3, 0.3, 0)
+      y <- simulator1(1, l1, l2, d1, d2, u, 0)
       tempx <- tempx + y
     }
     x <- tempx
@@ -25,6 +33,7 @@ for (j in seq(7)){
          xlim = c(0, 14),
          ylim = c(0, 1),
          xlab="time (day)", ylab="ratio (good/total)")
+    abline(h=c(((l1-d1)-(l2-d2)-u)/((l1-d1)-(l2-d2))))
   }
   else{
     lines(0:T, r, type="o", col=j, pch=j)

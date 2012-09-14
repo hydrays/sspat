@@ -1,5 +1,4 @@
 program main
-  use nrtype
   use random
   use setting
   implicit none

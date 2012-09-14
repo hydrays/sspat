@@ -66,7 +66,6 @@ program main
      do while ( private_t < t + 0.01)
         call Next_Reaction(k, tau, ilow, iup)
         call cell_event(k, nthread)
-        call cell_cuttop()
         if ( (k .le. 2).or.(k .ge. L-1) ) then
            call Perodic_BC(k)
         end if

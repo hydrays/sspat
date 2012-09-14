@@ -21,12 +21,13 @@ program main
   call par_zigset(npar, seed, grainsize)
 
   open (unit = 100, file='./out/logfile', action="write")
+  !call ran_seed(sequence=12345)
 
   call init_cell_pool()
 
   t = 0.0
   tp = 0.0
-  tm = 100.0
+  tm = 1000.0
   private_t = 0.0
   output_index = 0
 
@@ -41,14 +42,17 @@ program main
      end if
 
      if (t .ge. tm) then
-        i = 500
-        j = 1
-        cmat(i,j)%type = 4
-        cmat(i,j)%gene1 = 0.0
-        call Update_Rate(i)
-        call Update_Rate(i+1)
-        call Update_Rate(i-1)
-        tm = huge(1.0)
+        do i = 300, 600
+              do j = 1, npack(i)
+                 cmat(i,j)%type = 0
+              end do
+              npack(i) = 0
+              TDC(i) = 0
+              call Update_Rate(i)
+              call Update_Rate(i+1)
+              call Update_Rate(i-1)
+           end do
+           tm = huge(1.0)
      end if
 
      do iredblack = 0, 1

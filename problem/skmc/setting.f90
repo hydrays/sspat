@@ -26,7 +26,7 @@ module setting
 
 contains
   subroutine init_cell_pool()
-    use par_zig_mod
+    use random
     implicit none
     integer temp_num
     real u
@@ -36,7 +36,7 @@ contains
     cmat(1:L, 2:3)%type = 2
     cmat(1:L, 3:4)%type = 3
     do i = 1, L
-       u = par_uni(0)
+       call ran2(u)
        cmat(i, 1)%gene1 = 0.96
        cmat(i, 1)%gene2 = 0.2
        cmat(i, 1)%gene3 = 0.01! + 0.01*(u-0.5)
@@ -107,15 +107,15 @@ contains
     close(12)
   end subroutine output_to_file
 
-  subroutine cell_event(i, kpar)
-    use par_zig_mod
+  subroutine cell_event(i)
+    use random
     implicit none
-    integer, intent(in) :: i, kpar
+    integer, intent(in) :: i
     integer j, k, m, shift_i
     real u, u1, p0, TGFbeta
     real vr, vl
     type(cell) new_cell
-    u = par_uni(kpar)
+    call ran2(u)
     u = u*a(i)
     if (npack(i).ne.0) then
        vr = max(0.0, D*real(npack(i)-npack(i+1)))
@@ -132,7 +132,7 @@ contains
 
     u = u - vr
     if ( u < 0 ) then
-       u1 = par_uni(kpar)
+       call ran2(u1)
        j = ceiling(u1*npack(i))
        if (j < 1 .or. j>npack(i)) then
           print *, 'error 4', j, u1
@@ -140,7 +140,7 @@ contains
        end if
 
        if ( cmat(i, j)%type .eq. 1 ) then
-          u1 = par_uni(kpar)
+          call ran2(u1)
           if ( u1 < cmat(i,j)%gene1 ) then
              return
           end if
@@ -170,7 +170,7 @@ contains
     end if
     u = u - vl
     if ( u < 0 ) then
-       u1 = par_uni(kpar)
+       call ran2(u1)
        j = ceiling(u1*npack(i))
        if (j < 1 .or. j>npack(i)) then
           print *, 'error 5', j, u1, npack(i)
@@ -178,7 +178,7 @@ contains
        end if
        !print *, 'move left at height j', i, j
        if ( cmat(i, j)%type .eq. 1 ) then
-          u1 = par_uni(kpar)
+          call ran2(u1)
           if ( u1 < cmat(i,j)%gene1 ) then
              return
           end if
@@ -228,7 +228,7 @@ contains
              do k=H, j+2, -1
                 cmat(i, k) = cmat(i, k-1)
              end do
-             u1 = par_uni(kpar)
+             call ran2(u1)
              if ( u1 < p0 ) then
                 ! SC -> 2SC
                 cmat(i,j+1) = cmat(i,j)
@@ -243,7 +243,7 @@ contains
              do k=H, j+2, -1
                 cmat(i, k) = cmat(i, k-1)
              end do
-             u1 = par_uni(kpar)
+             call ran2(u1)
              if ( u1 < p1 ) then
                 ! TAC -> 2TAC
                 cmat(i, j+1) = cmat(i,j)
@@ -273,7 +273,7 @@ contains
           if ( u < 0 ) then
              if ( cmat(i,j)%type .eq. 1 ) then
                 ! mutation
-                u1 = par_uni(kpar)
+                call ran2(u1)
                 cmat(i,j)%gene1 = cmat(i,j)%gene1 + (u1-0.5)*0.1
                 if ( cmat(i,j)%gene1 > 0.995) then
                    cmat(i,j)%gene1 = 0.995
@@ -384,17 +384,16 @@ contains
     end if
   end subroutine Perodic_BC
 
-  subroutine Next_Reaction(k, tau, ilow, iup)
+  subroutine Next_Reaction(k, tau)
     implicit none
     integer, intent(out) :: k
-    integer, intent(in) :: ilow, iup
     real, intent(out) :: tau
     real tau_temp
     integer i
 
     tau = huge(0.0)
     k = 0
-    do i = ilow, iup
+    do i = 1, L
        if ( a(i) > 0.0 ) then
           tau_temp = ( NP(i) - NT(i) ) / a(i)
           if ( tau_temp < tau) then

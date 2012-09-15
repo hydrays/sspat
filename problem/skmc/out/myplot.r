@@ -2,7 +2,7 @@ library("lattice")
 library("grid")
 jet.colors <- colorRampPalette(c("white", "red", "blue", "green"))
 
-N = 1000
+N = 10
 L = 1000
 H = 200
 pL = 600
@@ -14,7 +14,7 @@ for (i in seq(N)) {
   datafile <- sprintf("%s%05d%s", "m", i, ".dat")
   outfile <- sprintf("%s%05d%s", "slice", i, ".png")
   png(outfile, width=.pwidth, height=.pheight)
-  z <- matrix(scan(datafile, n=L*H),
+  z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
               L, H, byrow=TRUE)
   z <- z[1:pL, 1:pH]
 
@@ -38,6 +38,6 @@ for (i in seq(N)) {
   ## draw the customized legend
   ## --------------
   ## .xleft <- 
-  cat(i, datafile, outfile, "\n")
+  cat(i, "\n")
   dev.off()
 }

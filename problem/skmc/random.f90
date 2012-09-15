@@ -355,7 +355,6 @@ contains
   END FUNCTION arth_i
 
   FUNCTION gammln_s(xx)
-    ;
     IMPLICIT NONE
     REAL, INTENT(IN) :: xx
     REAL :: gammln_s
@@ -377,7 +376,6 @@ contains
   END FUNCTION gammln_s
 
   FUNCTION gammln_test(xx)
-    ;
     IMPLICIT NONE
     REAL, INTENT(IN) :: xx
     REAL :: gammln_test
@@ -399,7 +397,6 @@ contains
   END FUNCTION gammln_test
 
   FUNCTION gammln_v(xx)
-    ;
     IMPLICIT NONE
     INTEGER :: i
     REAL, DIMENSION(:), INTENT(IN) :: xx

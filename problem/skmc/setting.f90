@@ -1,8 +1,8 @@
 module setting
-  integer, parameter :: L = 200
+  integer, parameter :: L = 1000
   integer, parameter :: H = 200
-  real, parameter :: b = 8.0
-  real, parameter :: bd10 = 10.0/b
+  integer, parameter :: b = 8
+  real, parameter :: bd10 = 10.0/real(b)
   real, parameter :: tend = 1000.0
   real, parameter :: p1 = 0.3
   real, parameter :: v = 1.0
@@ -85,13 +85,10 @@ contains
     open (unit = 11, file=filename, action="write")
     open (unit = 12, file=filename2, action="write")
 
-    do i = 1, L+1
+    do i = 1, L
        do j = 1, H
           write(11, '(I5)', advance="no"), cmat(i,j)%type
        end do
-       write(11, '(I6)', advance="no"), TDC(i)
-       write(11, '(I6)', advance="no"), TAC(i)
-       write(11, '(I6)', advance="no"), SC(i)
        write(11, *)
     end do
     do i = 1, L

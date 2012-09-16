@@ -3,8 +3,10 @@ library("grid")
 jet.colors <- colorRampPalette(c("white", "red", "blue", "green"))
 
 parainfo <- read.csv("control.csv", strip.white=TRUE)
+.tend <- parainfo$VALUE[parainfo$PARAMETER=='tend']
+.tpinc <-parainfo$VALUE[parainfo$PARAMETER=='tpinc']
 
-N = 10
+N = 200
 L = 1000
 H = 200
 pL = 600
@@ -12,6 +14,7 @@ pH = 100
 .pwidth = 2048
 .pheight = 576
 
+cat("processing file ...[",N,"]\n")
 i <- 0
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 outfile <- sprintf("%s%05d%s", "slice", i, ".png")
@@ -19,11 +22,14 @@ png(outfile, width=.pwidth, height=.pheight)
 z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
             L, H, byrow=TRUE)
 z <- z[1:pL, 1:pH]
+my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
 p1 <- levelplot(z, col.regions=jet.colors,
                 colorkey=FALSE, xlab="",
                 ylab="",
                 panel=function(...){
                   panel.levelplot(...)
+                  grid.text(my.label.time,
+                            y = unit(0.9, "npc"), gp=gpar(fontsize=30))
                   grid.text(paste("------ # Parameter Setting",
                                   "( figure generated at",
                                    date(), " ) # ------"),
@@ -40,7 +46,7 @@ p1 <- levelplot(z, col.regions=jet.colors,
                 },
                 scales=list(cex=2))
 print(p1)
-dev.off()
+#dev.off()
 
 for (i in seq(N)) {
 
@@ -51,7 +57,7 @@ for (i in seq(N)) {
               L, H, byrow=TRUE)
   z <- z[1:pL, 1:pH]
 
-  my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
+  my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
   p1 <- levelplot(z, col.regions=jet.colors,
             colorkey=FALSE, xlab="",
             ylab="",
@@ -72,6 +78,8 @@ for (i in seq(N)) {
   ## draw the customized legend
   ## --------------
   ## .xleft <- 
-  cat(i, "\n")
+  output.str1 <- sprintf("%5d", i)
+  if (i > 1) cat("\b\b\b\b\b")
+  cat(output.str1)
   dev.off()
 }

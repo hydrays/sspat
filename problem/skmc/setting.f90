@@ -1,12 +1,12 @@
 module setting
   integer, parameter :: L = 1000
   integer, parameter :: H = 200
-  integer :: brange
-  real :: tend, p1, v, difv, mutv
-  real :: fdgain1, scstick, prelax
+  integer :: brange, thisrandseed
+  real :: tend, p1, v, difv, mutv, tm
+  real :: fdgain1, scstick, prelax, tpinc
   real :: bd10
   namelist /xdata/ brange, tend, p1, v, difv, mutv, &
-       fdgain1, scstick, prelax
+       fdgain1, scstick, prelax, thisrandseed, tpinc, tm
   type cell
      integer type
      real gene1
@@ -36,6 +36,7 @@ contains
     write(*, *), 'Control parameters...'
     write(*, nml=xdata)
     write(*, '(a20, i10)'), 'brange = ', brange
+    write(*, '(a20, i10)'), 'thisrandseed = ', thisrandseed
     write(*, '(a20, f10.2)'), 'tend = ', tend
     write(*, '(a20, f10.2)'), 'p1 = ', p1
     write(*, '(a20, f10.2)'), 'v = ', v
@@ -44,9 +45,14 @@ contains
     write(*, '(a20, f10.2)'), 'fdgain1 = ', fdgain1
     write(*, '(a20, f10.2)'), 'scstick = ', scstick
     write(*, '(a20, f10.2)'), 'prelax = ', prelax
+    write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
+    write(*, '(a20, f10.2)'), 'tm = ', tm
 
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
+    write(9, '(a20, i10)'), 'L,', L
+    write(9, '(a20, i10)'), 'H,', H
     write(9, '(a20, i10)'), 'brange,', brange
+    write(9, '(a20, i10)'), 'thisrandseed,', thisrandseed
     write(9, '(a20, f10.2)'), 'tend,', tend
     write(9, '(a20, f10.2)'), 'p1,', p1
     write(9, '(a20, f10.2)'), 'v,', v
@@ -55,6 +61,8 @@ contains
     write(9, '(a20, f10.2)'), 'fdgain1,', fdgain1
     write(9, '(a20, f10.2)'), 'scstick,', scstick
     write(9, '(a20, f10.2)'), 'prelax,', prelax
+    write(9, '(a20, f10.2)'), 'tpinc,', tpinc
+    write(9, '(a20, f10.2)'), 'tm,', tm
     
     close(8)
     close(9)

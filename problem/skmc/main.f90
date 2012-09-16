@@ -3,20 +3,18 @@ program main
   use setting
   implicit none
 
-  real t, tau, tp, tm, u
+  real t, tau, tp, u
   integer output_index, i, j, active_index
   integer k, shift_i
   open (unit = 100, file='./out/logfile', action="write")
-  call ran_seed(sequence=12345)
+  call ran_seed(sequence=thisrandseed)
 
   call read_xdata()
 
-  read(*,*)
   call init_cell_pool()
 
   t = 0.0
   tp = 0.0
-  tm = 1000.0
   output_index = 0
 
   do while (t < tend)
@@ -24,7 +22,7 @@ program main
         call output_to_file(output_index)
         call cell_stat(t)
         output_index = output_index + 1
-        tp = tp + 5.0
+        tp = tp + tpinc
      end if
 
      call Next_Reaction(k, tau)

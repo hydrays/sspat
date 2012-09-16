@@ -1,0 +1,15 @@
+! Control parameters
+&xdata
+	brange = 8,
+	tend = 1000.0,
+  	p1 = 0.3,
+	v = 1.0,
+	difv = 200.0,
+	mutv = 0.0,
+	fdgain1 = 0.01,
+	scstick = 0.96,
+	prelax = 0.2,
+	thisrandseed = 1234,
+	tpinc = 1.0,
+	tm = 200
+/

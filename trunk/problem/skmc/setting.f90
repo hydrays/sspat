@@ -1,13 +1,12 @@
 module setting
   integer, parameter :: L = 1000
   integer, parameter :: H = 200
-  integer, parameter :: b = 8
-  real, parameter :: bd10 = 10.0/real(b)
-  real, parameter :: tend = 1000.0
-  real, parameter :: p1 = 0.3
-  real, parameter :: v = 1.0
-  real, parameter :: D = 200.0
-  real, parameter :: mv = 0.0
+  integer :: brange
+  real :: tend, p1, v, difv, mutv
+  real :: fdgain1, scstick, prelax
+  real :: bd10
+  namelist /xdata/ brange, tend, p1, v, difv, mutv, &
+       fdgain1, scstick, prelax
   type cell
      integer type
      real gene1
@@ -25,6 +24,42 @@ module setting
   integer TAC(0:L+1)
 
 contains
+  subroutine read_xdata()
+    implicit none
+    open(8, file="control.txt", status='OLD', recl=80, delim='APOSTROPHE')
+    read(8, nml=xdata)
+    
+    bd10 = 10.0/real(brange)
+
+    open(9, file="out/control.csv")
+    
+    write(*, *), 'Control parameters...'
+    write(*, nml=xdata)
+    write(*, '(a20, i10)'), 'brange = ', brange
+    write(*, '(a20, f10.2)'), 'tend = ', tend
+    write(*, '(a20, f10.2)'), 'p1 = ', p1
+    write(*, '(a20, f10.2)'), 'v = ', v
+    write(*, '(a20, f10.2)'), 'difv = ', difv
+    write(*, '(a20, f10.2)'), 'mutv = ', mutv
+    write(*, '(a20, f10.2)'), 'fdgain1 = ', fdgain1
+    write(*, '(a20, f10.2)'), 'scstick = ', scstick
+    write(*, '(a20, f10.2)'), 'prelax = ', prelax
+
+    write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
+    write(9, '(a20, i10)'), 'brange,', brange
+    write(9, '(a20, f10.2)'), 'tend,', tend
+    write(9, '(a20, f10.2)'), 'p1,', p1
+    write(9, '(a20, f10.2)'), 'v,', v
+    write(9, '(a20, f10.2)'), 'difv,', difv
+    write(9, '(a20, f10.2)'), 'mutv,', mutv
+    write(9, '(a20, f10.2)'), 'fdgain1,', fdgain1
+    write(9, '(a20, f10.2)'), 'scstick,', scstick
+    write(9, '(a20, f10.2)'), 'prelax,', prelax
+    
+    close(8)
+    close(9)
+  end subroutine read_xdata
+
   subroutine init_cell_pool()
     use random
     implicit none
@@ -37,9 +72,9 @@ contains
     cmat(1:L, 3:4)%type = 3
     do i = 1, L
        call ran2(u)
-       cmat(i, 1)%gene1 = 0.96
-       cmat(i, 1)%gene2 = 0.2
-       cmat(i, 1)%gene3 = 0.01! + 0.01*(u-0.5)
+       cmat(i, 1)%gene1 = scstick
+       cmat(i, 1)%gene2 = prelax
+       cmat(i, 1)%gene3 = fdgain1
        cmat(i, 1)%gene4 = 10!+2.0*(u-0.5)
     end do
     cmat(0, :) = cmat(L, :)
@@ -117,8 +152,8 @@ contains
     call ran2(u)
     u = u*a(i)
     if (npack(i).ne.0) then
-       vr = max(0.0, D*real(npack(i)-npack(i+1)))
-       vl = max(0.0, D*real(npack(i)-npack(i-1)))
+       vr = max(0.0, difv*real(npack(i)-npack(i+1)))
+       vl = max(0.0, difv*real(npack(i)-npack(i-1)))
     else
        vr = 0.0
        vl = 0.0
@@ -209,14 +244,14 @@ contains
        if ( u < 0 ) then
           if ( cmat(i,j)%type .eq. 1 ) then
              TGFbeta = 0.0
-             do k = -b, b
+             do k = -brange, brange
                 shift_i = k + i
                 if ( shift_i .le. 0 ) then
                    shift_i = shift_i + L
                 else if ( shift_i > L ) then
                    shift_i = shift_i - L
                 end if
-                TGFbeta = TGFbeta + bd10*TDC(shift_i)*exp(-real(abs(k))/b)
+                TGFbeta = TGFbeta + bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
              end do
              p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
                   / (1.0 + cmat(i,j)%gene3*TGFbeta)
@@ -266,9 +301,9 @@ contains
           return
        end if
     end do
-    if ( mv .ne. 0.0 ) then
+    if ( mutv .ne. 0.0 ) then
        do j = 1, npack(i)
-          u = u - mv
+          u = u - mutv
           if ( u < 0 ) then
              if ( cmat(i,j)%type .eq. 1 ) then
                 ! mutation
@@ -421,12 +456,12 @@ contains
     implicit none
     integer, intent(in) :: i
     real vr, vl
-    vr = max(0.0, D*real(npack(i)-npack(i+1)))
-    vl = max(0.0, D*real(npack(i)-npack(i-1)))
+    vr = max(0.0, difv*real(npack(i)-npack(i+1)))
+    vl = max(0.0, difv*real(npack(i)-npack(i-1)))
     if (npack(i).eq.0) then
        !       print *, vr, vl
     end if
-    a(i) = vr + vl + npack(i)*(v+mv)
+    a(i) = vr + vl + npack(i)*(v+mutv)
   end subroutine Update_Rate
 
 end module setting

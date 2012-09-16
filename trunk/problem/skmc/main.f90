@@ -9,6 +9,9 @@ program main
   open (unit = 100, file='./out/logfile', action="write")
   call ran_seed(sequence=12345)
 
+  call read_xdata()
+
+  read(*,*)
   call init_cell_pool()
 
   t = 0.0

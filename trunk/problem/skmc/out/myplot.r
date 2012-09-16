@@ -4,8 +4,11 @@ jet.colors <- colorRampPalette(c("white", "red", "blue", "green"))
 
 parainfo <- read.csv("control.csv", strip.white=TRUE)
 .tend <- parainfo$VALUE[parainfo$PARAMETER=='tend']
-.tpinc <-parainfo$VALUE[parainfo$PARAMETER=='tpinc']
-
+.tpinc <- parainfo$VALUE[parainfo$PARAMETER=='tpinc']
+.divide <- which(parainfo$PARAMETER=='useomp')
+ompinfo <- parainfo[.divide:nrow(parainfo),]
+parainfo <- parainfo[1:(.divide-1),]
+  
 N = 200
 L = 1000
 H = 200
@@ -42,6 +45,20 @@ p1 <- levelplot(z, col.regions=jet.colors,
                               x = unit(0.01 + 0.1*((j-1)%%4), "npc"),
                               y = unit(0.7-0.1*as.integer((j-1)/4), "npc"),
                               gp=gpar(fontsize=20) )
+                  }
+
+                  if (ompinfo[1,2]==1){
+                    grid.text("------ # OMP in use! # ------",
+                              x = unit(0.7, "npc"), y = unit(0.8, "npc"),
+                              just="left",
+                              gp=gpar(fontsize=20) )                  
+                    for ( j in seq(nrow(ompinfo)) ){
+                      grid.text(paste("# ", ompinfo[j,1], " = ", ompinfo[j,2]),
+                                just="left",
+                                x = unit(0.7 + 0.1*((j-1)%%2), "npc"),
+                                y = unit(0.7-0.1*as.integer((j-1)/2), "npc"),
+                                gp=gpar(fontsize=20) )
+                    }
                   }
                 },
                 scales=list(cex=2))

@@ -5,8 +5,15 @@ module setting
   real :: tend, p1, v, difv, mutv, tm
   real :: fdgain1, scstick, prelax, tpinc
   real :: bd10
+  integer :: useomp, is64bit
+  real :: timestep
+  integer :: npar
+
   namelist /xdata/ brange, tend, p1, v, difv, mutv, &
        fdgain1, scstick, prelax, thisrandseed, tpinc, tm
+
+  namelist /xdataomp/ useomp, is64bit, timestep, npar
+
   type cell
      integer type
      real gene1
@@ -28,13 +35,11 @@ contains
     implicit none
     open(8, file="control.txt", status='OLD', recl=80, delim='APOSTROPHE')
     read(8, nml=xdata)
+    read(8, nml=xdataomp)
     
     bd10 = 10.0/real(brange)
 
-    open(9, file="out/control.csv")
-    
     write(*, *), 'Control parameters...'
-    write(*, nml=xdata)
     write(*, '(a20, i10)'), 'brange = ', brange
     write(*, '(a20, i10)'), 'thisrandseed = ', thisrandseed
     write(*, '(a20, f10.2)'), 'tend = ', tend
@@ -47,7 +52,15 @@ contains
     write(*, '(a20, f10.2)'), 'prelax = ', prelax
     write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
     write(*, '(a20, f10.2)'), 'tm = ', tm
+    
+    if (useomp.eq.1) then
+       write(*, '(a)'), 'OpenMP parallel in use!'
+       write(*, '(a20, I10)'), 'is64bit = ', is64bit
+       write(*, '(a20, f10.2)'), 'timestep = ', timestep
+       write(*, '(a20, I10)'), 'npar = ', npar
+    end if
 
+    open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
     write(9, '(a20, i10)'), 'L,', L
     write(9, '(a20, i10)'), 'H,', H
@@ -63,9 +76,13 @@ contains
     write(9, '(a20, f10.2)'), 'prelax,', prelax
     write(9, '(a20, f10.2)'), 'tpinc,', tpinc
     write(9, '(a20, f10.2)'), 'tm,', tm
-    
+    write(9, '(a20, i10)'), 'useomp,', useomp
+    write(9, '(a20, i10)'), 'is64bit,', is64bit
+    write(9, '(a20, f10.2)'), 'timestep,', timestep
+    write(9, '(a20, I10)'), 'npar,', npar
     close(8)
     close(9)
+
   end subroutine read_xdata
 
   subroutine init_cell_pool()
@@ -471,5 +488,212 @@ contains
     end if
     a(i) = vr + vl + npack(i)*(v+mutv)
   end subroutine Update_Rate
+
+  !!$ ----------------------
+  !!$ Parallel Using OM
+  !!$ ----------------------
+
+  subroutine cell_event_omp(i, kpar)
+    use par_zig_mod
+    implicit none
+    integer, intent(in) :: i, kpar
+    integer j, k, m, shift_i
+    real u, u1, p0, TGFbeta
+    real vr, vl
+    type(cell) new_cell
+    u = par_uni(kpar)
+    u = u*a(i)
+    if (npack(i).ne.0) then
+       vr = max(0.0, difv*real(npack(i)-npack(i+1)))
+       vl = max(0.0, difv*real(npack(i)-npack(i-1)))
+    else
+       vr = 0.0
+       vl = 0.0
+    end if
+    do j = 1, npack(i)
+       u = u - v
+       if ( u < 0 ) then
+          if ( (cmat(i,j)%type .eq. 1) ) then
+             TGFbeta = 0.0
+             do k = -brange, brange
+                shift_i = k + i
+                if ( shift_i .le. 0 ) then
+                   shift_i = shift_i + L
+                else if ( shift_i > L ) then
+                   shift_i = shift_i - L
+                end if
+                TGFbeta = TGFbeta + TDC(shift_i)*exp(-real(abs(k))/brange)
+             end do
+             p0 = prelax + (1.0-2.0*prelax) / (1.0 + fdgain1*TGFbeta)
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             u1 = par_uni(kpar)
+             if ( u1 < p0 ) then
+                ! SC -> 2SC
+                cmat(i,j+1) = cmat(i,j)
+             else
+                ! SC -> 2TAC
+                cmat(i,j)%type = 2
+                cmat(i,j+1) = cmat(i,j) 
+             end if
+             npack(i) = npack(i) + 1
+          else if ( cmat(i,j)%type .eq. 2 ) then
+             ! division
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             u1 = par_uni(kpar)
+             if ( u1 < p1 ) then
+                ! TAC -> 2TAC
+                cmat(i, j+1) = cmat(i,j)
+             else
+                ! TAC -> 2TDC
+                cmat(i, j)%type = 3
+                cmat(i, j+1) = cmat(i,j)
+                TDC(i) = TDC(i) + 2
+             end if
+             npack(i) = npack(i) + 1
+          else if ( cmat(i,j)%type .eq. 3 ) then
+             ! death
+             do k=j, H-1
+                cmat(i, k) = cmat(i, k+1)
+             end do
+             TDC(i) = TDC(i) - 1
+             npack(i) = npack(i) - 1
+          else if ( (cmat(i,j)%type .eq. 4) ) then
+             p0 = 1.0
+             do k=H, j+2, -1
+                cmat(i, k) = cmat(i, k-1)
+             end do
+             cmat(i,j+1) = cmat(i,j)
+             npack(i) = npack(i) + 1
+          else
+             ! do nothing
+          end if
+          return
+       end if
+    end do
+    u = u - vr
+    if ( u < 0 ) then
+       u1 = par_uni(kpar)
+       j = ceiling(u1*npack(i))
+       if (j < 1 .or. j>npack(i)) then
+          print *, 'error 4', j, u1
+          read(*,*)
+       end if
+
+       if ( (cmat(i,j)%type .eq. 1) .or. (cmat(i,j)%type .eq. 4)) then
+          u1 = par_uni(kpar)
+          if (u1 < scstick) then
+             return
+          end if
+       end if
+
+       new_cell = cmat(i, j)
+       do k=j, H-1
+          cmat(i, k) = cmat(i, k+1)
+       end do
+       npack(i) = npack(i) - 1
+
+       m = i + 1
+       if ( cmat(m, j)%type .eq. 0 ) then
+          cmat(m, npack(m)+1) = new_cell
+       else
+          do k=npack(m)+1, j+1, -1
+             cmat(m, k) = cmat(m, k-1)
+          end do
+          cmat(m, j) = new_cell
+       end if
+       npack(m) = npack(m) + 1
+       if (new_cell%type .eq. 3) then
+          TDC(i) = TDC(i) - 1
+          TDC(m) = TDC(m) + 1
+       end if
+       return
+    end if
+    u = u - vl
+    if ( u < 0 ) then
+       u1 = par_uni(kpar)
+       j = ceiling(u1*npack(i))
+       if (j < 1 .or. j>npack(i)) then
+          print *, 'error 5', j, u1, npack(i)
+          read(*,*)
+       end if
+       !print *, 'move left at height j', i, j
+       if ( (cmat(i,j)%type .eq. 1) .or. (cmat(i,j)%type .eq. 4)) then
+          u1 = par_uni(kpar)
+          if (u1 < scstick) then
+             return
+          end if
+       end if
+       new_cell = cmat(i, j)
+       do k=j, H-1
+          cmat(i, k) = cmat(i, k+1)
+       end do
+       npack(i) = npack(i) - 1
+
+       m = i - 1
+       if ( cmat(m, j)%type .eq. 0 ) then
+          cmat(m, npack(m)+1) = new_cell
+       else
+          do k=npack(m)+1, j+1, -1
+             cmat(m, k) = cmat(m, k-1)
+          end do
+          cmat(m, j) = new_cell
+       end if
+       npack(m) = npack(m) + 1
+       if (new_cell%type .eq. 3) then
+          TDC(i) = TDC(i) - 1
+          TDC(m) = TDC(m) + 1
+       end if
+       return
+    else
+       print *, 'event at', i
+       print *, 'npack', npack(i-1:i+1)
+       print *, 'cell', cmat(i, 1:npack(i))%type
+       print *, 'u', u
+       print *, 'vl', vl
+       print *, 'a', a(i)
+       write(*,*) 'error 2'
+       read(*,*)
+    end if
+  end subroutine cell_event_omp
+
+
+  subroutine Next_Reaction_omp(k, tau, ilow, iup)
+    implicit none
+    integer, intent(out) :: k
+    integer, intent(in) :: ilow, iup
+    real, intent(out) :: tau
+    real tau_temp
+    integer i
+
+    tau = huge(0.0)
+    k = 0
+    do i = ilow, iup
+       if ( a(i) > 0.0 ) then
+          tau_temp = ( NP(i) - NT(i) ) / a(i)
+          if ( tau_temp < tau) then
+             tau = tau_temp
+             k = i
+          end if
+       else
+!          print *, 'no reaction -------------- ', i, k, a(i)
+!          read(*,*)
+       end if
+    end do
+!    print *, 'k', k
+!    print *, 'a', a
+    if ( k .le. 0 ) then
+       write(*,*), 'error'
+       read(*,*)
+    end if
+    if ( tau .le. 0 ) then
+       write(*,*), 'error', 'tau', tau
+       print *, 'NP-NT', NP - NT
+       read(*,*)
+    end if
+  end subroutine Next_Reaction_omp
 
 end module setting

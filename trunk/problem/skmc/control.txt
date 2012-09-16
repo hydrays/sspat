@@ -13,3 +13,10 @@
 	tpinc = 1.0,
 	tm = 200
 /
+
+&xdataomp
+	useomp = 1,
+	is64bit = 0,
+	timestep = 0.01,
+	npar = 4
+/

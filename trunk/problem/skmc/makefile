@@ -1,11 +1,13 @@
 RM := rm -rf
 OUTPUT_FILE := run
 
-FC = gfortran -fdefault-real-8
+FC = gfortran -fopenmp -fdefault-real-8
 #FC = ifort -r8
 OBJS += \
 ./random.o \
+./par_zig_mod.o \
 ./setting.o \
+./kmcsample.o \
 ./main.o
 
 # Each subdirectory must supply rules for building sources it contributes

@@ -16,7 +16,7 @@
 
 &xdataomp
 	useomp = 1,
-	is64bit = 1,
+	is64bit = 0,
 	timestep = 0.01,
 	npar = 4
 /

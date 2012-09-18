@@ -1,10 +1,9 @@
 program main
+  use setting
   use kmcsample
   implicit none
   
   call read_xdata()
-  print *, timestep
-  read(*,*)
 
   if (useomp.eq.1) then
      if (is64bit.eq.1) then

@@ -13,7 +13,6 @@ contains
     integer k, shift_i
     open (unit = 100, file='./out/logfile', action="write")
     call ran_seed(sequence=thisrandseed)
-    call read_xdata()
     call init_cell_pool()
 
     t = 0.0
@@ -63,7 +62,6 @@ contains
   end subroutine kmc_sample_serial
 
   subroutine kmc_sample_omp32()
-
     use omp_lib
     use par_zig_mod
     use setting
@@ -116,7 +114,8 @@ contains
 
        do iredblack = 0, 1
           !$OMP PARALLEL default(private) &
-          !$OMP shared(a, NT, NP, t, npack, TDC, cmat, iredblack, npar)
+          !$OMP shared(a, NT, NP, t, npack, TDC, &
+          !$OMP cmat, iredblack, npar, timestep)
 
           nthread = OMP_GET_THREAD_NUM()
           ilow = (nthread)*L/npar + iredblack*L/(2*npar) + 1
@@ -124,7 +123,7 @@ contains
 
           !print *, nthread, ilow, iup
           private_t = t
-          !print *, nthread, private_t, t
+          !print *, nthread, timestep, private_t, t
           !read(*,*)
           do while ( private_t < t + timestep)
              call Next_Reaction_omp(k, tau, ilow, iup)
@@ -132,7 +131,9 @@ contains
              if ( (k .le. 2).or.(k .ge. L-1) ) then
                 call Perodic_BC(k)
              end if
-
+             
+             !print *, k, nthread
+             
              do i = ilow, iup
                 NT(i) = NT(i) + a(i)*tau
              end do

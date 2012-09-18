@@ -4,7 +4,7 @@ source('Csimulator1.r')
 for (j in seq(7)){
   N <- 100
   m <- c(0, 50, 100, 200, 800, 2000, 10000)
-  T <- 30
+  T <- 40
   x <- c(100, m[j])
   r <- seq(T+1)
   r[1] <- x[1]/sum(x)

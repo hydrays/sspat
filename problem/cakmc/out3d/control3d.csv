@@ -1,5 +1,5 @@
           PARAMETER,  VALboxUE
-               Lbox,       256
+               Lbox,       100
                   H,       100
              brange,         8
        thisrandseed,      1234
@@ -16,4 +16,4 @@
              useomp,         1
             is64bit,         0
            timestep,      0.01
-               npar,         4
+               npar,         2

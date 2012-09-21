@@ -23,7 +23,7 @@ contains
     Lbox_npar = Lbox/npar
     Lbox_2npar = Lbox/(2*npar)
 
-    !print *, Lbox_npar, Lbox_2npar
+    print *, Lbox_npar, Lbox_2npar
     !read(*,*)
 
     allocate(seed(2**npar))
@@ -34,9 +34,9 @@ contains
     call par_zigset(2**npar, seed, grainsize)
 
     open (unit = 100, file='./out/logfile', action="write")
-  
-    call init_cell_pool()
 
+    call init_cell_pool()
+  
     t = 0.0
     tp = 0.0
     private_t = 0.0
@@ -50,7 +50,7 @@ contains
           call cell_stat(t)
           call output_to_file(output_index)
           output_index = output_index + 1
-          tp = tp + 1.0
+          tp = tp + tpinc
        end if
        t = t + timestep
 

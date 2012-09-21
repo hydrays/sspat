@@ -1,6 +1,6 @@
 module setting
-  integer, parameter :: L = 1000
-  integer, parameter :: H = 200
+  integer :: L
+  integer :: H
   integer :: brange, thisrandseed
   real :: tend, p1, v, difv, mutv, tm
   real :: fdgain1, scstick, prelax, tpinc
@@ -9,7 +9,7 @@ module setting
   real :: timestep
   integer :: npar
 
-  namelist /xdata/ brange, tend, p1, v, difv, mutv, &
+  namelist /xdata/ L, H, brange, tend, p1, v, difv, mutv, &
        fdgain1, scstick, prelax, thisrandseed, tpinc, tm
 
   namelist /xdataomp/ useomp, is64bit, timestep, npar
@@ -21,14 +21,14 @@ module setting
      real gene3
      real gene4
   end type cell
-  type(cell) cmat(0:L+1,H)
-  real a(1:L)
-  real NT(1:L)
-  real NP(1:L)
-  integer npack(0:L+1)
-  integer TDC(0:L+1)
-  integer SC(0:L+1)
-  integer TAC(0:L+1)
+  type(cell), allocatable :: cmat(:,:)
+  real, allocatable :: a(:)
+  real, allocatable :: NT(:)
+  real, allocatable :: NP(:)
+  integer, allocatable :: npack(:)
+  integer, allocatable :: TDC(:)
+  integer, allocatable :: SC(:)
+  integer, allocatable :: TAC(:)
 
 contains
   subroutine read_xdata()
@@ -40,6 +40,8 @@ contains
     bd10 = 10.0/real(brange)
 
     write(*, *), 'Control parameters...'
+    write(*, '(a20, i10)'), 'L = ', L
+    write(*, '(a20, i10)'), 'H = ', H
     write(*, '(a20, i10)'), 'brange = ', brange
     write(*, '(a20, i10)'), 'thisrandseed = ', thisrandseed
     write(*, '(a20, f10.2)'), 'tend = ', tend
@@ -91,6 +93,15 @@ contains
     integer temp_num
     real u
     integer i, j
+
+    allocate(cmat(0:L+1,H))
+    allocate(a(1:L))
+    allocate(NT(1:L))
+    allocate(NP(1:L))
+    allocate(npack(0:L+1))
+    allocate(TDC(0:L+1))
+    allocate(SC(0:L+1))
+    allocate(TAC(0:L+1))
 
     cmat(1:L, 1)%type = 1
     cmat(1:L, 2:3)%type = 2

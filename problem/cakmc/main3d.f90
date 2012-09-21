@@ -10,7 +10,6 @@ program main3d
         call kmc_sample_omp3d64()
      else
         call kmc_sample_omp3d32()
-        stop
         !call kmc_sample_omp32()
      end if
   else

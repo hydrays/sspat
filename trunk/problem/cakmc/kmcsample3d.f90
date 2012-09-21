@@ -23,7 +23,7 @@ contains
     Lbox_npar = Lbox/npar
     Lbox_2npar = Lbox/(2*npar)
 
-    print *, Lbox_npar, Lbox_2npar
+    !print *, Lbox_npar, Lbox_2npar
     !read(*,*)
 
     allocate(seed(2**npar))
@@ -78,7 +78,7 @@ contains
              !$OMP PARALLEL default(private) &
              !$OMP shared(a, NT, NP, t, npack, TDC, &
              !$OMP cmat, ibl, jbl, scanner, npar, &
-             !$OMP Lbox_npar, Lbox_2npar, timestep)
+             !$OMP Lbox_npar, Lbox_2npar, timestep, Lbox, H)
 
              nthread = OMP_GET_THREAD_NUM()
              ibox = nthread/npar
@@ -232,7 +232,7 @@ contains
              !$OMP PARALLEL default(private) &
              !$OMP shared(a, NT, NP, t, npack, TDC, &
              !$OMP cmat, ibl, jbl, scanner, npar, &
-             !$OMP Lbox_npar, Lbox_2npar, timestep)
+             !$OMP Lbox_npar, Lbox_2npar, timestep, Lbox, H)
 
              nthread = OMP_GET_THREAD_NUM()
              ibox = nthread/npar

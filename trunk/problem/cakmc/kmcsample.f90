@@ -115,7 +115,7 @@ contains
        do iredblack = 0, 1
           !$OMP PARALLEL default(private) &
           !$OMP shared(a, NT, NP, t, npack, TDC, &
-          !$OMP cmat, iredblack, npar, timestep)
+          !$OMP cmat, iredblack, npar, timestep, L, H)
 
           nthread = OMP_GET_THREAD_NUM()
           ilow = (nthread)*L/npar + iredblack*L/(2*npar) + 1
@@ -221,7 +221,7 @@ contains
        do iredblack = 0, 1
           !$OMP PARALLEL default(private) &
           !$OMP shared(a, NT, NP, t, npack, TDC, &
-          !$OMP cmat, iredblack, npar, timestep)
+          !$OMP cmat, iredblack, npar, timestep, L, H)
 
           nthread = OMP_GET_THREAD_NUM()
           ilow = (nthread)*L/npar + iredblack*L/(2*npar) + 1

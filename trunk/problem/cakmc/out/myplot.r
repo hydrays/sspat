@@ -3,6 +3,8 @@ library("grid")
 jet.colors <- colorRampPalette(c("white", "red", "blue", "green"))
 
 parainfo <- read.csv("control.csv", strip.white=TRUE)
+L <- parainfo$VALUE[parainfo$PARAMETER=='L']
+H <- parainfo$VALUE[parainfo$PARAMETER=='H']
 .tend <- parainfo$VALUE[parainfo$PARAMETER=='tend']
 .tpinc <- parainfo$VALUE[parainfo$PARAMETER=='tpinc']
 .divide <- which(parainfo$PARAMETER=='useomp')
@@ -10,8 +12,6 @@ ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
   
 N = 200
-L = 1000
-H = 200
 pL = 600
 pH = 100
 .pwidth = 2048

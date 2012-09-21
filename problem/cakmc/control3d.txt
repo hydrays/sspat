@@ -1,6 +1,6 @@
 ! Control parameters
 &xdata
-	Lbox = 100,
+	Lbox = 256,
 	H = 100,
 	brange = 8,
 	tend = 1000.0,
@@ -20,5 +20,5 @@
 	useomp = 1,
 	is64bit = 0,
 	timestep = 0.01,
-	npar = 2
+	npar = 4
 /

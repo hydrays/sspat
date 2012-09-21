@@ -80,6 +80,20 @@ contains
              !$OMP cmat, ibl, jbl, scanner, npar, &
              !$OMP Lbox_npar, Lbox_2npar, timestep, Lbox, H)
 
+!!$             !$OMP PARALLEL default(private) &
+!!$             !$OMP shared(a, NT, NP, t, npack, TDC, &
+!!$             !$OMP SC, TAC, v_diff, geneinfo, &
+!!$             !$OMP cmat, ibl, jbl, scanner, npar, &
+!!$             !$OMP Lbox_npar, Lbox_2npar, timestep, Lbox, Lbox2, H)
+             
+!!$             !$OMP PARALLEL default(private) &
+!!$             !$OMP shared(a, NT, NP, t, npack, TDC, &
+!!$             !$OMP SC, TAC, v_diff, geneinfo, &
+!!$             !$OMP cmat, ibl, jbl, scanner, npar, &
+!!$             !$OMP Lbox_npar, Lbox_2npar, timestep, Lbox, Lbox2, H, &
+!!$             !$OMP brange, p1, v, difv, mutv, fdgain1, &
+!!$             !$OMP scstick, prelax, bd10, thisrandseed)
+
              nthread = OMP_GET_THREAD_NUM()
              ibox = nthread/npar
              jbox = mod(nthread, npar)

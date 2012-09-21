@@ -72,7 +72,7 @@ SUBROUTINE par_zigset( npar, par_jsrseed, grainsize)
 ! Now treat each instance separately
 do kpar = 0,npar-1
    !  Set the seed
-   par_jsr(kpar*par_step) = par_jsrseed(kpar)
+   par_jsr(kpar*par_step) = par_jsrseed(kpar+1)
 
    !  Tables for RNOR
    dn = dn0

@@ -1,0 +1,7 @@
+dyn.load('simulator1.so')
+source('simulator1n.r')
+simcell1 <- simulator1n(8, 1, 0.6, 0.3, 0.3, 0.3, 0.75, 50)
+write.csv(simcell1, file='data/simcell1.csv', row.names=FALSE)
+mcell <- as.matrix(read.csv('data/simcell1.csv'))
+Fe <- edcf(mcell)
+plot(Fe)

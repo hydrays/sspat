@@ -61,7 +61,7 @@ contains
     end if
 
     open(9, file="out3d/control3d.csv")
-    write(9, '(a20, a10)'), 'PARAMETER,', 'VALboxUE'
+    write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
     write(9, '(a20, i10)'), 'Lbox,', Lbox
     write(9, '(a20, i10)'), 'H,', H
     write(9, '(a20, i10)'), 'brange,', brange

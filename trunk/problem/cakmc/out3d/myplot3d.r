@@ -2,32 +2,49 @@ library("lattice")
 library("grid")
 jet.colors <- colorRampPalette(c("white", "red", "blue", "green"))
 
-parainfo <- read.csv("control.csv", strip.white=TRUE)
+parainfo <- read.csv("control3d.csv", strip.white=TRUE)
 .tend <- parainfo$VALUE[parainfo$PARAMETER=='tend']
 .tpinc <- parainfo$VALUE[parainfo$PARAMETER=='tpinc']
 .divide <- which(parainfo$PARAMETER=='useomp')
 ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
   
-N = 200
-L = 1000
-H = 200
-pL = 600
-pH = 100
-.pwidth = 2048
-.pheight = 576
+N <- 12
+Lbox <- 256
+H <- 102
+pLbox <- 256
+pH <- 100
+.pwidth <- 720
+.pheight <- 720
+.pthing <- 'SC'
 
 cat("processing file ...[",N,"]\n")
 i <- 0
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 outfile <- sprintf("%s%05d%s", "slice", i, ".png")
 png(outfile, width=.pwidth, height=.pheight)
-z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
-            L, H, byrow=TRUE)
-z <- z[1:pL, 1:pH]
+z <- matrix(scan(datafile, n=Lbox*Lbox*H, quiet=TRUE),
+            Lbox*Lbox, H, byrow=TRUE)
+z <- z[1:(pLbox*pLbox),1:pH]
+if (.pthing == 'SC'){
+   z[z!=1] <- 0
+   z <- rowSums(z)
+} else if (.pthing == 'CP'){
+   z[z!=2] <- 0
+   z <- rowSums(z)
+} else if (.pthing == 'TC'){
+   z[z!=3] <- 0
+   z <- rowSums(z)
+} else{
+   stop("please tell me what do you want to plot, SC, CP or TC?")
+}
+z <- matrix(z, pLbox, pLbox)
+
 my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
-p1 <- levelplot(z, col.regions=jet.colors,
-                colorkey=FALSE, xlab="",
+p1 <- levelplot(z, 
+		col.regions=terrain.colors,
+                #colorkey=FALSE, 
+		xlab="",
                 ylab="",
                 panel=function(...){
                   panel.levelplot(...)
@@ -63,6 +80,7 @@ p1 <- levelplot(z, col.regions=jet.colors,
                 },
                 scales=list(cex=2))
 print(p1)
+
 #dev.off()
 
 for (i in seq(N)) {
@@ -70,13 +88,28 @@ for (i in seq(N)) {
   datafile <- sprintf("%s%05d%s", "m", i, ".dat")
   outfile <- sprintf("%s%05d%s", "slice", i, ".png")
   png(outfile, width=.pwidth, height=.pheight)
-  z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
-              L, H, byrow=TRUE)
-  z <- z[1:pL, 1:pH]
+
+z <- matrix(scan(datafile, n=Lbox*Lbox*H, quiet=TRUE),
+            Lbox*Lbox, H, byrow=TRUE)
+z <- z[1:(pLbox*pLbox),1:pH]
+if (.pthing == 'SC'){
+   z[z!=1] <- 0
+   z <- rowSums(z)
+} else if (.pthing == 'CP'){
+   z[z!=2] <- 0
+   z <- rowSums(z)
+} else if (.pthing == 'TC'){
+   z[z!=3] <- 0
+   z <- rowSums(z)
+} else{
+   stop("please tell me what do you want to plot, SC, CP or TC?")
+}
+z <- matrix(z, pLbox, pLbox)
 
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
-  p1 <- levelplot(z, col.regions=jet.colors,
-            colorkey=FALSE, xlab="",
+  p1 <- levelplot(z, 
+  	    col.regions=topo.colors(100),
+            #colorkey=FALSE, 
             ylab="",
             panel=function(...){
               panel.levelplot(...)

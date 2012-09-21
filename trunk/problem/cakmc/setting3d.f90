@@ -1,7 +1,7 @@
 module setting
-  integer, parameter :: Lbox = 256
-  integer, parameter :: Lbox2 = Lbox*Lbox
-  integer, parameter :: H = 100
+  integer Lbox
+  integer Lbox2
+  integer H
   integer :: brange, thisrandseed
   real :: tend, p1, v, difv, mutv, tm
   real :: fdgain1, scstick, prelax, tpinc
@@ -10,7 +10,7 @@ module setting
   real :: timestep
   integer :: npar
 
-  namelist /xdata/ brange, tend, p1, v, difv, mutv, &
+  namelist /xdata/ Lbox, H, brange, tend, p1, v, difv, mutv, &
        fdgain1, scstick, prelax, thisrandseed, tpinc, tm
 
   namelist /xdataomp/ useomp, is64bit, timestep, npar
@@ -23,7 +23,6 @@ module setting
      real gene4
   end type cell
   type(cell), allocatable :: cmat(:,:,:)
-!  type(cell) cmat(0:Lbox+1,0:Lbox+1,H)
   real, allocatable :: a(:,:), NT(:,:), NP(:,:)
   integer, allocatable :: npack(:, :), TDC(:,:), SC(:,:), TAC(:,:)
   real, allocatable ::  v_diff(:,:,:), geneinfo(:,:,:)
@@ -36,8 +35,11 @@ contains
     read(8, nml=xdataomp)
     
     bd10 = 10.0/real(brange)
+    Lbox2 = Lbox*Lbox
 
     write(*, *), 'Control parameters...'
+    write(*, '(a20, i10)'), 'Lbox = ', Lbox
+    write(*, '(a20, i10)'), 'H = ', H
     write(*, '(a20, i10)'), 'brange = ', brange
     write(*, '(a20, i10)'), 'thisrandseed = ', thisrandseed
     write(*, '(a20, f10.2)'), 'tend = ', tend
@@ -176,7 +178,7 @@ contains
              write(11, '(I5)', advance="no"), cmat(i,j,k)%type
           end do
           if ( SC(i,j).eq.0 ) then
-             geneinfo(i,j,:) = huge(1.0)
+             geneinfo(i,j,:) = -1.0
           else
              geneinfo(i,j,:) = geneinfo(i,j,:) / SC(i,j)
           end if
@@ -197,11 +199,12 @@ contains
     type(cell) new_cell
     u = par_uni(kpar)
     u = u*a(i, j)
-!!$    print *, 'event happen at ', i
+    print *, 'event happen at ', kpar, i, j
 !!$    print *, 'u', u
 !!$    print *, 'a(i)', a(i)
 !!$    print *, 'npack(i)', npack(i-1:i+1)
 !!$    print *, 'vr, vl', vr, vl
+    print *, Lbox, H
 
     u = u - v_diff(i, j, 1)
     if ( u < 0 ) then
@@ -297,6 +300,9 @@ contains
                 cmat(i,j,k) = cmat(i,j,k-1)
              end do
              u1 = par_uni(kpar)
+
+             !write(*, *), kpar, u1
+
              if ( u1 < p0 ) then
                 ! SC -> 2SC
                 cmat(i,j,len+1) = cmat(i,j,len)

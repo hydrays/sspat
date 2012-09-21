@@ -3,7 +3,8 @@ OUTPUT_FILE := run
 OUTPUT_FILE3D := run3d
 
 FC = gfortran -fopenmp -fdefault-real-8
-#FC = ifort -r8
+#FC = ifort -openmp -r8
+
 OBJS += \
 ./random.o \
 ./par_zig_mod.o \

@@ -2,9 +2,7 @@ library('adk')
 dyn.load('simulator1.so')
 source('simulator1n.r')
 
-data7 <- read.csv('data/8dayfast.csv')
-mcell <- as.numeric(data7[8,3:(ncol(data7[1,]))])
-mcell[is.na(mcell)] <- 0
+mcell <- as.matrix(read.csv('data/day8fast.csv'))
 
 Nsample = 2000
 T = 8

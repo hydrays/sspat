@@ -1,7 +1,7 @@
-\name{PMValidate}
-\alias{PMValidate}
+\name{PMV}
+\alias{PMV}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{PMValidate
+\title{PMV
 %%  ~~function to do ... ~~
 }
 \description{

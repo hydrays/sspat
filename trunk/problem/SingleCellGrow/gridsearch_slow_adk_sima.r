@@ -6,61 +6,49 @@ source('simulator1n.r')
 # Simulated data using r2 = 0.6, d2 = 0.3, 50 samples.
 mcell <- as.matrix(read.csv('data/simcella.csv'))
 
-Nsample = 2000
-T = 8
-d <- matrix(0, 101, 101)
-pvalue <- matrix(0, 101, 101)
-x <- seq(Nsample)
-i <- 1
-for ( r2 in seq(0, 1, by=0.01) ){
-    j <- 1
-    for ( d2 in seq(0, 1, by=0.01) ){
-            x <- simulator1n(T, 0, r2, 0, d2, 0, 0, Nsample)
-            dis <- adk.test(mcell, x)
-            d[i, j] <- dis$adk[1,2]
-            pvalue[i, j] <- dis$adk[2,2]
-            cat(c(d[i, j], r2, d2, i, j),'\n')
-            j <- j + 1
-    }
-    i <- i + 1
-}
-
-
-## j <- 1
-## n <- 0
-## m <- 0
-## dvsr1 <- seq(1000000)
-## dvsd1 <- seq(1000000)
-## dvsv <- seq(1000000)
-## dvsw <- seq(1000000)
-## pl <- seq(1000000)
-## for ( r1 in seq(0, 2, by=0.05) ){
-##     for ( d1 in seq(0, 1, by=0.05) ){
-##         for ( v in seq(0, 1, by=0.05) ){
-##           for ( w in seq(0, 1, by=0.05) ){
-## 	    if ( (d[j] > 0.58) && (d[j] < 1) ){
-##               n <- n+1
-##               if ( (d[j] > 0.1) && (d[j] < 1) ){
-##                 m <- m+1
-##                 dvsr1[m] <- r1
-##                 dvsd1[m] <- d1
-##                 dvsv[m] <- v
-##                 dvsw[m] <- w
-##                 pl[m] <- d[j]
-##                 cat(m, j, '\n')
-##               }
-##             }
-##             j <- j+1
-##           }
-##         }
-##   }
+## Nsample = 2000
+## T = 8
+## d <- matrix(0, 101, 101)
+## pvalue <- matrix(0, 101, 101)
+## x <- seq(Nsample)
+## i <- 1
+## for ( r2 in seq(0, 1, by=0.01) ){
+##     j <- 1
+##     for ( d2 in seq(0, 1, by=0.01) ){
+##             x <- simulator1n(T, 0, r2, 0, d2, 0, 0, Nsample)
+##             dis <- adk.test(mcell, x)
+##             d[i, j] <- dis$adk[1,2]
+##             pvalue[i, j] <- dis$adk[2,2]
+##             cat(c(d[i, j], r2, d2, i, j),'\n')
+##             j <- j + 1
+##     }
+##     i <- i + 1
 ## }
 
-## par(mfrow=c(2,2))
-## plot(dvsr1[1:n], pl[1:m])
-## plot(dvsd1[1:m], pl[1:m])
-## plot(dvsv[1:m], pl[1:m])
-## plot(dvsw[1:m], pl[1:m])
+## -----------------------------------
+## Plot the contour
+## -----------------------------------
+
+filled.contour(x = seq(0, 1, length.out=101),
+		 y = seq(0, 1, length.out=101),
+		 d,
+		 color=terrain.colors,
+		 plot.title = title(main = "KS-distance between ECDFs [Good Cells]",
+		 xlab = "proliferation rate",
+		 ylab = "death rate"),
+		 asp = 1,
+		 plot.axes={ axis(1); axis(2); points(0.6,0.3,pch=17) },
+		 level=c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7))
+
+mtext(paste("@", date()), side=1, line=4, adj=1.04, cex=.66)
+
+text(0.4, 1.3, "Grid search for best fit using one-species model.")
+text(0.4, 1.25, "The best fit is located at")
+text(0.4, 1.2, "r1 = 0.84, d1 = 0.44 (triangle)")
+
+dev.copy(pdf,'search5.pdf')
+dev.off()
+
 
 ## ## -----------------------------------
 ## ## Plot the fit

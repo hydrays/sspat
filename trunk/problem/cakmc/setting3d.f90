@@ -165,25 +165,25 @@ contains
     WRITE(filename,'(A9,I5.5,A4)') './out3d/m', index, '.dat'
     open (unit = 11, file=filename, action="write")
 
-    do i = 1, Lbox
-       do j = 1, Lbox
+    do i = 0, Lbox+1
+       do j = 0, Lbox+1
           geneinfo(i,j,:) = 0.0
           do k = 1, H
-             if ( cmat(i,j,k)%type .eq. 1 ) then
-                geneinfo(i,j,1) = geneinfo(i,j,1) + cmat(i,j,k)%gene1
-                geneinfo(i,j,2) = geneinfo(i,j,2) + cmat(i,j,k)%gene2
-                geneinfo(i,j,3) = geneinfo(i,j,3) + cmat(i,j,k)%gene3
-                geneinfo(i,j,4) = geneinfo(i,j,4) + cmat(i,j,k)%gene4
-             end if
+!!$             if ( cmat(i,j,k)%type .eq. 1 ) then
+!!$                geneinfo(i,j,1) = geneinfo(i,j,1) + cmat(i,j,k)%gene1
+!!$                geneinfo(i,j,2) = geneinfo(i,j,2) + cmat(i,j,k)%gene2
+!!$                geneinfo(i,j,3) = geneinfo(i,j,3) + cmat(i,j,k)%gene3
+!!$                geneinfo(i,j,4) = geneinfo(i,j,4) + cmat(i,j,k)%gene4
+!!$             end if
              write(11, '(I5)', advance="no"), cmat(i,j,k)%type
           end do
-          if ( SC(i,j).eq.0 ) then
-             geneinfo(i,j,:) = -1.0
-          else
-             geneinfo(i,j,:) = geneinfo(i,j,:) / SC(i,j)
-          end if
-          write(11, '(f14.7)', advance="no"), geneinfo(i,j,1)
-          write(11, '(f14.7)', advance="no"), geneinfo(i,j,3)
+!!$          if ( SC(i,j).eq.0 ) then
+!!$             geneinfo(i,j,:) = -1.0
+!!$          else
+!!$             geneinfo(i,j,:) = geneinfo(i,j,:) / SC(i,j)
+!!$          end if
+!!$          write(11, '(f14.7)', advance="no"), geneinfo(i,j,1)
+!!$          write(11, '(f14.7)', advance="no"), geneinfo(i,j,3)
           write(11, *)
        end do
     end do
@@ -199,11 +199,14 @@ contains
     type(cell) new_cell
     u = par_uni(kpar)
     u = u*a(i, j)
-!!$    print *, 'event happen at ', kpar, i, j
-!!$    print *, 'u', u
-!!$    print *, 'a(i)', a(i)
+
+!!$    if (kpar .eq. 0) then
+!!$       print *, 'event happen at ', kpar, i, j
+!!$       print *, 'u', u
+!!$       print *, 'a(i,j)', a(i,j)
 !!$    print *, 'npack(i)', npack(i-1:i+1)
 !!$    print *, 'vr, vl', vr, vl
+!!$    end if
 
     u = u - v_diff(i, j, 1)
     if ( u < 0 ) then

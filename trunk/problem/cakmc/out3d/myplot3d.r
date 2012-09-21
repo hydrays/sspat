@@ -13,7 +13,8 @@ parainfo <- parainfo[1:(.divide-1),]
 
 cat(Lbox, H, '\n')
   
-N <- 12
+N <- 26
+Lbox <- Lbox + 2
 pLbox <- Lbox
 pH <- H
 .pwidth <- 720
@@ -25,8 +26,8 @@ i <- 0
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 outfile <- sprintf("%s%05d%s", "slice", i, ".png")
 png(outfile, width=.pwidth, height=.pheight)
-z <- matrix(scan(datafile, n=Lbox*Lbox*(H+2), quiet=TRUE),
-            Lbox*Lbox, H+2, byrow=TRUE)
+z <- matrix(scan(datafile, n=Lbox*Lbox*H, quiet=TRUE),
+            Lbox*Lbox, H, byrow=TRUE)
 z <- z[1:(pLbox*pLbox),1:pH]
 if (.pthing == 'SC'){
    z[z!=1] <- 0

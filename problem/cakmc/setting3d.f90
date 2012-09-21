@@ -199,12 +199,11 @@ contains
     type(cell) new_cell
     u = par_uni(kpar)
     u = u*a(i, j)
-    print *, 'event happen at ', kpar, i, j
+!!$    print *, 'event happen at ', kpar, i, j
 !!$    print *, 'u', u
 !!$    print *, 'a(i)', a(i)
 !!$    print *, 'npack(i)', npack(i-1:i+1)
 !!$    print *, 'vr, vl', vr, vl
-    print *, Lbox, H
 
     u = u - v_diff(i, j, 1)
     if ( u < 0 ) then

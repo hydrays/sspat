@@ -12,7 +12,7 @@
 	scstick = 0.96,
 	prelax = 0.2,
 	thisrandseed = 1234,
-	tpinc = 1.0,
+	tpinc = 5.0,
 	tm = 200
 /
 

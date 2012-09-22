@@ -3,69 +3,77 @@ dyn.load('simulator1.so')
 source('simulator1n.r')
 
 # Simulated data 
-T <- 8
-r1 <- 0
-r2 <- 0.6
-d1 <- 0
-d2 <- 0.3
-v <- 0
-w <- 0
-N <- 100
+.T <- 8
+.r1 <- 1
+.r2 <- 0.6
+.d1 <- 0.4
+.d2 <- 0.3
+.v <- 0.3
+.w <- 0.7
+.N <- 100
 
 #mcell <- as.matrix(read.csv('data/simcella.csv'))
-#mcell <- simulator1n(T, r1, r2, d1, d2, v, w, N)
+mcell <- simulator1n(.T, .r1, .r2, .d1, .d2, .v, .w, .N)
 
-Nsample = 10000
-.lenr2 <- 101
-.lend2 <- 101
+Nsample = 2000
+T = 8
+r2 = 0.6
+d2 = 0.3
+d <- double(1000000)
+pvalue <- double(1000000)
 x <- seq(Nsample)
-pvalue1 <- matrix(0, .lenr2, .lend2)
-pvalue2 <- matrix(0, .lenr2, .lend2)
-
-r2 <- seq(0, 1, length=.lenr2)
-d2 <- seq(0, 1, length=.lend2)
-
-for ( i in seq(.lenr2) ){
-    for ( j in seq(.lend2) ){
-            x <- simulator1n(T, 0, r2[i], 0, d2[j], 0, 0, Nsample)
+j <- 1
+for ( r1 in seq(0, 1.5, by=0.05) ){
+    for ( d1 in seq(0, 1, by=0.05) ){
+        for ( v in seq(0, 1, by=0.05) ){
+          for ( w in seq(0, 1, by=0.05) ){
+            x <- simulator1n(T, r1, r2, d1, d2, v, w, Nsample)
             dis <- adk.test(mcell, x)
-            pvalue1[i, j] <- dis$adk[1,2]
-            pvalue2[i, j] <- dis$adk[2,2]
-            cat(c(pvalue1[i, j], r2[i], d2[j], i, j),'\n')
-    }
+            d[j] <- dis$adk[1,2]
+            pvalue[j] <- dis$adk[2,2]
+            cat(c(d[j], r1, r2, d1, d2, v, w),'\n')
+            j <- j+1
+          }
+      }
+  }
 }
 
-res <- which(pvalue2==max(pvalue2), arr.ind=T)
-r2max <- r2[res[1]]
-d2max <- d2[res[2]]
 
-cat('optimal value found at', '\n')
-cat(r2max, d2max, '\n')
+## j <- 1
+## n <- 0
+## m <- 0
+## dvsr1 <- seq(1000000)
+## dvsd1 <- seq(1000000)
+## dvsv <- seq(1000000)
+## dvsw <- seq(1000000)
+## pl <- seq(1000000)
+## for ( r1 in seq(0, 2, by=0.05) ){
+##     for ( d1 in seq(0, 1, by=0.05) ){
+##         for ( v in seq(0, 1, by=0.05) ){
+##           for ( w in seq(0, 1, by=0.05) ){
+## 	    if ( (d[j] > 0.6) && (d[j] < 1) ){
+##               n <- n+1
+##               if ( (d[j] > 0.1) && (d[j] < 1) ){
+##                 m <- m+1
+##                 dvsr1[m] <- r1
+##                 dvsd1[m] <- d1
+##                 dvsv[m] <- v
+##                 dvsw[m] <- w
+##                 pl[m] <- d[j]
+##                 cat(m, j, '\n')
+##               }
+##             }
+##             j <- j+1
+##           }
+##         }
+##   }
+## }
 
-## ## -----------------------------------
-## ## Plot the contour
-## ## -----------------------------------
-
-## filled.contour(x = seq(0, 1, length.out=101),
-## 		 y = seq(0, 1, length.out=101),
-## 		 d,
-## 		 color=terrain.colors,
-## 		 plot.title = title(main = "KS-distance between ECDFs [Good Cells]",
-## 		 xlab = "proliferation rate",
-## 		 ylab = "death rate"),
-## 		 asp = 1,
-## 		 plot.axes={ axis(1); axis(2); points(0.6,0.3,pch=17) },
-## 		 level=c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7))
-
-## mtext(paste("@", date()), side=1, line=4, adj=1.04, cex=.66)
-
-## text(0.4, 1.3, "Grid search for best fit using one-species model.")
-## text(0.4, 1.25, "The best fit is located at")
-## text(0.4, 1.2, "r1 = 0.84, d1 = 0.44 (triangle)")
-
-## dev.copy(pdf,'search5.pdf')
-## dev.off()
-
+## par(mfrow=c(2,2))
+## plot(dvsr1[1:n], pl[1:m])
+## plot(dvsd1[1:m], pl[1:m])
+## plot(dvsv[1:m], pl[1:m])
+## plot(dvsw[1:m], pl[1:m])
 
 ## ## -----------------------------------
 ## ## Plot the fit

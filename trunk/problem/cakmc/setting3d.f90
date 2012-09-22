@@ -165,8 +165,8 @@ contains
     WRITE(filename,'(A9,I5.5,A4)') './out3d/m', index, '.dat'
     open (unit = 11, file=filename, action="write")
 
-    do i = 0, Lbox+1
-       do j = 0, Lbox+1
+    do i = 1, Lbox
+       do j = 1, Lbox
           geneinfo(i,j,:) = 0.0
           do k = 1, H
 !!$             if ( cmat(i,j,k)%type .eq. 1 ) then

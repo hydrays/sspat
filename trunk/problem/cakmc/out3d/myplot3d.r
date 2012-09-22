@@ -13,8 +13,8 @@ parainfo <- parainfo[1:(.divide-1),]
 
 cat(Lbox, H, '\n')
   
-N <- 26
-Lbox <- Lbox + 2
+N <- 200
+Lbox <- Lbox
 pLbox <- Lbox
 pH <- H
 .pwidth <- 720

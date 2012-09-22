@@ -33,7 +33,7 @@ contains
     enddo
     call par_zigset(2**npar, seed, grainsize)
 
-    open (unit = 100, file='./out/logfile', action="write")
+    open (unit = 100, file='./out3d/logfile', action="write")
 
     call init_cell_pool()
   
@@ -201,7 +201,7 @@ contains
     enddo
     call par_zigset(2**npar, seed, grainsize)
 
-    open (unit = 100, file='./out/logfile', action="write")
+    open (unit = 100, file='./out3d/logfile', action="write")
   
     call init_cell_pool()
 
@@ -218,7 +218,7 @@ contains
           call cell_stat(t)
           call output_to_file(output_index)
           output_index = output_index + 1
-          tp = tp + 1.0
+          tp = tp + tpinc
        end if
        t = t + timestep
 

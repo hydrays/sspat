@@ -1,6 +1,5 @@
 \name{PMValidate-package}
-\alias{PMValidate-package}
-\alias{PMValidate}
+\alias{PMV}
 \docType{package}
 \title{
 What the package does (short line)

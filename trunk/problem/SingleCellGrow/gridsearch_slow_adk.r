@@ -4,15 +4,15 @@ source('simulator1n.r')
 
 mcell <- as.matrix(read.csv('data/day8slow.csv'))
 
-## Nsample = 2000
+## Nsample = 10000
 ## T = 8
 ## d <- matrix(0, 101, 101)
 ## pvalue <- matrix(0, 101, 101)
 ## x <- seq(Nsample)
 ## i <- 1
-## for ( r2 in seq(0, 1, by=0.01) ){
+## for ( r2 in seq(0.4, 0.8, by=0.004) ){
 ##     j <- 1
-##     for ( d2 in seq(0, 1, by=0.01) ){
+##     for ( d2 in seq(0.2, 0.6, by=0.004) ){
 ##             x <- simulator1n(T, 0, r2, 0, d2, 0, 0, Nsample)
 ##             dis <- adk.test(mcell, x)
 ##             d[i, j] <- dis$adk[1,2]
@@ -29,15 +29,18 @@ mcell <- as.matrix(read.csv('data/day8slow.csv'))
 ## ## Plot the contour
 ## ## -----------------------------------
 
-## filled.contour(x = seq(0, 1, length.out=101),
-## 		 y = seq(0, 1, length.out=101),
+## res <- which(d == max(d), arr.ind=T)
+## r2max <- 0.4 + 0.004*res[1]
+## d2max <- 0.2 + 0.004*res[2]
+## filled.contour(x = seq(0.4, 0.8, length.out=101),
+## 		 y = seq(0.2, 0.6, length.out=101),
 ## 		 d,
 ## 		 color=terrain.colors,
 ## 		 plot.title = title(main = "KS-distance between ECDFs [Good Cells]",
 ## 		 xlab = "proliferation rate",
 ## 		 ylab = "death rate"),
 ## 		 asp = 1,
-## 		 plot.axes={ axis(1); axis(2); points(0.65,0.33,pch=1) },
+## 		 plot.axes={ axis(1); axis(2); points(r2max,d2max,pch=17) },
 ## 		 level=c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.66, 0.7))
 
 ## mtext(paste("@", date()), side=1, line=4, adj=1.04, cex=.66)
@@ -57,12 +60,14 @@ mcell <- as.matrix(read.csv('data/day8slow.csv'))
 Nsample = 10000
 T = 8
 r1 = 0
-r2 = 0.6
+r2 = 0.652
 d1 = 0
-d2 = 0.3
+d2 = 0.34
 v = 0
 w = 0
 x <- simulator1n(T, r1, r2, d1, d2, v, w, Nsample)
+
+y <- simulator1n(T, r1, 0.6, d1, 0.3, v, w, Nsample)
 
 Fn <- ecdf(x)
 Fe <- ecdf(mcell)
@@ -71,6 +76,9 @@ plot(Fn, xlim=c(0,100),
      ylab = "Cumulative probability",
      xlab = "8-day Cell number ")
 lines(Fe, col='red')
+
+Fy <- ecdf(y)
+lines(Fy, col='blue')
 
 text(200, 0.6, "Goodness of fit")
 text(200, 0.55, "Black: simulated using parameters from grid search")

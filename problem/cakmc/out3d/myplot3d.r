@@ -14,7 +14,6 @@ parainfo <- parainfo[1:(.divide-1),]
 cat(Lbox, H, '\n')
   
 N <- 200
-Lbox <- Lbox
 pLbox <- Lbox
 pH <- H
 .pwidth <- 720
@@ -53,30 +52,29 @@ p1 <- levelplot(z,
                   panel.levelplot(...)
                   grid.text(my.label.time,
                             y = unit(0.9, "npc"), gp=gpar(fontsize=30))
-                  grid.text(paste("------ # Parameter Setting",
-                                  "( figure generated at",
-                                   date(), " ) # ------"),
+                  grid.text(paste("------ # figure generated at",
+                                   date(), " # ------"),
                             x = unit(0.01, "npc"), y = unit(0.8, "npc"),
                             just="left",
                             gp=gpar(fontsize=20) )                  
                   for ( j in seq(nrow(parainfo)) ){
                     grid.text(paste("# ", parainfo[j,1], " = ", parainfo[j,2]),
                               just="left",
-                              x = unit(0.01 + 0.1*((j-1)%%4), "npc"),
-                              y = unit(0.7-0.1*as.integer((j-1)/4), "npc"),
+                              x = unit(0.01 + 0.3*((j-1)%%3), "npc"),
+                              y = unit(0.7-0.05*as.integer((j-1)/3), "npc"),
                               gp=gpar(fontsize=20) )
                   }
 
                   if (ompinfo[1,2]==1){
                     grid.text("------ # OMP in use! # ------",
-                              x = unit(0.7, "npc"), y = unit(0.8, "npc"),
+                              x = unit(0.01, "npc"), y = unit(0.4, "npc"),
                               just="left",
                               gp=gpar(fontsize=20) )                  
                     for ( j in seq(nrow(ompinfo)) ){
                       grid.text(paste("# ", ompinfo[j,1], " = ", ompinfo[j,2]),
                                 just="left",
-                                x = unit(0.7 + 0.1*((j-1)%%2), "npc"),
-                                y = unit(0.7-0.1*as.integer((j-1)/2), "npc"),
+                                x = unit(0.01 + 0.3*((j-1)%%2), "npc"),
+                                y = unit(0.3-0.05*as.integer((j-1)/2), "npc"),
                                 gp=gpar(fontsize=20) )
                     }
                   }

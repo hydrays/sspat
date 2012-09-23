@@ -29,7 +29,7 @@ contains
     allocate(seed(2**npar))
     do i = 1,2**npar
        call random_number(r)
-       seed(i) = thisrandseed*r
+       seed(i) = iseed*r
     enddo
     call par_zigset(2**npar, seed, grainsize)
 
@@ -92,7 +92,7 @@ contains
 !!$             !$OMP cmat, ibl, jbl, scanner, npar, &
 !!$             !$OMP Lbox_npar, Lbox_2npar, timestep, Lbox, Lbox2, H, &
 !!$             !$OMP brange, p1, v, difv, mutv, fdgain1, &
-!!$             !$OMP scstick, prelax, bd10, thisrandseed)
+!!$             !$OMP scstick, prelax, bd10, iseed)
 
              nthread = OMP_GET_THREAD_NUM()
              ibox = nthread/npar
@@ -197,7 +197,7 @@ contains
     allocate(seed(2**npar))
     do i = 1,2**npar
        call random_number(r)
-       seed(i) = thisrandseed*r
+       seed(i) = iseed*r
     enddo
     call par_zigset(2**npar, seed, grainsize)
 

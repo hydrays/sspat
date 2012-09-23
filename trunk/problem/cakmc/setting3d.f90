@@ -2,7 +2,7 @@ module setting
   integer Lbox
   integer Lbox2
   integer H
-  integer :: brange, thisrandseed
+  integer :: brange, iseed
   real :: tend, p1, v, difv, mutv, tm
   real :: fdgain1, scstick, prelax, tpinc
   real :: bd10
@@ -11,7 +11,7 @@ module setting
   integer :: npar
 
   namelist /xdata/ Lbox, H, brange, tend, p1, v, difv, mutv, &
-       fdgain1, scstick, prelax, thisrandseed, tpinc, tm
+       fdgain1, scstick, prelax, iseed, tpinc, tm
 
   namelist /xdataomp/ useomp, is64bit, timestep, npar
 
@@ -41,7 +41,7 @@ contains
     write(*, '(a20, i10)'), 'Lbox = ', Lbox
     write(*, '(a20, i10)'), 'H = ', H
     write(*, '(a20, i10)'), 'brange = ', brange
-    write(*, '(a20, i10)'), 'thisrandseed = ', thisrandseed
+    write(*, '(a20, i10)'), 'iseed = ', iseed
     write(*, '(a20, f10.2)'), 'tend = ', tend
     write(*, '(a20, f10.2)'), 'p1 = ', p1
     write(*, '(a20, f10.2)'), 'v = ', v
@@ -65,7 +65,7 @@ contains
     write(9, '(a20, i10)'), 'Lbox,', Lbox
     write(9, '(a20, i10)'), 'H,', H
     write(9, '(a20, i10)'), 'brange,', brange
-    write(9, '(a20, i10)'), 'thisrandseed,', thisrandseed
+    write(9, '(a20, i10)'), 'iseed,', iseed
     write(9, '(a20, f10.2)'), 'tend,', tend
     write(9, '(a20, f10.2)'), 'p1,', p1
     write(9, '(a20, f10.2)'), 'v,', v

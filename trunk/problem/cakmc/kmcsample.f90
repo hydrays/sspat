@@ -12,7 +12,7 @@ contains
     integer output_index, i, j, active_index
     integer k, shift_i
     open (unit = 100, file='./out/logfile', action="write")
-    call ran_seed(sequence=thisrandseed)
+    call ran_seed(sequence=iseed)
     call init_cell_pool()
 
     t = 0.0
@@ -78,7 +78,7 @@ contains
     allocate(seed(npar))
     do i = 1,npar
        call random_number(r)
-       seed(i) = thisrandseed*r
+       seed(i) = iseed*r
     enddo
     call par_zigset(npar, seed, grainsize)
 
@@ -184,7 +184,7 @@ contains
     allocate(seed(npar))
     do i = 1,npar
        call random_number(r)
-       seed(i) = thisrandseed*r
+       seed(i) = iseed*r
     enddo
     call par_zigset(npar, seed, grainsize)
 

@@ -167,3 +167,59 @@ void simulator1n(double *Tin, double *l1in, double *l2in, double *d1in,
     xout[i] = y[0] + y[1];
       }
 }
+
+void gridopslow(double *Tin, double *l2truein, double *d2truein, 
+		double *l2in, double *d2in, 
+		int *msin, int *nsin, double *xout){
+  double T = Tin[0];
+  double l2true = l2truein[0];
+  double d2true = d2truein[0];
+  double l2min = l2in[0];
+  double l2max = l2in[1];
+  double l2step = l2in[2];
+  double d2min = d2in[0];
+  double d2max = d2in[1];
+  double d2step = d2in[2];
+
+  int ms = msin[0];
+  int ns = nsin[0];
+
+  int i, j;
+  int sp1[ms];
+  int sp2[ns];
+  double l2, d2;
+  double l1, d1;
+  double v, w;
+
+  int nl2, nd2;
+
+  double res;
+
+  xout[0] = -1.0;
+  xout[1] = -1.0;
+
+  l1 = 0.0;
+  d1 = 0.0;
+  v = 0.0;
+  w = 0.0;
+  
+  nl2 = (int)((l2max - l2min)/l2step) + 1;
+  nd2 = (int)((d2max - d2min)/d2step) + 1;
+
+  simulator1n(&T, &l1, &l2true, &d1, &d2true, &v, &w, &ms, sp1);
+  printf("[%f %f] \n", l2true, d2true);
+  for(i=0; i<ms; i++) printf("%4d ", sp1[i]);
+
+  printf("\n");
+
+  for (i=0; i<=nl2; i++){
+    l2 = l2min + i*l2step;
+    for (j=0; j<=nd2; j++){
+      d2 = d2min + j*d2step;
+      simulator1n(&T, &l1, &l2, &d1, &d2, &v, &w, &ns, sp2);      
+      res = kstest(sp1, ms, sp2, ns);
+      printf("--[%f %f : %f] \n", l2, d2, res);
+    }
+  }
+}
+

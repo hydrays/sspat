@@ -14,6 +14,6 @@
               tpinc,      5.00
                  tm,    200.00
              useomp,         1
-            is64bit,         0
+            is64bit,         1
            timestep,      0.01
-               npar,         4
+               npar,         2

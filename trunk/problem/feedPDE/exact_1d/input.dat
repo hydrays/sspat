@@ -1,7 +1,8 @@
-	1d0   ! alx		!actual length of domain in the X-direction
-	2     ! boundary_type	! flag for type of boundary conditions -(1-dirich: all  2-dirich:west,neuman:east)
-	1d-3  ! alpha           ! thermal diffusivity
+	10d0   ! alx		!actual length of domain in the X-direction
+	3     ! boundary_type	! flag for type of boundary conditions -(1-dirich: all  2-dirich:west,neuman:east)
+	1d-3  ! alpha1           ! thermal diffusivity
+	1d-1  ! alpha2           ! thermal diffusivity
 	2d-1  ! Fo              ! value of grid Fourier number (reduce the value of Fo if solution diverges)
-	5d-7  ! tolstdy         ! covergence criterion for steady-state solution
-	1d4   ! tfinal		! final time
-	5     ! print_freq	! printing the transient temperature; print_freq = (1-every time step, 2-alternate time step and so on)  
+	5d-7  ! tolstdy
+	1d1   ! tfinal
+	0.1     ! tpinc

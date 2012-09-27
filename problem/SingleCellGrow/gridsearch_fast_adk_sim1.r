@@ -4,9 +4,9 @@ source('simulator1n.r')
 
 # Simulated data
 .T <- 8
-.r1 <- 1
+.r1 <- 1.1
 .r2 <- 0.6
-.d1 <- 0.3
+.d1 <- 0.4
 .d2 <- 0.3
 .v <- 0.3
 .w <- 0.4
@@ -27,14 +27,11 @@ mcell <- simulator1n(.T, .r1, .r2, .d1, .d2, .v, .w, .N)
 ##         for ( v in seq(0, 1, by=0.1) ){
 ##           for ( w in seq(0, 1, by=0.1) ){
 ##             x <- simulator1n(T, r1, r2, d1, d2, v, w, Nsample)
-##             #dis <- adk.test(mcell, x)
-##             #d[j] <- dis$adk[1,2]
-##             #pvalue[j] <- dis$adk[2,2]
-
-##             dis <- ks.test(mcell, x)
-##             d[j] <- dis$statistic
-##             pvalue[j] <- dis$p.value
-##             cat(c(d[j], r1, r2, d1, d2, v, w),'\n')
+##             dis <- adk.test(mcell, x)
+##             d[j] <- dis$adk[2,1]
+##             pvalue[j] <- dis$adk[2,2]
+##             cat(prettyNum(c(d[j], pvalue[j], r1, r2, d1, d2, v, w),
+##                           width=6, ),'\n')
 ##             j <- j+1
 ##           }
 ##       }
@@ -42,33 +39,37 @@ mcell <- simulator1n(.T, .r1, .r2, .d1, .d2, .v, .w, .N)
 ## }
 
 
-## j <- 1
-## n <- 0
-## m <- 0
-## dvsr1 <- seq(1000000)
-## dvsd1 <- seq(1000000)
-## dvsv <- seq(1000000)
-## dvsw <- seq(1000000)
-## pl <- seq(1000000)
-## for ( r1 in seq(0.5, 1.5, by=0.1) ){
-##     for ( d1 in seq(0, 1, by=0.1) ){
-##         for ( v in seq(0, 1, by=0.1) ){
-##           for ( w in seq(0, 1, by=0.1) ){
-## 	    if ( (pvalue[j] > 0.8) && (pvalue[j] < 1) ){
-##                 m <- m+1
-##                 dvsr1[m] <- r1
-##                 dvsd1[m] <- d1
-##                 dvsv[m] <- v
-##                 dvsw[m] <- w
-##                 pl[m] <- pvalue[j]
-##                 cat(m, j, '\n')
-##               }
-##             j <- j+1
-##           }
-##         }
-##   }
-## }
+j <- 1
+n <- 0
+m <- 0
+dvsr1 <- seq(1000000)
+dvsd1 <- seq(1000000)
+dvsv <- seq(1000000)
+dvsw <- seq(1000000)
+pl <- seq(1000000)
+for ( r1 in seq(0.5, 1.5, by=0.1) ){
+    for ( d1 in seq(0, 1, by=0.1) ){
+        for ( v in seq(0, 1, by=0.1) ){
+          for ( w in seq(0, 1, by=0.1) ){
+	    if ( (pvalue[j] > 0.1) && (abs(d[j]) < 1) ){
+                m <- m+1
+                dvsr1[m] <- r1
+                dvsd1[m] <- d1
+                dvsv[m] <- v
+                dvsw[m] <- w
+                pl[m] <- pvalue[j]
+                cat(m, j, d[j], pvalue[j], '\n')
+              }
+            j <- j+1
+          }
+        }
+  }
+}
 
+cat(dvsr1[1:m], '\n')
+cat(dvsd1[1:m], '\n')
+cat(dvsv[1:m], '\n')
+cat(dvsw[1:m], '\n')
 ## par(mfrow=c(2,2))
 ## plot(dvsr1[1:m], pl[1:m])
 ## plot(dvsd1[1:m], pl[1:m])
@@ -81,9 +82,9 @@ mcell <- simulator1n(.T, .r1, .r2, .d1, .d2, .v, .w, .N)
 
 # Simulated data
 .T <- 8
-.r1 <- 1
+.r1 <- 1.1
 .r2 <- 0.6
-.d1 <- 0.3
+.d1 <- 0.4
 .d2 <- 0.3
 .v <- 0.3
 .w <- 0.4
@@ -97,10 +98,10 @@ y <- simulator1n(.T, .r1, .r2, .d1, .d2, .v, .w, Nsample)
 T = 8
 r1 = 1.5
 r2 = 0.6
-d1 = 0.7
+d1 = 0.5
 d2 = 0.3
-v = 0.8
-w = 0.9
+v = 0.9
+w = 0.6
 x <- simulator1n(T, r1, r2, d1, d2, v, w, Nsample)
 
 Fn <- ecdf(x)

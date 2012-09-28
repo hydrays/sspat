@@ -33,5 +33,5 @@ main: $(OBJS) $(USER_OBJS)
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS) $(OUTPUT_FILE) *.mod *~
+	-$(RM) $(OBJS) $(OUTPUT_FILE) *.mod *~ out/*.dat
 	-@echo ' '

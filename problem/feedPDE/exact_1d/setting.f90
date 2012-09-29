@@ -3,7 +3,7 @@ module setting
   integer boundary_type, maxntimestp, ntimestp, print_freq
   real, parameter :: pi = 3.14159265
   real alx, dx, tfinal, dt, time, alpha1, alpha2, Fo, tolstdy, tpinc
-  integer, parameter :: nx = 1024
+  integer, parameter :: nx = 128
   integer, parameter :: n = nx+2
   integer, parameter :: n1 = nx+3
   real tw, te, qw1, qw2, qe1, qe2
@@ -16,96 +16,81 @@ module setting
   real press(0:n1)
   real d(0:n1)
   real TGF(0:n1)
+  real, parameter :: alpha_TGF = 1.0
   real, parameter :: gain1 = 0.5
-  real, parameter :: xi = 0.5
+  real, parameter :: xi = 0.0
+  real, parameter :: beta_product = 0.5
+  real, parameter :: beta_uptake = 1.0
+  real, parameter :: beta_decay = 1.0
 
 contains
 
-  subroutine update_TGF(TGF(0:n1))
+  subroutine update_TGF()
     implicit none
-    real, intent(inout) :: TGF(0:n1)
     integer i
-    real maxdif, dif
+    real maxdif_TGF, dif_TGF, dt_TGF
     real TGF_old(0:n1)
+    real C_TGF(0:n1)
+    real dTdx_w, dTdx_e, dTdt, dTdx_west, dTdx_east
+    integer i_counter
+    integer boundary_condition_TGF
 
     TGF_old = TGF
-    maxdif = huge(1.0)
-    do while (maxdif > tolstdy)
-       do i = 3, n-2
-          dTdx_west = (TN1(i) - TN1(i-1))/dx
-          dTdx_east = (TN1(i+1) - TN1(i))/dx
-          dTdt      = alpha1*(dTdx_east - dTdx_west)/dx + C1(i)
-          phi1(i)    = TN1(i) + dTdt*dt
+    maxdif_TGF = huge(1.0)
+    dt_TGF = Fo*dx**2 / alpha_TGF
+    i_counter = 0
 
-          dTdx_west = (TN2(i) - TN2(i-1))/dx
-          dTdx_east = (TN2(i+1) - TN2(i))/dx
-          dTdt      = alpha2*(dTdx_east - dTdx_west)/dx + C2(i)
-          phi2(i)    = TN2(i) + dTdt*dt
+    do while (maxdif_TGF > 1e-5)
+
+    do i = 2, n-1
+       C_TGF(i) = beta_product*phi2(i) - beta_decay*TGF(i)
+    end do
+
+       do i = 3, n-2
+          dTdx_west = (TGF_old(i) - TGF_old(i-1))/dx
+          dTdx_east = (TGF_old(i+1) - TGF_old(i))/dx
+          dTdt      = alpha_TGF*(dTdx_east - dTdx_west)/dx + C_TGF(i)
+          TGF(i)   = TGF_old(i) + dTdt*dt_TGF
        enddo
        ! boundary conditions
-       ! west
+       ! west Neumann
        i = 2
-       if (boundary_type == 1) then
-          print *, 'not implemented here!'
-          stop
-          dTdx_w = (-TN1(i+1) + 9*TN1(i) - 8*TN1(i-1))/(3*dx)
-          dTdx_e = (TN1(i+1) - TN1(i))/dx
-          dTdt   = alpha1*(dTdx_e - dTdx_w)/dx + C1(i)
-          phi1(i) = TN1(i) + dTdt*dt
-
-          dTdx_w = (-TN2(i+1) + 9*TN2(i) - 8*TN2(i-1))/(3*dx)
-          dTdx_e = (TN2(i+1) - TN2(i))/dx
-          dTdt   = alpha2*(dTdx_e - dTdx_w)/dx + C2(i)
-          phi2(i) = TN2(i) + dTdt*dt
-       elseif (boundary_type == 2) then
-          print *, 'not implemented here!'
-          stop
-       elseif (boundary_type == 3) then
-          dTdx_w = qw1
-          dTdx_e = (TN1(i+1) - TN1(i))/dx
-          dTdt   = alpha1*(dTdx_e - dTdx_w)/dx + C1(i)
-          phi1(i) = TN1(i) + dTdt*dt
-
-          dTdx_w = qw2
-          dTdx_e = (TN2(i+1) - TN2(i))/dx
-          dTdt   = alpha2*(dTdx_e - dTdx_w)/dx + C2(i)
-          phi2(i) = TN2(i) + dTdt*dt
-       end if
+!!$       dTdx_w = (-TGF_old(i+1) + 9*TGF_old(i) - 8*TGF_old(i-1))/(3*dx)
+!!$       dTdx_e = (TGF_old(i+1) - TGF_old(i))/dx
+!!$       dTdt   = alpha_TGF*(dTdx_e - dTdx_w)/dx + C_TGF(i)
+!!$       TGF(i) = TGF_old(i) + dTdt*dt_TGF
+!!$
+       dTdx_w = 0.0
+       dTdx_e = (TGF_old(i+1) - TGF_old(i))/dx
+       dTdt   = alpha_TGF*(dTdx_e - dTdx_w)/dx + C_TGF(i)
+       TGF(i) = TGF_old(i) + dTdt*dt_TGF
        ! east
        i = n-1
-       if (boundary_type == 1) then
-          print *, 'not implemented here!'
-          stop
-          !dTdx_w = (TN(i) - TN(i-1))/dx
-          !dTdx_e = (8*TN(i+1) - 9*TN(i) + TN(i-1))/(3*dx)
-          !dTdt   = alpha*(dTdx_e - dTdx_w)/dx + C(i)
-          !phi(i) = TN(i) + dTdt*dt
-       elseif (boundary_type == 2) then
-          print *, 'not implemented here!'
-          stop
-          !dTdx_w = (TN(i) - TN(i-1))/dx
-          !dTdx_e = qe
-          !dTdt   = alpha*(dTdx_e - dTdx_w)/dx + C(i)
-          !phi(i) = TN(i) + dTdt*dt
-       elseif (boundary_type == 3) then
-          dTdx_w = (TN1(i) - TN1(i-1))/dx
-          dTdx_e = qe1
-          dTdt   = alpha1*(dTdx_e - dTdx_w)/dx + C1(i)
-          phi1(i) = TN1(i) + dTdt*dt
+!!$       dTdx_w = (TGF_old(i) - TGF(i-1))/dx
+!!$       dTdx_e = (8*TGF_old(i+1) - 9*TGF_old(i) + TGF_old(i-1))/(3*dx)
+!!$       dTdt   = alpha_TGF*(dTdx_e - dTdx_w)/dx + C_TGF(i)
+!!$       TGF(i) = TGF_old(i) + dTdt*dt_TGF
+!!$
+       dTdx_w = (TGF_old(i) - TGF_old(i-1))/dx
+       dTdx_e = 0.0
+       dTdt   = alpha_TGF*(dTdx_e - dTdx_w)/dx + C_TGF(i)
+       TGF(i) = TGF_old(i) + dTdt*dt_TGF
 
-          dTdx_w = (TN2(i) - TN2(i-1))/dx
-          dTdx_e = qe2
-          dTdt   = alpha2*(dTdx_e - dTdx_w)/dx + C2(i)
-          phi2(i) = TN2(i) + dTdt*dt
-       endif
-
-       time = time + dt
-       TN1 = phi1
-       TN2 = phi2       
+       maxdif_TGF = 0.0
+       do i = 2, n-1
+          dif_TGF = TGF(i) - TGF_old(i)
+          if (abs(dif_TGF) > maxdif_TGF) then
+             maxdif_TGF = abs(dif_TGF)
+          endif
+       enddo
+       TGF_old = TGF
+       i_counter = i_counter + 1
+       write(*,*), time, i_counter, maxdif_TGF
+       write(*,'(6(f10.6))'), C_TGF(100:105)
+       write(*,'(6(f10.6))'), TGF(100:105)
     end do
-    
   end subroutine update_TGF
-  
+
   subroutine SOLVE
     implicit none
     real TN1(0:n1), TN2(0:n1)
@@ -131,7 +116,7 @@ contains
        endif
 
        ! inclusion of source term
-       call update_TGF(TGF(0:n1))
+       call update_TGF()
        do i = 2, n-1
           p0(i) = 0.2 + 0.6 / (1.0 + gain1*TGF(i))
           press(i) = TN2(i) + TN1(i)
@@ -250,7 +235,7 @@ contains
     open (unit = 11, file=filename, action="write")
 
     do i=1,n
-       write(11,'(3(e16.6))') phi1(i), phi2(i), p0(i)
+       write(11,'(3(e16.6))') phi1(i), phi2(i), p0(i), TGF(i)
     end do
 
     close(11)
@@ -302,6 +287,10 @@ contains
     elseif (boundary_type == 3) then
        ! do nothing
     endif
+
+    TGF(1) = 1.0
+    TGF(n) = 1.0
+
   end SUBROUTINE BOUNDARY_COND
 
   SUBROUTINE INITIAL_COND

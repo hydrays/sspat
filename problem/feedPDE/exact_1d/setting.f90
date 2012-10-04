@@ -1,6 +1,6 @@
 module setting
   implicit none
-  integer, parameter :: nx = 128
+  integer, parameter :: nx = 256
   integer, parameter :: n = nx+2
   integer, parameter :: n1 = nx+3
   real x(0:n1)
@@ -126,20 +126,33 @@ contains
        do i = 2, n-1
           !press(i) = phi_TC_old(i) + phi_SC_old(i) + phi_MC_old(i)
           press(i) = phi_SC_old(i) + phi_MC_old(i)
-          if (press(i)>0.5) then
-             press(1:i) = press(1:i) + 0.1
+          if (press(i) > 0.65) then
+             press(1:i) = press(1:i) + 0.05
           end if
        end do
 
+!!$       do i = 2, n-1
+!!$          if (phi_MC_old(i) < tol) then
+!!$             phi_MC_old(i) = 0.0
+!!$          end if
+!!$       end do
+
        do i = 2, n-1
           p0(i) = 1.0 / (l_d + gain1*TGF(i))
-          !d(i) = max(0.0, xi*(press(i) - 1.0))
-          d(i) = xi*press(i)
-          q(i) = 1.0/press(i)
+          q(i) = 1.0/(1.0 + 2.0*press(i))
+          d(i) = max(0.0, xi*(press(i)-0.5))
           v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = (2.0*(1-p0(i)))*phi_SC_old(i) - &
-               v_tc*phi_TC_old(i) - 10.0*phi_MC_old(i)*phi_TC_old(i)
+               v_tc*phi_TC_old(i)
+          if ( time > 15 ) then
+             if ( sum(phi_MC_old(2:n-1)) > 0.1 ) then
+                !print *, time, sum(phi_MC_old(2:n-1))
+                C2(2:10) = C2(2:10) - 10.0*phi_TC_old(2:10)
+             else
+                phi_MC_old(2:n-1) = 0.0
+             end if
+          end if
           C3(i) = q(i)*v_m*(2.0*p_m-1.0)*phi_MC_old(i) - d(i)*phi_MC_old(i)
        enddo
 
@@ -277,7 +290,7 @@ contains
        !write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
        !     phi_MC(i), p0(i), TGF(i), d(i), v0(i), press(i)
        write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
-            phi_MC(i), d(i), TGF(i), &
+            phi_MC(i), d(i), q(i), &
             q(i)*v0(i)*(2.0*p0(i)-1.0)-d(i), &
             q(i)*v_m*(2.0*p_m-1.0)-d(i), press(i)
     end do

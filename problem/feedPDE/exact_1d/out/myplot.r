@@ -84,31 +84,31 @@ for (i in seq(N)) {
 z <- matrix(scan(datafile, quiet=TRUE), ncol=NumCol, byrow=TRUE)
 my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
 
-p1 <- xyplot(c(0,max(z))~c(0, max(x)),
+p1 <- xyplot(c(-1,3)~c(0, max(x)),
              type='n', xlab="", ylab="",
              scales=list(cex=2),
-             key = list(x = 0.01, y=0.99,
-             border=TRUE,
+             key = list(x = 0.4, y=0.8,
+             border=FALSE,
              lines=list(
              pch=c(1,1,1,NA,NA,NA,NA,NA),
-             col=c("red","green","black","red","blue",
-             "black","green","red","black"),
+             col=c("red","green","black","red","black",
+             "grey","green","red","black"),
              type=c("b","b","b","l","l","l","l","l","l"),
-             lty=c(1,1,1,2,2,2,2,3,3),
-             lwd=c(1,1,1,2,2,2,2,4,4)),
+             lty=c(1,1,1,2,2,3,3,3,3),
+             lwd=c(1,1,1,2,2,6,0,0,0)),
              cex = 1,
-             text = list(lab = c("SC","TC","MC","p0",
-                         "TGFb","d","v0", "v0(2p0-1)","vm(2pm-1)")),
+             text = list(lab = c("SC","TC","MC","net growth rate of SC",
+                         "net growth rate of MC","pressure","","","")),
              columns = 4,
-             title = NULL,
-             space = "top"
+             #space = ""
+             title = NULL
              ),
              panel=function(...){
                  panel.lines(x, z[,1], type='b', col='red')
                  panel.lines(x, z[,2], type='b', col='green')
                  panel.lines(x, z[,3], type='b', col='black')
-                 panel.lines(x, z[,4], type='l',
-                             lwd = 2, lty = 2, col='pink')
+                 #panel.lines(x, (z[,1] + z[,3]), type='l',
+                 #            lwd = 2, lty = 2, col='pink')
                  #panel.lines(x, z[,5], type='l',
                  #            lwd = 2, lty=2, col='blue')
                  panel.lines(x, z[,6], type='l',

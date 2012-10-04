@@ -1,15 +1,15 @@
 ! Control parameters
 &xdata
-	xlen = 10.0,
+	xlen = 20.0,
 	btype = 3,
 	Fo = 0.2,
 	tol = 5d-7,
-	alpha1 = 0.1,
+	alpha1 = 1.0,
   	alpha2 = 10.0,
   	alpha3 = 0.001,
  	alpha_TGF = 0.01,
   	gain1 = 1.5,
-  	xi = 0.5,
+  	xi = 1.0,
   	beta_prod = 0.5,
   	beta_decay = 1.0,
   	tfinal = 100.0,

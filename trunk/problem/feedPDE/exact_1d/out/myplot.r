@@ -107,8 +107,8 @@ p1 <- xyplot(c(-1,3)~c(0, max(x)),
                  panel.lines(x, z[,1], type='b', col='red')
                  panel.lines(x, z[,2], type='b', col='green')
                  panel.lines(x, z[,3], type='b', col='black')
-                 #panel.lines(x, (z[,1] + z[,3]), type='l',
-                 #            lwd = 2, lty = 2, col='pink')
+                 panel.lines(x, z[,4], type='l',
+                             lwd = 4, lty = 2, col='pink')
                  #panel.lines(x, z[,5], type='l',
                  #            lwd = 2, lty=2, col='blue')
                  panel.lines(x, z[,6], type='l',

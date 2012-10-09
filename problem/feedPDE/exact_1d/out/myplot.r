@@ -42,13 +42,13 @@ p1 <- xyplot(c(0,max(z))~c(0, max(x)),
                  panel.lines(x, z[,1], type='b', col='red')
                  panel.lines(x, z[,2], type='b', col='green')
                  panel.lines(x, z[,3], type='b', col='black')
-                 panel.lines(x, z[,4]/max(z[,4]), type='l',
+                 panel.lines(x, z[,4], type='l',
                              lwd = 2, lty = 2, col='red')
-                 panel.lines(x, z[,5]/max(z[,5]), type='l',
+                 panel.lines(x, z[,5], type='l',
                              lwd = 2, lty=2, col='blue')
-                 panel.lines(x, z[,6]/max(z[,6]), type='l',
+                 panel.lines(x, z[,6], type='l',
                              lwd = 2, lty=2, col='black')
-                 panel.lines(x, z[,7]/max(z[,7]), type='l',
+                 panel.lines(x, z[,7], type='l',
                              lwd = 2, lty=2, col='green')
                   grid.text(my.label.time,
                             y = unit(0.9, "npc"), gp=gpar(fontsize=30))
@@ -111,9 +111,9 @@ p1 <- xyplot(c(-1,3)~c(0, max(x)),
                              lwd = 4, lty = 2, col='pink')
                  #panel.lines(x, z[,5], type='l',
                  #            lwd = 2, lty=2, col='blue')
-                 panel.lines(x, z[,6]/max(z[,6]), type='l',
+                 panel.lines(x, z[,6], type='l',
                              lwd = 2, lty=2, col='red')
-                 panel.lines(x, z[,7]/max(z[,7]), type='l',
+                 panel.lines(x, z[,7], type='l',
                              lwd = 2, lty=2, col='black')
                  #panel.lines(x, z[,7]*(2*z[,4]-1), type="l",
                  #            lwd = 4, lty="dotted", col='red')

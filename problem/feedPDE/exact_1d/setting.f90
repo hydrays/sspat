@@ -133,22 +133,21 @@ contains
           press(i) = press(i)
        end do
 
-       do i = 2, n-1
-          if (phi_MC_old(i) < tol) then
-             phi_MC_old(i) = 0.0
-          end if
-       end do
+!!$       do i = 2, n-1
+!!$          if (phi_MC_old(i) < tol) then
+!!$             phi_MC_old(i) = 0.0
+!!$          end if
+!!$       end do
 
        do i = 2, n-1
           p0(i) = 1.0 / (l_d + gain1*TGF(i))
-!!$          if ( press(i) > 0.8) then
-!!$             q(i) = 0.0
-!!$          else
-!!$             q(i) = 1.0
-!!$          end if
-          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-0.8)))
+          if ( press(i) > 0.8) then
+             q(i) = 0.0
+          else
+             q(i) = 1.0
+          end if
           !q(i) = 1.0/(1.0 + 2.0*press(i))
-          d(i) = max(0.0, xi*(press(i)-0.8))
+          d(i) = max(0.0, xi*(press(i)-0.5))
           v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = (2.0*(1-p0(i)))*phi_SC_old(i) - &
@@ -156,7 +155,7 @@ contains
 !!$          if ( time > 15 ) then
 !!$             if ( sum(phi_MC_old(2:n-1)) > 0.01 ) then
 !!$                !print *, time, sum(phi_MC_old(2:n-1))
-!!$                C2(2:2) = C2(2:2) - 10.0*phi_TC_old(2:2)
+!!$                C2(2:5) = C2(2:5) - 10.0*phi_TC_old(2:5)
 !!$             else
 !!$                phi_MC_old(2:n-1) = 0.0
 !!$             end if
@@ -164,13 +163,11 @@ contains
           C3(i) = q(i)*v_m*(2.0*p_m-1.0)*phi_MC_old(i) - d(i)*phi_MC_old(i)
        enddo
 
-       if ( time > 25 ) then
-          do i = 2, n-1
-             if (phi_MC_old(i) > 0.001 ) then
-                C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
-             end if
-          end do
-       end if
+       do i = 2, n-1
+          if (phi_MC_old(i) > tol ) then
+             C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
+          end if
+       end do
 
        do i = 3, n-2
           dTdx_west = (phi_SC_old(i) - phi_SC_old(i-1))/dx
@@ -370,7 +367,7 @@ contains
        ! do nothing
     endif
 
-    TGF(n) = 1.0
+    TGF(n) = 0.2
   end SUBROUTINE BOUNDARY_COND
 
   SUBROUTINE INITIAL_COND

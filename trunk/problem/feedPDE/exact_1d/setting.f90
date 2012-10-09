@@ -102,6 +102,7 @@ contains
     time = 0.0
     tp = 0.0
     file_index = 0
+    tm = 10.0
 
     do ntimestp = 1, maxntimestp
 
@@ -132,11 +133,11 @@ contains
           press(i) = press(i)
        end do
 
-!!$       do i = 2, n-1
-!!$          if (phi_MC_old(i) < tol) then
-!!$             phi_MC_old(i) = 0.0
-!!$          end if
-!!$       end do
+       do i = 2, n-1
+          if (phi_MC_old(i) < tol) then
+             phi_MC_old(i) = 0.0
+          end if
+       end do
 
        do i = 2, n-1
           p0(i) = 1.0 / (l_d + gain1*TGF(i))
@@ -163,11 +164,13 @@ contains
           C3(i) = q(i)*v_m*(2.0*p_m-1.0)*phi_MC_old(i) - d(i)*phi_MC_old(i)
        enddo
 
-!!$       do i = 2, n-1
-!!$          if (phi_MC_old(i) > tol ) then
-!!$             C2(i) = C2(i) - 10.0*phi_MC_old(i)*phi_TC_old(i)
-!!$          end if
-!!$       end do
+       if ( time > 25 ) then
+          do i = 2, n-1
+             if (phi_MC_old(i) > 0.001 ) then
+                C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
+             end if
+          end do
+       end if
 
        do i = 3, n-2
           dTdx_west = (phi_SC_old(i) - phi_SC_old(i-1))/dx
@@ -367,7 +370,7 @@ contains
        ! do nothing
     endif
 
-    TGF(n) = 0.2
+    TGF(n) = 1.0
   end SUBROUTINE BOUNDARY_COND
 
   SUBROUTINE INITIAL_COND

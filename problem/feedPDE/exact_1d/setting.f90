@@ -102,7 +102,6 @@ contains
     time = 0.0
     tp = 0.0
     file_index = 0
-    tm = 10.0
 
     do ntimestp = 1, maxntimestp
 
@@ -164,11 +163,11 @@ contains
           C3(i) = q(i)*v_m*(2.0*p_m-1.0)*phi_MC_old(i) - d(i)*phi_MC_old(i)
        enddo
 
-       do i = 2, n-1
-          if (phi_MC_old(i) > tol ) then
-             C2(i) = C2(i) - 100.0*phi_MC_old(i)*phi_TC_old(i)
-          end if
-       end do
+!!$       do i = 2, n-1
+!!$          if (phi_MC_old(i) > tol ) then
+!!$             C2(i) = C2(i) - 10.0*phi_MC_old(i)*phi_TC_old(i)
+!!$          end if
+!!$       end do
 
        do i = 3, n-2
           dTdx_west = (phi_SC_old(i) - phi_SC_old(i-1))/dx

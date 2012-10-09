@@ -166,7 +166,7 @@ contains
 
        do i = 2, n-1
           if (phi_MC_old(i) > tol ) then
-             C2(i) = C2(i) - 100.0*phi_MC_old(i)*phi_TC_old(i)
+             C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
           end if
        end do
 

@@ -1,6 +1,6 @@
 module setting
   implicit none
-  integer, parameter :: nx = 128
+  integer, parameter :: nx = 300
   integer, parameter :: n = nx+2
   integer, parameter :: n1 = nx+3
   real x(0:n1)
@@ -8,6 +8,7 @@ module setting
   real C1(0:n1), C2(0:n1), C3(0:n1)
   real p0(0:n1), v0(0:n1)
   real press(0:n1)
+  real p0_press(0:n1)
   real q(0:n1)
   real d(0:n1)
   real TGF(0:n1)
@@ -140,19 +141,39 @@ contains
 !!$       end do
 
        do i = 2, n-1
-          p0(i) = 1.0 / (l_d + gain1*TGF(i))
-!!$          if ( press(i) > 0.8) then
+          !p0(i) = 1.0 / (l_d + (gain1*TGF(i)))
+          p0(i) = exp(-0.3*TGF(i))
+!!$          if ( p0(i) .le. 0.9 .and. p0(i) > 0.5 .and. time > 120) then
+!!$             p0(i) = 0.9! + min(0.4, (p0(i) - 0.6)*1.5)
+!!$          end if
+!!$          !p0(i) = min(0.99, p0(i))
+!!$          p0_press(i) = p0(i)
+!!$          if ( time > 100 .and. press(i) > 0.9 ) then
+!!$             !p0(i) = max(0.99, p0(i))
+!!$             !p0(i) = p0(i) + &
+!!$             !     0.4*exp(10.0*(press(i)-1.0))/(1.0+exp(10.0*(press(i)-1.0)))
+!!$             p0_press(i) = p0_press(i) + ((press(i) - 0.9))**1.0
+!!$             p0_press(i) = min(1.0, p0_press(i))
+!!$          end if
+!!$          
+!!$          if ( TGF(i) < 1.15 ) then
+!!$             p0(i) = p0_press(i)
+!!$          end if
+          !p0(i) = 1.0 / (l_d + gain1*TGF(i)**2)
+          !p0(i) = exp(-gain1*TGF(i))
+!!$          q(i) = 1.0
+!!$          if ( press(i) > 1.1 .and. time > 125) then
 !!$             q(i) = 0.0
 !!$          else
 !!$             q(i) = 1.0
 !!$          end if
-          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-0.8)))
+          q(i) = 1.0 / (1.0 + exp(1000.0*(press(i) - 1.1)))
           !q(i) = 1.0/(1.0 + 2.0*press(i))
-          d(i) = max(0.0, xi*(press(i)-0.8))
-          v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
+          d(i) = max(0.01, xi*(press(i)- 1.0))
+          v0(i) = 1.0 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = (2.0*(1-p0(i)))*phi_SC_old(i) - &
-               v_tc*phi_TC_old(i)
+               v_tc*phi_TC_old(i)! - d(i)*phi_TC_old(i)
 !!$          if ( time > 15 ) then
 !!$             if ( sum(phi_MC_old(2:n-1)) > 0.01 ) then
 !!$                !print *, time, sum(phi_MC_old(2:n-1))
@@ -164,11 +185,13 @@ contains
           C3(i) = q(i)*v_m*(2.0*p_m-1.0)*phi_MC_old(i) - d(i)*phi_MC_old(i)
        enddo
 
-       do i = 2, n-1
-          if (phi_MC_old(i) > tol ) then
-             C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
-          end if
-       end do
+!!$       if (time>120) then
+!!$       do i = 2, n-1
+!!$          if (phi_MC_old(i) > 0.01 ) then
+!!$             C2(i) = C2(i) - 100*phi_MC_old(i)*phi_TC_old(i)
+!!$          end if
+!!$       end do
+!!$       end if
 
        do i = 3, n-2
           dTdx_west = (phi_SC_old(i) - phi_SC_old(i-1))/dx
@@ -304,9 +327,12 @@ contains
        !write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
        !     phi_MC(i), p0(i), TGF(i), d(i), v0(i), press(i)
        write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
-            phi_MC(i), TGF(i), q(i), &
+            phi_MC(i), TGF(i), p0(i), &
             q(i)*v0(i)*(2.0*p0(i)-1.0)-d(i), &
             q(i)*v_m*(2.0*p_m-1.0)-d(i), press(i)
+
+       !q(i)*v0(i), &
+       !q(i)*v_m, press(i)
     end do
 
     close(11)
@@ -368,7 +394,7 @@ contains
        ! do nothing
     endif
 
-    TGF(n) = 0.2
+    TGF(n) = 1.0
   end SUBROUTINE BOUNDARY_COND
 
   SUBROUTINE INITIAL_COND
@@ -377,8 +403,8 @@ contains
     ! defining the initial conditions
     ! dsin(pi*x/xlen)
     do i = 1, n
-       phi_SC(i) = 0.1 + 0.05*sin(x(i))
-       phi_TC(i) = 1.0
+       phi_SC(i) = 0.6
+       phi_TC(i) = 3.0
        phi_MC(i) = 0.0
     enddo
   end SUBROUTINE INITIAL_COND

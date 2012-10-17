@@ -10,7 +10,7 @@ H <- parainfo$VALUE[parainfo$PARAMETER=='H']
 .divide <- which(parainfo$PARAMETER=='useomp')
 ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
-  
+
 N = 200
 pL = 600
 pH = 100
@@ -38,7 +38,7 @@ p1 <- levelplot(z, col.regions=jet.colors,
                                    date(), " ) # ------"),
                             x = unit(0.01, "npc"), y = unit(0.8, "npc"),
                             just="left",
-                            gp=gpar(fontsize=20) )                  
+                            gp=gpar(fontsize=20) )
                   for ( j in seq(nrow(parainfo)) ){
                     grid.text(paste("# ", parainfo[j,1], " = ", parainfo[j,2]),
                               just="left",
@@ -51,7 +51,7 @@ p1 <- levelplot(z, col.regions=jet.colors,
                     grid.text("------ # OMP in use! # ------",
                               x = unit(0.7, "npc"), y = unit(0.8, "npc"),
                               just="left",
-                              gp=gpar(fontsize=20) )                  
+                              gp=gpar(fontsize=20) )
                     for ( j in seq(nrow(ompinfo)) ){
                       grid.text(paste("# ", ompinfo[j,1], " = ", ompinfo[j,2]),
                                 just="left",
@@ -84,7 +84,7 @@ for (i in seq(N)) {
                         y = unit(0.9, "npc"), gp=gpar(fontsize=30))
             },
             scales=list(cex=2))
-  
+
   print(p1)
 
   ## print(p2)
@@ -94,7 +94,7 @@ for (i in seq(N)) {
   ## --------------
   ## draw the customized legend
   ## --------------
-  ## .xleft <- 
+  ## .xleft <-
   output.str1 <- sprintf("%5d", i)
   if (i > 1) cat("\b\b\b\b\b")
   cat(output.str1)

@@ -102,7 +102,6 @@ contains
     time = 0.0
     tp = 0.0
     file_index = 0
-    tm = 10.0
 
     do ntimestp = 1, maxntimestp
 
@@ -140,7 +139,7 @@ contains
 !!$       end do
 
        do i = 2, n-1
-          p0(i) = 1.0 / (l_d + gain1*TGF(i))
+          p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.0)
 !!$          if ( press(i) > 0.8) then
 !!$             q(i) = 0.0
 !!$          else
@@ -165,7 +164,7 @@ contains
        enddo
 
        do i = 2, n-1
-          if (phi_MC_old(i) > tol ) then
+          if (time > 120.0) then
              C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
           end if
        end do
@@ -304,9 +303,9 @@ contains
        !write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
        !     phi_MC(i), p0(i), TGF(i), d(i), v0(i), press(i)
        write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
-            phi_MC(i), TGF(i), q(i), &
-            q(i)*v0(i)*(2.0*p0(i)-1.0)-d(i), &
-            q(i)*v_m*(2.0*p_m-1.0)-d(i), press(i)
+            phi_MC(i), TGF(i), d(i), &
+            q(i)*v0(i)*(2.0*p0(i)-1.0), &
+            q(i)*v_m*(2.0*p_m-1.0), press(i)
     end do
 
     close(11)

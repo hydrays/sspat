@@ -1,0 +1,129 @@
+\documentclass[12pt]{article}
+\usepackage{graphicx}
+\usepackage{amscd}
+\usepackage{amssymb}
+\usepackage{mathrsfs}
+\usepackage{amsfonts}
+\usepackage{mathtools}
+\usepackage{subfigure}
+
+\newcommand{\bfmath}[1]{{\mathchoice
+    {\mbox{\boldmath$\displaystyle#1$}}
+    {\mbox{\boldmath$\textstyle#1$}}
+    {\mbox{\boldmath$\scriptstyle#1$}}
+    {\mbox{\boldmath$\scriptscriptstyle#1$}}}}
+\usepackage[T1]{fontenc}
+\usepackage[latin1]{inputenc}
+\usepackage[a4paper]{geometry}
+%\usepackage{lmodern}
+\usepackage[english]{babel}
+\newcommand{\xb}{\bfmath{x}}
+\newcommand{\Xb}{\bfmath{X}}
+
+\newtheorem{model}{Model}
+
+%double line
+\renewcommand{\baselinestretch}{1.5}
+
+\begin{document}
+\title{Feedback Regulation in 1D-PDE}
+\maketitle
+
+\section{Model}
+
+Reaction-diffusion equation for the concentration 
+of SC ($\phi_0(x)$), TC ($\phi_1(x)$) and MC ($\phi_m(x)$).
+\begin{eqnarray*}
+\frac{\partial \phi_0}{\partial t} &=&
+D_0 \frac{\partial^2 \phi_0}{\partial x^2} + S_0, \\
+\frac{\partial \phi_1}{\partial t} &=&
+D_1 \frac{\partial^2 \phi_1}{\partial x^2} + S_1, \\
+\frac{\partial \phi_m}{\partial t} &=&
+D_m \frac{\partial^2 \phi_m}{\partial x^2} + S_m, \\
+\frac{\partial \phi}{\partial x}|_{0, L} &=& 0.
+\end{eqnarray*}
+The source terms are
+\begin{eqnarray*}
+S_0 &=& q v_0 (2p_0 - 1) \phi_0 - d \phi_0, \\
+S_1 &=& q v_0 2(1 - p_0) \phi_0 - a \phi_1, \\
+S_m &=& q v_m (2p_m - 1) \phi_m - d \phi_m.
+\end{eqnarray*}
+The feedback from TC to SC is via TGF ($c(x)$),
+which is in quasi-steady state given by
+$$
+0 = D_c \frac{\partial^2 c}{\partial x^2} + 
+\alpha \phi_1 - \beta c, \frac{\partial c}{\partial x}|_{x=0} = 0, 
+\frac{\partial c}{\partial x}|_{x=L} = 0.2.
+$$
+where $\alpha$ is the production rate of TGF by TC and
+$\beta$ is the auto-decay rate of TGF.
+Given $c(x)$, $p_0$ and $v_0$ is determined by
+\begin{eqnarray*}
+p_0 &=& 1 / (1.01 + k_1 c), \\
+v_0 &=& v_0^{max} / (1 + k_2 c).
+\end{eqnarray*}
+Now we define the pressure as
+$$
+\eta = \phi_0 + \phi_m.
+$$
+This pressure effect the overall death rate $d$ 
+and the division rate $q$ by
+\begin{eqnarray*}
+d &=& \max \{0, \xi (\eta - \eta_0)\}, \\
+q &=& 1 / (1 + e^{\gamma (\eta - \eta_0)} ).
+\end{eqnarray*}
+
+\section{Numerical experiments}
+\noindent\textbf{Design principle}\\
+The source term of SC and MC are controlled by $q$ and $d$ by
+$$
+S = q v_0 (2p_0 - 1) \phi - d \phi.
+$$
+Since MC is always advantageous than SC at the same location,
+we choose $q$ to be almost zero around MC region.
+Thus the MC get killed while the SC can be supplied by the 
+diffusion of remote SCs. See Fig.~1.
+
+\begin{figure}
+\includegraphics[width=\textwidth]{fig1.eps}
+\end{figure}
+
+\noindent\textbf{Current status}\\
+See movie 1.
+
+At time 100 we introduce a small amount of MC on the left-hand-side
+boundary and let it grow for a while. At time 120 we give
+an extra decay term on TC, so the source term for $\phi_1$ now is
+$$
+S_1 = qv_02(1-p_0)\phi_0 - d\phi_0 - 100\phi_m.
+$$
+
+Because the MC is more advantageous than SC in region B, in 
+the continous model a tiny amount of MC can spread via diffusion
+to B and proliferate there, causing the ``tunnelling effect''.
+So we modify $\phi_m$ by setting $\phi_m = 0$ when its value
+is below a certain threshold, say $tol = 10^{-7}$.
+
+Now we have movie 2.
+
+\noindent\textbf{On-going study}\\
+From here, we have been trying to remove the extra source term
+in $S_1$, i.e., not assuming MC consumes TC. It seems the shape
+of TC (or TGF) around the mutation site is important 
+(as it controls $v_0$ and $p_0$).
+
+\begin{itemize}
+\item
+The first experiment is to reduce the coefficient
+in $100\phi_m$. If it is too small, the MC will begin
+to spread. 
+
+\item
+We tried to make $p_0$ and $v_0$ to be more sensitive 
+to TGF. For example, using higher exponential terms in
+the Hill's function. But doing that may leads to instability issues.
+See movie 3.
+\end{itemize} 
+
+
+\end{document}

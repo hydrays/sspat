@@ -142,7 +142,8 @@ contains
 
        do i = 2, n-1
           !p0(i) = 1.0 / (l_d + (gain1*TGF(i)))
-          p0(i) = exp(-0.3*TGF(i))
+          p0(i) = exp(-0.5*(TGF(i)-1.0))
+          p0(i) = min(0.99, p0(i))
 !!$          if ( p0(i) .le. 0.9 .and. p0(i) > 0.5 .and. time > 120) then
 !!$             p0(i) = 0.9! + min(0.4, (p0(i) - 0.6)*1.5)
 !!$          end if
@@ -161,19 +162,20 @@ contains
 !!$          end if
           !p0(i) = 1.0 / (l_d + gain1*TGF(i)**2)
           !p0(i) = exp(-gain1*TGF(i))
-!!$          q(i) = 1.0
-!!$          if ( press(i) > 1.1 .and. time > 125) then
-!!$             q(i) = 0.0
-!!$          else
-!!$             q(i) = 1.0
-!!$          end if
-          q(i) = 1.0 / (1.0 + exp(1000.0*(press(i) - 1.1)))
+          q(i) = 1.0
+          if ( press(i) > 1.2 .and. time > 0) then
+             q(i) = 0.0
+          else
+             q(i) = 1.0
+          end if
+          !q(i) = 1.0 / (1.0 + exp(1000.0*(press(i) - 1.1)))
           !q(i) = 1.0/(1.0 + 2.0*press(i))
           d(i) = max(0.01, xi*(press(i)- 1.0))
-          v0(i) = 1.0 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
+          !v0(i) = 1.0 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
+          v0(i) = 1.0
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = (2.0*(1-p0(i)))*phi_SC_old(i) - &
-               v_tc*phi_TC_old(i)! - d(i)*phi_TC_old(i)
+               v_tc*phi_TC_old(i) - d(i)*phi_TC_old(i)
 !!$          if ( time > 15 ) then
 !!$             if ( sum(phi_MC_old(2:n-1)) > 0.01 ) then
 !!$                !print *, time, sum(phi_MC_old(2:n-1))

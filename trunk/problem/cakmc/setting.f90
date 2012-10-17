@@ -36,7 +36,7 @@ contains
     open(8, file="control.txt", status='OLD', recl=80, delim='APOSTROPHE')
     read(8, nml=xdata)
     read(8, nml=xdataomp)
-    
+
     bd10 = 10.0/real(brange)
 
     write(*, *), 'Control parameters...'
@@ -54,7 +54,7 @@ contains
     write(*, '(a20, f10.2)'), 'prelax = ', prelax
     write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
     write(*, '(a20, f10.2)'), 'tm = ', tm
-    
+
     if (useomp.eq.1) then
        write(*, '(a)'), 'OpenMP parallel in use!'
        write(*, '(a20, I10)'), 'is64bit = ', is64bit
@@ -305,7 +305,7 @@ contains
              else
                 ! SC -> 2TAC
                 cmat(i,j)%type = 2
-                cmat(i,j+1) = cmat(i,j) 
+                cmat(i,j+1) = cmat(i,j)
              end if
              npack(i) = npack(i) + 1
           else if ( cmat(i,j)%type .eq. 2 ) then
@@ -546,7 +546,7 @@ contains
              else
                 ! SC -> 2TAC
                 cmat(i,j)%type = 2
-                cmat(i,j+1) = cmat(i,j) 
+                cmat(i,j+1) = cmat(i,j)
              end if
              npack(i) = npack(i) + 1
           else if ( cmat(i,j)%type .eq. 2 ) then

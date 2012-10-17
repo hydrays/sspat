@@ -1,7 +1,7 @@
 ! Control parameters
 &xdata
-	L = 2000,
-	H = 200,
+	L = 600,
+	H = 100,
 	brange = 8,
 	tend = 1000.0,
   	p1 = 0.3,
@@ -17,7 +17,7 @@
 /
 
 &xdataomp
-	useomp = 1,
+	useomp = 0,
 	is64bit = 0,
 	timestep = 0.01,
 	npar = 4

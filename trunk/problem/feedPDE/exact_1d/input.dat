@@ -1,24 +1,8 @@
-! Control parameters
-&xdata
-	xlen = 80.0,
-	btype = 3,
-	Fo = 0.2,
-	tol = 5d-7,
-	alpha1 = 1.0,
-  	alpha2 = 10.0,
-  	alpha3 = 0.000001,
- 	alpha_TGF = 0.1,
-  	gain1 = 0.5,
-  	xi = 0.2,
-  	beta_prod = 1.0,
-  	beta_decay = 1.0,
-  	tfinal = 400.0,
-  	tpinc = 5.0,
-  	v0max = 1,
-  	v0min = 0.5,
-	tm = 100.0,
-	v_tc = 0.4,
-	v_m = 1.0,
-	p_m = 1.0,
-	l_d = 1.01
-/
+	10d0   ! alx		!actual length of domain in the X-direction
+	3     ! boundary_type	! flag for type of boundary conditions -(1-dirich: all  2-dirich:west,neuman:east)
+	1d-1  ! alpha1           ! thermal diffusivity
+	1d0    ! alpha2           ! thermal diffusivity
+	2d-1  ! Fo              ! value of grid Fourier number (reduce the value of Fo if solution diverges)
+	5d-7  ! tolstdy
+	1d2   ! tfinal
+	1.0     ! tpinc

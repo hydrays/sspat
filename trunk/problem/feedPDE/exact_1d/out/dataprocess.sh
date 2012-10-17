@@ -4,7 +4,7 @@ echo
 
 rm slice*.png
 
-OF=movie-$(date +%d%m%y-%H%M).mp4
+OF=movie-$(date +%d%m%y-%k).mp4
 
 R CMD BATCH --slave myplot.r /dev/tty
 

@@ -1,7 +1,9 @@
 program FTCS1
   use setting
   implicit none
-  call read_xdata()
+  open(unit=11,file='input.dat',status='unknown')
+  CALL READ_IN          ! read-in data
+  close (unit=11)
 
   CALL GRID             ! setting up the grid points in the domain
 
@@ -10,6 +12,8 @@ program FTCS1
   CALL BOUNDARY_COND    ! setting up boundary values
 
   CALL SOLVE            ! setting up system of equations
+
+  CALL WRITE_OUT     ! write-out the basic data used for computation
 
 end program FTCS1
 

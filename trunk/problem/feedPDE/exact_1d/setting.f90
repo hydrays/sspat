@@ -1,6 +1,6 @@
 module setting
   implicit none
-  integer, parameter :: nx = 256
+  integer, parameter :: nx = 128
   integer, parameter :: n = nx+2
   integer, parameter :: n1 = nx+3
   real x(0:n1)
@@ -113,7 +113,7 @@ contains
        endif
 
        if (time .ge. tm) then
-          phi_MC_old(nx/2) = 0.01
+          phi_MC_old(2) = 0.01
           tm = tm + tfinal
           !write(*,*), 'mutation time'
           !read(*,*)
@@ -122,8 +122,14 @@ contains
        ! inclusion of source term
        call update_TGF()
 
-       do i = 1, n
+       do i = 2, n-1
+          !press(i) = phi_TC_old(i) + phi_SC_old(i) + phi_MC_old(i)
           press(i) = phi_SC_old(i) + phi_MC_old(i)
+!!$          if (press(i) > 0.65) then
+!!$             press(1:i) = press(1:i) + 0.05
+!!$          end if
+          !press(i) = press(i) / (1.0 - 0.1*press(i))
+          press(i) = press(i)
        end do
 
 !!$       do i = 2, n-1
@@ -139,25 +145,33 @@ contains
 !!$          else
 !!$             q(i) = 1.0
 !!$          end if
-          q(i) = 1.0 / (1.0 + exp(1000.0*(press(i)-0.7)))
+          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-0.8)))
           !q(i) = 1.0/(1.0 + 2.0*press(i))
-          d(i) = max(0.1, xi*(press(i)-0.5))
+          d(i) = max(0.0, xi*(press(i)-0.8))
           v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = (2.0*(1-p0(i)))*phi_SC_old(i) - &
                v_tc*phi_TC_old(i)
+!!$          if ( time > 15 ) then
+!!$             if ( sum(phi_MC_old(2:n-1)) > 0.01 ) then
+!!$                !print *, time, sum(phi_MC_old(2:n-1))
+!!$                C2(2:2) = C2(2:2) - 10.0*phi_TC_old(2:2)
+!!$             else
+!!$                phi_MC_old(2:n-1) = 0.0
+!!$             end if
+!!$          end if
           C3(i) = q(i)*v_m*(2.0*p_m-1.0)*phi_MC_old(i) - d(i)*phi_MC_old(i)
        enddo
 
-!!$       do i = 2, n-1
-!!$          if (time > 120.0) then
-!!$             C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
-!!$          end if
-!!$       end do
+       do i = 2, n-1
+          if (time > 120.0) then
+             C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
+          end if
+       end do
 
        do i = 3, n-2
-          dTdx_west = .5*(phi_SC_old(i) + phi_SC_old(i-1))*(press(i) - press(i-1))/dx
-          dTdx_east = .5*(phi_SC_old(i+1) + phi_SC_old(i))*(press(i+1) - press(i))/dx  
+          dTdx_west = (phi_SC_old(i) - phi_SC_old(i-1))/dx
+          dTdx_east = (phi_SC_old(i+1) - phi_SC_old(i))/dx
           dTdt      = alpha1*(dTdx_east - dTdx_west)/dx + C1(i)
           phi_SC(i)    = phi_SC_old(i) + dTdt*dt
 
@@ -166,8 +180,8 @@ contains
           dTdt      = alpha2*(dTdx_east - dTdx_west)/dx + C2(i)
           phi_TC(i)    = phi_TC_old(i) + dTdt*dt
 
-          dTdx_west = .5*(phi_MC_old(i) + phi_MC_old(i-1))*(press(i) - press(i-1))/dx
-          dTdx_east = .5*(phi_MC_old(i+1) + phi_MC_old(i))*(press(i+1) - press(i))/dx
+          dTdx_west = (phi_MC_old(i) - phi_MC_old(i-1))/dx
+          dTdx_east = (phi_MC_old(i+1) - phi_MC_old(i))/dx
           dTdt      = alpha3*(dTdx_east - dTdx_west)/dx + C3(i)
           phi_MC(i)    = phi_MC_old(i) + dTdt*dt
        enddo
@@ -193,7 +207,7 @@ contains
           stop
        elseif (btype == 3) then
           dTdx_w = qw1
-          dTdx_e = .5*(phi_SC_old(i+1) + phi_SC_old(i))*(press(i+1) - press(i))/dx
+          dTdx_e = (phi_SC_old(i+1) - phi_SC_old(i))/dx
           dTdt   = alpha1*(dTdx_e - dTdx_w)/dx + C1(i)
           phi_SC(i) = phi_SC_old(i) + dTdt*dt
 
@@ -203,7 +217,7 @@ contains
           phi_TC(i) = phi_TC_old(i) + dTdt*dt
 
           dTdx_w = qw3
-          dTdx_e = .5*(phi_MC_old(i+1) + phi_MC_old(i))*(press(i+1) - press(i))/dx
+          dTdx_e = (phi_MC_old(i+1) - phi_MC_old(i))/dx
           dTdt   = alpha3*(dTdx_e - dTdx_w)/dx + C3(i)
           phi_MC(i) = phi_MC_old(i) + dTdt*dt
        end if
@@ -224,7 +238,7 @@ contains
           !dTdt   = alpha*(dTdx_e - dTdx_w)/dx + C(i)
           !phi(i) = TN(i) + dTdt*dt
        elseif (btype == 3) then
-          dTdx_w = .5*(phi_SC_old(i) + phi_SC_old(i-1))*(press(i) - press(i-1))/dx
+          dTdx_w = (phi_SC_old(i) - phi_SC_old(i-1))/dx
           dTdx_e = qe1
           dTdt   = alpha1*(dTdx_e - dTdx_w)/dx + C1(i)
           phi_SC(i) = phi_SC_old(i) + dTdt*dt
@@ -234,7 +248,7 @@ contains
           dTdt   = alpha2*(dTdx_e - dTdx_w)/dx + C2(i)
           phi_TC(i) = phi_TC_old(i) + dTdt*dt
 
-          dTdx_w = .5*(phi_MC_old(i) + phi_MC_old(i-1))*(press(i) - press(i-1))/dx
+          dTdx_w = (phi_MC_old(i) - phi_MC_old(i-1))/dx
           dTdx_e = qe3
           dTdt   = alpha3*(dTdx_e - dTdx_w)/dx + C3(i)
           phi_MC(i) = phi_MC_old(i) + dTdt*dt
@@ -270,6 +284,7 @@ contains
           phi_MC(1) = (9*phi_MC(2) - phi_MC(3) + 3*qw3*dx) /8d0
           phi_MC(n) = (9*phi_MC(n-1) - phi_MC(n-2) + 3*qe3*dx) /8d0
        endif
+
     end do
 
   end subroutine SOLVE
@@ -289,8 +304,8 @@ contains
        !     phi_MC(i), p0(i), TGF(i), d(i), v0(i), press(i)
        write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
             phi_MC(i), TGF(i), d(i), &
-            q(i)*v0(i)*(2.0*p0(i)-1.0) - d(i), &
-            q(i)*v_m*(2.0*p_m-1.0) - d(i), press(i)
+            q(i)*v0(i)*(2.0*p0(i)-1.0), &
+            q(i)*v_m*(2.0*p_m-1.0), press(i)
     end do
 
     close(11)

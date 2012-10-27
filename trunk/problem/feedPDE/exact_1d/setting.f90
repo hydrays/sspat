@@ -142,15 +142,16 @@ contains
        end do
 
        do i = 2, n-1
-          p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.0)
+          p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.8)
+          !p0(i) = 1.1*(p0(i)-0.5)
 !!$          if ( press(i) > 0.8) then
 !!$             q(i) = 0.0
 !!$          else
 !!$             q(i) = 1.0
 !!$          end if
-          q(i) = 1.0 / (1.0 + exp(1000.0*(press(i)-0.3)))
+          q(i) = 1.0 / (1.0 + exp(1000.0*(press(i)-0.36)))
           !q(i) = 1.0/(1.0 + 2.0*press(i))
-          d(i) = max(0.0, xi*(press(i)-0.2))
+          d(i) = max(0.001, xi*(press(i)-0.3))
           v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = (2.0*(1-p0(i)))*phi_SC_old(i) - &
@@ -306,9 +307,9 @@ contains
        !write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
        !     phi_MC(i), p0(i), TGF(i), d(i), v0(i), press(i)
        write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
-            phi_MC(i), TGF(i), d(i), &
-            q(i)*v0(i)*(2.0*p0(i)-1.0), &
-            q(i)*v_m*(2.0*p_m-1.0), press(i)
+            phi_MC(i), TGF(i), p0(i), &
+            q(i)*v0(i)*(2.0*p0(i)-1.0) - d(i), &
+            q(i)*v_m*(2.0*p_m-1.0) - d(i), press(i)
     end do
 
     close(11)

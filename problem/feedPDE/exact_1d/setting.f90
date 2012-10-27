@@ -132,13 +132,14 @@ contains
 !!$          end if
           !press(i) = press(i) / (1.0 - 0.1*press(i))
           press(i) = press(i)
+
        end do
 
-!!$       do i = 2, n-1
-!!$          if (phi_MC_old(i) < tol) then
-!!$             phi_MC_old(i) = 0.0
-!!$          end if
-!!$       end do
+       do i = 2, n-1
+          if (phi_MC_old(i) < tol) then
+             phi_MC_old(i) = 0.0
+          end if
+       end do
 
        do i = 2, n-1
           p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.0)

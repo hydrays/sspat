@@ -3,7 +3,7 @@
 	xlen = 40.0,
 	btype = 3,
 	Fo = 0.2,
-	tol = 5d-7,
+	tol = 5d-10,
 	alpha1 = 0.001,
   	alpha2 = 1.0,
   	alpha3 = 0.000001,

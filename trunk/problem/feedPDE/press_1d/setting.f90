@@ -4,7 +4,7 @@ module setting
   integer, parameter :: n = nx+2
   integer, parameter :: n1 = nx+3
   real x(0:n1)
-  real phi_SC(0:n1), phi_TC(0:n1), phi_MC(0:n1)
+  real phi_SC(0:n1), phi_PC(0:n1), phi_TC(0:n1)
   real C1(0:n1), C2(0:n1), C3(0:n1)
   real p0(0:n1), v0(0:n1)
   real press(0:n1)

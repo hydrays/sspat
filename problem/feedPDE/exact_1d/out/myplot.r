@@ -109,8 +109,8 @@ for (i in seq(N)) {
                    panel.lines(x, z[,3], type='b', col='black')
                    panel.lines(x, z[,4], type='l',
                                lwd = 4, lty = 2, col='pink')
-                   #panel.lines(x, z[,5], type='l',
-                   #            lwd = 1, lty=1, col='blue')
+                   panel.lines(x, z[,5], type='l',
+                               lwd = 1, lty=1, col='blue')
                    panel.lines(x, z[,6], type='l',
                                lwd = 2, lty=2, col='red')
                    panel.lines(x, z[,7], type='l',

@@ -12,7 +12,7 @@ N = 20000
 .pwidth = 1024
 .pheight = 768
 
-NumCol <- 8
+NumCol <- 9
 cat("processing file ...[",N,"]\n")
 i <- 0
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
@@ -117,6 +117,8 @@ for (i in seq(N)) {
                                lwd = 2, lty=2, col='black')
                    panel.lines(x, z[,8], type="l",
                                lwd = 6, lty="dotted", col='grey')
+                   panel.lines(x, z[,9], type="l",
+                               lwd = 2, lty="dotted", col='green')
                    grid.text(my.label.time,
                              y = unit(0.9, "npc"), gp=gpar(fontsize=30))
                }

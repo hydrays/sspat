@@ -70,7 +70,7 @@ mcell2 <- as.matrix(read.csv('data/day8fast.csv'))
 ## Plot the fit
 ## -----------------------------------
 
-Nsample = 10000
+Nsample = 50
 T = 8
 r1 = 0
 r2 = 0.652

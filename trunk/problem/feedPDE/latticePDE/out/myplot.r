@@ -12,7 +12,7 @@ N = 20000
 .pwidth = 1024
 .pheight = 768
 
-NumCol <- 8
+NumCol <- 5
 cat("processing file ...[",N,"]\n")
 i <- 0
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
@@ -40,10 +40,10 @@ p1 <- xyplot(c(0,max(z))~c(0, max(x)),
              ),
              panel=function(...){
                  panel.lines(x, z[,1], type='b', col='red')
-                 panel.lines(x, z[,2], type='b', col='green')
-                 panel.lines(x, z[,3], type='b', col='black')
+                 panel.lines(x, z[,2], type='b', col='blue')
+                 panel.lines(x, z[,3], type='b', col='green')
                  panel.lines(x, z[,4], type='l',
-                             lwd = 2, lty = 2, col='red')
+                             lwd = 2, lty = 2, col='black')
                  panel.lines(x, z[,5], type='l',
                              lwd = 2, lty=2, col='blue')
                  panel.lines(x, z[,6], type='l',
@@ -84,7 +84,7 @@ for (i in seq(N)) {
 z <- matrix(scan(datafile, quiet=TRUE), ncol=NumCol, byrow=TRUE)
 my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
 
-p1 <- xyplot(c(-1,3)~c(0, max(x)),
+p1 <- xyplot(c(0,max(z))~c(0, max(x)),
              type='n', xlab="", ylab="",
              scales=list(cex=2),
              key = list(x = 0.4, y=0.8,
@@ -109,18 +109,18 @@ p1 <- xyplot(c(-1,3)~c(0, max(x)),
                  panel.lines(x, z[,3], type='b', col='black')
                  panel.lines(x, z[,4], type='l',
                              lwd = 4, lty = 2, col='pink')
-                 #panel.lines(x, z[,5], type='l',
-                 #            lwd = 1, lty=1, col='blue')
-                 panel.lines(x, z[,6], type='l',
-                             lwd = 2, lty=2, col='red')
-                 panel.lines(x, z[,7], type='l',
-                             lwd = 2, lty=2, col='black')
+                 panel.lines(x, z[,5], type='l',
+                             lwd = 1, lty=1, col='blue')
+                 #panel.lines(x, z[,6], type='l',
+                 #            lwd = 2, lty=2, col='red')
+                 #panel.lines(x, z[,7], type='l',
+                 #            lwd = 2, lty=2, col='black')
                  #panel.lines(x, z[,7]*(2*z[,4]-1), type="l",
                  #            lwd = 4, lty="dotted", col='red')
                  #panel.lines(x, .vm*(2*.pm-1), type="l",
                  #            lwd = 4, lty="dotted", col='black')
-                 panel.lines(x, z[,8], type="l",
-                             lwd = 6, lty="dotted", col='grey')
+                 #panel.lines(x, z[,8], type="l",
+                 #            lwd = 6, lty="dotted", col='grey')
                   grid.text(my.label.time,
                             y = unit(0.9, "npc"), gp=gpar(fontsize=30))
              }

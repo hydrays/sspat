@@ -84,43 +84,43 @@ for (i in seq(N)) {
   z <- matrix(scan(datafile, quiet=TRUE), ncol=NumCol, byrow=TRUE)
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
 
-  p1 <- xyplot(c(0,1)~c(0, max(x)),
-               type='n', xlab="", ylab="",
-               scales=list(cex=2),
-               key = list(x = 0.8, y=0.9,
-               border=FALSE,
-               lines=list(
-               pch=c(1,1,1,NA,NA,NA,NA,NA),
-               col=c("red","green","black","red","black",
-               "grey","green","red","black"),
-               type=c("b","b","b","l","l","l","l","l","l"),
-               lty=c(1,1,1,2,2,3,3,3,3),
-               lwd=c(1,1,1,2,0,0,0,0,0)),
-               cex = 2,
-               text = list(lab = c("SC","TC","MC","TGFb",
-                           "","","","","")),
-               columns = 1,
-               #space = ""
-               title = NULL
-               ),
-               panel=function(...){
-                   panel.lines(x, z[,1], type='b', col='red')
-                   panel.lines(x, z[,2], type='b', col='green')
-                   panel.lines(x, z[,3], type='b', col='black')
-                   panel.lines(x, z[,4], type='l',
-                               lwd = 4, lty = 2, col='pink')
-                   panel.lines(x, z[,5], type='l',
-                               lwd = 1, lty=1, col='blue')
-                   panel.lines(x, z[,6], type='l',
-                               lwd = 2, lty=2, col='red')
-                   panel.lines(x, z[,7], type='l',
-                               lwd = 2, lty=2, col='black')
-                   panel.lines(x, z[,8], type="l",
-                               lwd = 6, lty="dotted", col='grey')
-                   grid.text(my.label.time,
-                             y = unit(0.9, "npc"), gp=gpar(fontsize=30))
-               }
-               )
+  ## p1 <- xyplot(c(0,2)~c(0, max(x)),
+  ##              type='n', xlab="", ylab="",
+  ##              scales=list(cex=2),
+  ##              key = list(x = 0.8, y=0.9,
+  ##              border=FALSE,
+  ##              lines=list(
+  ##              pch=c(1,1,1,NA,NA,NA,NA,NA),
+  ##              col=c("red","green","black","red","black",
+  ##              "grey","green","red","black"),
+  ##              type=c("b","b","b","l","l","l","l","l","l"),
+  ##              lty=c(1,1,1,2,2,3,3,3,3),
+  ##              lwd=c(1,1,1,2,0,0,0,0,0)),
+  ##              cex = 2,
+  ##              text = list(lab = c("SC","TC","MC","TGFb",
+  ##                          "","","","","")),
+  ##              columns = 1,
+  ##              #space = ""
+  ##              title = NULL
+  ##              ),
+  ##              panel=function(...){
+  ##                  panel.lines(x, z[,1], type='b', col='red')
+  ##                  panel.lines(x, z[,2], type='b', col='green')
+  ##                  panel.lines(x, z[,3], type='b', col='black')
+  ##                  panel.lines(x, z[,4], type='l',
+  ##                              lwd = 4, lty = 2, col='pink')
+  ##                  #panel.lines(x, z[,5], type='l',
+  ##                  #            lwd = 1, lty=1, col='blue')
+  ##                  #panel.lines(x, z[,6], type='l',
+  ##                  #            lwd = 2, lty=2, col='red')
+  ##                  #panel.lines(x, z[,7], type='l',
+  ##                  #            lwd = 2, lty=2, col='black')
+  ##                  #panel.lines(x, z[,8], type="l",
+  ##                  #            lwd = 6, lty="dotted", col='grey')
+  ##                  #grid.text(my.label.time,
+  ##                  #          y = unit(0.9, "npc"), gp=gpar(fontsize=30))
+  ##              }
+  ##              )
 
 
   ## p1 <- xyplot(c(0,2)~c(0, max(x)),

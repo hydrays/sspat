@@ -16,19 +16,101 @@
 */
 
 #include "paml.h"
+#include "eigensub.h"
 #define NS            3
 #define NGENE         1  /* required by ReadSeq, but not really in use */
 #define LSPNAME       50
 #define NCODE         4
+/*zzz*/
+#define DIM           22
 
 extern double Small_Diff;
 extern int noisy, NFunCall;
+
+/* zzz: variables from pt*/
+double mc1[]=
+{-3,0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0,-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+double mc2[]=
+{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, -3,0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 0, 1,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1,0, 0, 0, 0, 0, 0, 0, 1,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+
+double mw[]=
+{-3, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 1, -3, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 1, 0, -3, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 1, 1, -3, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 1, 0, 0, 0, -3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 1, 0, 0, 1, -3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0,
+ 0, 0, 1, 0, 1, 0, -3, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 1, 0, 1, 1, -3 , 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, -2 , 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2 , 0, 0, 1, 0, 0, 1, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -2 , 0, 0, 1, 0, 0, 1, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, -2, 0, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, -2, 0, 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, -2 , 0, 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, -2 , 0, 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, -2 , 0, 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, -2 , 0, 0,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 1,
+ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -1};
+double c1=400,c2=400,w=800;
+double Q[DIM*DIM]={0};
+
+   /* zzz */
 
 struct CommonInfo {
   char *z[3], *spname[3], outf[128], seqf[128], ratef[128], ctlf[128], fix_locusrate;
   int model, ncode, cleandata, seed, npoints, ncatBeta, UseMedianBeta, getSE;
   int ndata, ngene, seqtype, ns, ls, posG[1+1], lgene[1], *pose, npatt, readpattern;
   int *Nij, nGtree;
+  /* zzz define new variables*/
   int state;
   double *fpatt, kappa, alpha, rho, rgene[1], pi[4], piG[1][4];
   double *lnLmax, *locusrate;
@@ -40,9 +122,9 @@ double para[8];  /* theta0 theta1 tau0 tau1 qbeta */
 int debug = 0;
 
 enum {M0, M1DiscreteBeta, M2SIM3s} MODELS;
-enum {Gk, G1b, G1a} GTREES;   
+enum {G1a, G1b, G1c,G2a, G2b, G2c,G3a, G3b, G3c,G4a, G4b, G4c,G5a, G5b, G5c,G6a, G6b, G6c} GTREES;   
 char *ModelStr[3] = {"M0", "DiscreteBeta", "SIM3s"};
-char *GtreeStr[3] = {"Gk", "G1b", "G1a"};
+char *GtreeStr[18] = {"G1a", "G1b", "G1c","G2a", "G2b", "G2c","G3a", "G3b", "G3c","G4a", "G4b", "G4c","G5a", "G5b", "G5c","G6a", "G6b", "G6c"};
 
 #define REALSEQUENCE
 #include "treesub.c"
@@ -58,6 +140,7 @@ int Simulation(FILE *fout, FILE *frub, double space[]);
 
 
 FILE *fout, *frub, *frst;
+
 
 int main (int argc, char* argv[])
 {
@@ -83,19 +166,14 @@ int main (int argc, char* argv[])
   printf("3s (%s)\n", VerStr);
   fprintf(fout, "3s (%s)\n", VerStr);
   /* 
-     ReadSiteCounts(datafile); 
-  */
-#if(1)
+     ReadSiteCounts(datafile); */
+  #if(1)
   ReadSeqData(fout, com.seqf, com.ratef, com.cleandata);
   noisy = 3;
   for(i=0; i<4; i++) x[i] = 0.5+0.5*rndu();
   a=Models0123(fout, frub, frst, x, space);
-  printf("2*Dln=%f\n",a);  /*zzz*/
-
-  fprintf(fhu, "2*DlnL = %f\n", a); //zzz
-
-
-
+  printf("2*Dln=%f\n",a);
+  fprintf(fhu, "2*DlnL = %f\n", a); //
   free(com.Nij);
 #else
   Simulation(fout, frub, space);
@@ -109,6 +187,7 @@ int main (int argc, char* argv[])
 
   return 0;
 }
+
 
 
 int GetOptions (char *ctlf)
@@ -357,7 +436,7 @@ int GetPMatIM3s(double Pt[5*5], double t, double U[5*5], double V[5*5], double R
    t = y/(1-y)
    Three G trees are ordered G1c23, G1b, G1a
 */
-int ij (int i, int j, int k) /*calculate the location of P_{ij}*/
+int get_ij (int i, int j, int k) /*calculate the location of P_{ij}*/
 {
   return ((i-1)*k+j-1);
 }
@@ -367,7 +446,7 @@ double is2 (int i, double P[], int k)
   double g=0;
   int j;
   for (j=9;j<21;j++)
-    g += P[ij(i,j,k)];
+    g += P[get_ij(i,j,k)];
   return(g);
 }
 
@@ -376,21 +455,23 @@ double is3 (int i, double P[],int k)
   double g=0;
   int j;
   for (j=0;j<9;j++)
-    g += P[ij(i,j,k)];
+    g += P[get_ij(i,j,k)];
   return(g);
 }
 
 
 double lfun (double x[], int np)
 {
-  int *n, Gtree, locus, itau1, igrid, j, ixw[2], K=com.npoints, ij,dim=22;
+  int *n, Gtree, locus, itau1, igrid, i,j, ixw[2], K=com.npoints, ij;
   double theta4, theta1, theta2, theta5,tau0, tau1, taugap;
   double p, q, mbeta=-1;  /* paras in beta for tau1 under M1DiscreteBeta */
   double *xI=NULL, *wI=NULL;  /* points & weights from GaussLegendre */
   /* yup[] is y upper bound for y0 & y1 */
-  double yup[2]={1,1}, y[2], t[2], b[2], s[2], coeff, Li, lnL=0, z, t1;
+  double yup[2]={1,1}, y[2], t[2], b[2], s[2], coeff, Li, lnL=0, z, t1, f;
   double Pt[5*5], U[5*5], V[5*5], Root[5];
+  double Pt0[DIM*DIM], Pt1[DIM*DIM], Ptau1[DIM*DIM];
   double M12, c, m, a;
+  
 
   xtoy(x, para, np);
   if(!LASTROUND) para[3] = para[3]*para[2];  /* tau1 */
@@ -441,7 +522,7 @@ double lfun (double x[], int np)
       }
       else if (Gtree==G3a || Gtree==G3b || Gtree==G3c){
 	yup[1]=tau1;
-	yup[0]=INFTY; /*Ã»ÓÐ³õÖµ£¬ÐèÒª¸Äµô*/
+	yup[0]=-1; /*-1 means the up is infty*/
       }
       else if (Gtree==G4a || Gtree==G4b || Gtree==G4c){
 	yup[1]=1;
@@ -449,14 +530,14 @@ double lfun (double x[], int np)
       }
       else if (Gtree==G5a || Gtree==G5b || Gtree==G5c){
 	yup[1]=2*(tau0-tau1)/theta5;
-	yup[0]=INFTY;
+	yup[0]=-1;
       }
       else if (Gtree==G6a || Gtree==G6b || Gtree==G6c){
-	yup[1]=INFTY;
-	yup[0]=INFTY;
+	yup[1]=-1;
+	yup[0]=-1;
       }
       for(i=0;i<2;i++){
-	if(yup[i]==INFTY) yup[i]=1; /* x->x/(1+x)*/
+	if(yup[i]==-1) yup[i]=1; /* x->x/(1+x)*/
 	else yup[i]=yup[i]/(yup[i]+1);
       }
       coeff=yup[1]*yup[0]*0.25; /*(b-a)/2*(b-a)/2 */
@@ -471,64 +552,64 @@ double lfun (double x[], int np)
 	  }
 	  com.wwprior[Gtree][igrid] = coeff*wI[ixw[0]]*wI[ixw[1]]/square((1-y[0])*(1-y[1]));
 	  if(Gtree==G1a||Gtree==G1b || Gtree==G1c){
-	    Pt0=complexroots (Q,22,t[0]-t[0]*t[1]); /*ÔÚpt.cÀï£¬Ö±½ÓÓÃ¿ÉÄÜÓÐÎÊÌâ*/
-	    Pt1=complexroots (Q,22,t[0]*t[1]);
+	    complexroots (Q, Pt0, t[0]-t[0]*t[1]); /*ÔÚpt.cÀï£¬Ö±½ÓÓÃ¿ÉÄÜÓÐÎÊÌâ*/
+	    complexroots (Q, Pt1, t[0]*t[1]);
 	    if (Gtree==G1c)
-	      f=Pt1[ij(com.state,1,dim)]*2/theta1*(2/theta1*Pt0[ij(11,11,dim)]+2/theta2*Pt0[ij(11,14,dim)])
-		+Pt1[ij(com.state,2,dim)]*2/theta1*(2/theta1*Pt0[ij(20,11,dim)]+2/theta2*Pt0[ij(20,14,dim)])
-		+Pt1[ij(com.state,7,dim)]*2/theta2*(2/theta1*Pt0[ij(17,11,dim)]+2/theta2*Pt0[ij(17,14,dim)])
-		Pt1[ij(com.state,8,dim)]*2/theta2*(2/theta1*Pt0[ij(14,11,dim)]+2/theta2*Pt0[ij(14,14,dim)]);
+	      f=Pt1[get_ij(com.state,1,DIM)]*2/theta1*(2/theta1*Pt0[get_ij(11,11,DIM)]+2/theta2*Pt0[get_ij(11,14,DIM)])
+		+Pt1[get_ij(com.state,2,DIM)]*2/theta1*(2/theta1*Pt0[get_ij(20,11,DIM)]+2/theta2*Pt0[get_ij(20,14,DIM)])
+		+Pt1[get_ij(com.state,7,DIM)]*2/theta2*(2/theta1*Pt0[get_ij(17,11,DIM)]+2/theta2*Pt0[get_ij(17,14,DIM)])
+		+Pt1[get_ij(com.state,8,DIM)]*2/theta2*(2/theta1*Pt0[get_ij(14,11,DIM)]+2/theta2*Pt0[get_ij(14,14,DIM)]);
 	    else if (Gtree==G1b)
-	      f=Pt1[ij(com.state,1,dim)]*2/theta1*(2/theta1*Pt0[ij(10,10,dim)]+2/theta2*Pt0[ij(10,13,dim)])
-		+Pt1[ij(com.state,6,dim)]*2/theta1*(2/theta1*Pt0[ij(16,10,dim)]+2/theta2*Pt0[ij(16,13,dim)])
-		+Pt1[ij(com.state,3,dim)]*2/theta2*(2/theta1*Pt0[ij(19,10,dim)]+2/theta2*Pt0[ij(19,13,dim)])
-		+Pt1[ij(com.state,8,dim)]*2/theta2*(2/theta1*Pt0[ij(13,10,dim)]+2/theta2*Pt0[ij(13,13,dim)]);
+	      f=Pt1[get_ij(com.state,1,DIM)]*2/theta1*(2/theta1*Pt0[get_ij(10,10,DIM)]+2/theta2*Pt0[get_ij(10,13,DIM)])
+		+Pt1[get_ij(com.state,6,DIM)]*2/theta1*(2/theta1*Pt0[get_ij(16,10,DIM)]+2/theta2*Pt0[get_ij(16,13,DIM)])
+		+Pt1[get_ij(com.state,3,DIM)]*2/theta2*(2/theta1*Pt0[get_ij(19,10,DIM)]+2/theta2*Pt0[get_ij(19,13,DIM)])
+		+Pt1[get_ij(com.state,8,DIM)]*2/theta2*(2/theta1*Pt0[get_ij(13,10,DIM)]+2/theta2*Pt0[get_ij(13,13,DIM)]);
 	    else if (Gtree==G1a)
-	      f=Pt1[ij(com.state,1,dim)]*2/theta1*(2/theta1*Pt0[ij(10,10,dim)]+2/theta2*Pt0[ij(10,13,dim)])
-		+Pt1[ij(com.state,6,dim)]*2/theta1*(2/theta1*Pt0[ij(16,10,dim)]+2/theta2*Pt0[ij(16,13,dim)])
-		+Pt1[ij(com.state,3,dim)]*2/theta2*(2/theta1*Pt0[ij(19,10,dim)]+2/theta2*Pt0[ij(19,13,dim)])
-		+Pt1[ij(com.state,8,dim)]*2/theta2*(2/theta1*Pt0[ij(13,10,dim)]+2/theta2*Pt0[ij(13,13,dim)]);
+	      f=Pt1[get_ij(com.state,1,DIM)]*2/theta1*(2/theta1*Pt0[get_ij(10,10,DIM)]+2/theta2*Pt0[get_ij(10,13,DIM)])
+		+Pt1[get_ij(com.state,6,DIM)]*2/theta1*(2/theta1*Pt0[get_ij(16,10,DIM)]+2/theta2*Pt0[get_ij(16,13,DIM)])
+		+Pt1[get_ij(com.state,3,DIM)]*2/theta2*(2/theta1*Pt0[get_ij(19,10,DIM)]+2/theta2*Pt0[get_ij(19,13,DIM)])
+		+Pt1[get_ij(com.state,8,DIM)]*2/theta2*(2/theta1*Pt0[get_ij(13,10,DIM)]+2/theta2*Pt0[get_ij(13,13,DIM)]);
 	    b[1]=t[0]*t[1];	
 	    b[0]=t[0]-t[0]*t[1]; /*ºÃÏñ²»¶Ô*/
 	  }
 	  else if(Gtree=G2a || Gtree==G2b || Gtree==G2c || Gtree== G3a || Gtree ==G3b || Gtree ==G3c){
-	    Pt0=complexroots (Q,22,tau1-t[1]); /*ÔÚpt.cÀï£¬Ö±½ÓÓÃ¿ÉÄÜÓÐÎÊÌâ*/
-	    Pt1=complexroots (Q,22,t[1]);
+	    complexroots (Q, Pt0, tau1-t[1]); /*ÔÚpt.cÀï£¬Ö±½ÓÓÃ¿ÉÄÜÓÐÎÊÌâ*/
+	    complexroots (Q, Pt1, t[1]);
 	    if (Gtree==G2c || Gtree==G3c)
-	      f=(Pt1[ij(com.state,1,dim)] * is2(11,Pt0,dim) + Pt1[com.state,2,dim]*is2(20,Pt0,dim))*2/theta1
-		+(Pt1[ij(com.state,7,dim)] * is2(17,Pt0,dim) + Pt1[com.state,8,dim]*is2(14,Pt0,dim))*2/theta2;
+	      f=(Pt1[get_ij(com.state,1,DIM)] * is2(11,Pt0,DIM) + Pt1[com.state,2,DIM]*is2(20,Pt0,DIM))*2/theta1
+		+(Pt1[get_ij(com.state,7,DIM)] * is2(17,Pt0,DIM) + Pt1[com.state,8,DIM]*is2(14,Pt0,DIM))*2/theta2;
 	    else if (Gtree==G2b || Gtree==G3b)
-	      f=(Pt1[ij(com.state,1,dim)] * is2(10,Pt0,dim) + Pt1[com.state,3,dim]*is2(19,Pt0,dim))*2/theta1
-		+(Pt1[ij(com.state,6,dim)] * is2(16,Pt0,dim) + Pt1[com.state,8,dim]*is2(13,Pt0,dim))*2/theta2;
+	      f=(Pt1[get_ij(com.state,1,DIM)] * is2(10,Pt0,DIM) + Pt1[com.state,3,DIM]*is2(19,Pt0,DIM))*2/theta1
+		+(Pt1[get_ij(com.state,6,DIM)] * is2(16,Pt0,DIM) + Pt1[com.state,8,DIM]*is2(13,Pt0,DIM))*2/theta2;
 	    else if (Gtree==G2a || Gtree==G3c)
-	      f=(Pt1[ij(com.state,1,dim)] * is2(9,Pt0,dim) + Pt1[com.state,5,dim]*is2(18,Pt0,dim))*2/theta1
-		+(Pt1[ij(com.state,4,dim)] * is2(15,Pt0,dim) + Pt1[com.state,8,dim]*is2(12,Pt0,dim))*2/theta2;
+	      f=(Pt1[get_ij(com.state,1,DIM)] * is2(9,Pt0,DIM) + Pt1[com.state,5,DIM]*is2(18,Pt0,DIM))*2/theta1
+		+(Pt1[get_ij(com.state,4,DIM)] * is2(15,Pt0,DIM) + Pt1[com.state,8,DIM]*is2(12,Pt0,DIM))*2/theta2;
 	    if(Gtree=G2a || Gtree==G2b || Gtree==G2c){
 	      f*=exp(-t[0]);
 	      b[1]=t[1];
-	      b[0]= 2t[0]/theta5+tau1-t[1];
+	      b[0]= 2.0*t[0]/theta5+tau1-t[1];
 	    }
 	    else{
 	      f*= exp(-t[0])*exp(-2*(tau0-tau1)/theta5);
 	      b[1]=t[1];
-	      b[0]= 2t[0]/theta4+tau0-t[1];
+	      b[0]= 2.0*t[0]/theta4+tau0-t[1];
 	    } /* else*/
 	  } /* else if */
 	  else{
-	    Ptau1=complexroots (Q,22,tau1);
-	    f= is3(com.state,Ptau1,dim);
+	    complexroots (Q, Ptau1, tau1);
+	    f= is3(com.state,Ptau1,DIM);
 	    if (Gtree=G4a || Gtree==G4b || Gtree==G4c){
 	      f*= exp(-3*t[0]*t[1]-t[0]*(1-t[1]))*t[0];
 	      b[1]=theta5/2*t[0]*t[1]+tau1;
 	      b[0]=theta5/2*t[0]+tau1-b[1];
 	    }
 	    else if (Gtree=G5a || Gtree==G5b || Gtree==G5c){
-	      f*= exp(-2*t[1]-t[0])* exp(-2(tau0-tau1)/theta5);
+	      f*= exp(-2*t[1]-t[0])* exp(-2.0*(tau0-tau1)/theta5);
 	      b[1]=theta5/2*t[1]+tau1;
 	      b[0]=theta4/2*t[0]+tau0-b[1];
 	    }
 	    else if (Gtree=G6a || Gtree==G6b || Gtree==G6c){
-	      f*= exp(-3*t[1]-t[0])* exp(-6(tau0-tau1)/theta5);
+	      f*= exp(-3*t[1]-t[0])* exp(-6.0*(tau0-tau1)/theta5);
 	      b[1]=theta4/2*t[1]+tau0;
 	      b[0]=theta4/2*(t[0]+t[1])+tau0-b[1];
 	    } /*end else if*/
@@ -686,6 +767,14 @@ double Models0123 (FILE *fout, FILE *frub, FILE *frst, double x[], double space[
   char timestr[96];
   double *var, lnL, lnL0=0, e=1e-8;
   double xb[6][2];
+  /* zzz: compute Q  */
+   for (i=0;i<DIM*DIM;i++)
+	  {
+		  if(mc1[i]) Q[i]= c1*mc1[i];
+		  if(mc2[i]) Q[i]+=c2*mc2[i];
+		  if(mw[i])  Q[i]+=w*mw[i];
+	  }
+   /* zzz */
 
   com.pDclass = (double*)malloc((com.ncatBeta*com.ndata+com.ncatBeta)*sizeof(double));
   if(com.pDclass==NULL) error2("oom Models01231");
@@ -753,9 +842,9 @@ double Models0123 (FILE *fout, FILE *frub, FILE *frst, double x[], double space[
 			     4, 5, 7, 8, 10, 12, 15, 16, 18, 20, 22, 25};
 
       xtoy(x0, x, np);
-      for(ii=0; ii<nii; ii++) {
-	x[4] = theta12Set[ii];
-	for(jj=0; jj<njj; jj++) {
+      for(ii=0; ii<nii; ii++) 
+		  x[4] = theta12Set[ii];
+	  for(jj=0; jj<njj; jj++) {
 	  x[5] = Mset[jj];
 	  lnL = lfun(x, np);
 	  printf("%.6f\t%.6f\t%.4f\n", x[4], x[5], -lnL);
@@ -962,4 +1051,54 @@ int Simulation (FILE *fout, FILE *frub, double space[])
   }
   printf("\nTime used: %s\n", printtime(timestr));
   return 0;
+}
+
+int complexroots (double Q[], double P[], double t)
+{
+
+	int i,j,k, ii;
+   double rr[DIM], ri[DIM], vr[DIM*DIM], vi[DIM*DIM], space[DIM];
+   double now;
+    complex cU[DIM*DIM], cV[DIM*DIM], cRoot[DIM], cP[DIM*DIM];
+
+
+   FOR (ii, 1) {
+      eigen (1, Q, DIM, rr, ri, vr, vi, space) ;
+      FOR (i,DIM)   { cRoot[i].re=rr[i]; cRoot[i].im=ri[i]; }
+      FOR (i,DIM*DIM) { cU[i].re=cV[i].re=vr[i]; cU[i].im=cV[i].im=vi[i]; }
+      cmatinv (cV, DIM, DIM, space);
+      cmatby (cU, cV, cP, DIM, DIM, DIM);
+	  cPMat (P,t, cU, cV, cRoot);	   
+   }
+   return (0);
+}
+
+int cPMat (double P[],double t,complex cU[],complex cV[],complex cRoot[])
+{
+   /*P(t) = cU * exp{cRoot*t} * cV */
+   int i,j,k, status=0;
+   complex cUd[DIM*DIM], cP, cY;
+   double sum;
+
+   FOR (i,DIM) cUd[i*DIM+0]=cU[i*DIM+0];
+   for (j=1; j<DIM; j++) {
+      cY.re=cRoot[j].re*t; cY.im=cRoot[j].im*t; cY=cexp(cY);
+      for (i=0; i<DIM; i++)  cUd[i*DIM+j]=cby(cU[i*DIM+j],cY);
+   }
+   FOR (i,DIM)   {
+      for (j=0,sum=0; j<DIM; j++) {
+         for (k=0,cP=compl(0,0); k<DIM; k++) {
+            cY = cby(cUd[i*DIM+k],cV[k*DIM+j]);
+            cP.re+=cY.re;  cP.im+=cY.im;
+         }
+         P[i*DIM+j]=cP.re;
+         sum+=P[i*DIM+j];
+         if (P[i*DIM+j]<=0 || fabs(cP.im)>1e-4) status=-1;
+      }
+      if (fabs(sum-1)>1e-4) status=-1;
+   }
+  /*if (status)
+      { printf ("\nerr cPMat.."); getchar(); matout (F0, P, DIM, DIM); }*/
+
+   return (0);
 }

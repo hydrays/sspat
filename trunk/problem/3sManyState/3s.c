@@ -39,9 +39,9 @@ double para[8];  /* theta0 theta1 tau0 tau1 qbeta */
 int debug = 0;
 
 enum {M0, M1DiscreteBeta, M2SIM3s} MODELS;
-enum {Gk, G1b, G1a} GTREES;   
+enum {G1a, G1b, G1c, G2a, G2b, G2c, G3a, G3b, G3c,  G4a, G4b, G4c, G5a, G5b, G5c,  G6a, G6b, G6c} GTREES;   
 char *ModelStr[3] = {"M0", "DiscreteBeta", "SIM3s"};
-char *GtreeStr[3] = {"Gk", "G1b", "G1a"};
+char *GtreeStr[18] = {"G1a", "G1b", "G1c", "G2a", "G2b", "G2c","G3a", "G3b", "G3c","G4a", "G4b", "G4c","G5a", "G5b", "G5c","G6a", "G6b", "G6c"};
 
 #define REALSEQUENCE
 #include "treesub.c"

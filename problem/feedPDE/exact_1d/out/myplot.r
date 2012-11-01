@@ -87,19 +87,22 @@ for (i in seq(N)) {
   p1 <- xyplot(c(0,1)~c(0, max(x)),
                type='n', xlab="", ylab="",
                scales=list(cex=2),
-               key = list(x = 0.8, y=0.9,
+               key = list(x = 0.05, y=0.8,
                border=FALSE,
                lines=list(
                pch=c(1,1,1,NA,NA,NA,NA,NA),
-               col=c("red","green","black","red","black",
-               "grey","green","red","black"),
+               col=c("red","green","black","pink","blue",
+               "red","black","grey","black"),
                type=c("b","b","b","l","l","l","l","l","l"),
-               lty=c(1,1,1,2,2,3,3,3,3),
-               lwd=c(1,1,1,2,0,0,0,0,0)),
-               cex = 2,
+               lty=c(1,1,1,2,1,3,3,3,3),
+               lwd=c(1,1,1,4,4,2,2,6,0)),
+               cex = 1,
                text = list(lab = c("SC","TC","MC","TGFb",
-                           "","","","","")),
-               columns = 1,
+                           "death rate for SC and MC",
+                             "proliferation rate of SC",
+                             "proliferation rate of MC",
+                             "pressure","")),
+               columns = 2,
                #space = ""
                title = NULL
                ),
@@ -110,7 +113,7 @@ for (i in seq(N)) {
                    panel.lines(x, z[,4], type='l',
                                lwd = 4, lty = 2, col='pink')
                    panel.lines(x, z[,5], type='l',
-                               lwd = 1, lty=1, col='blue')
+                               lwd = 4, lty=1, col='blue')
                    panel.lines(x, z[,6], type='l',
                                lwd = 2, lty=2, col='red')
                    panel.lines(x, z[,7], type='l',

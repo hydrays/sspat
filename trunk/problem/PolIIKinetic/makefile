@@ -2,19 +2,20 @@ RM := rm -rf
 
 OUTPUT_FILE := run
 
+FC = gfortran -fdefault-real-8
+
 # add inputs and outputs from these tool invocations to the build variables 
 OBJS += \
-../../lib/nrtype.o \
-../../lib/random.o \
-./setting.o \
-./main.o
+./random.o \
+./setting_mutation.o \
+./CellPoolMutation.o
 
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ./%.f90
 	@echo 'Building file: $<'
 	@echo 'Invoking Fortran Compiler'
-	gfortran -g -O0 -c -o "$@" "$<"
+	$(FC) -g -O0 -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -30,11 +31,11 @@ main: $(OBJS) $(USER_OBJS)
 	@echo 'Output file name:'
 	@echo $(OUTPUT_FILE)
 	@echo 'Invoking Fortran Linker'
-	gfortran -o $(OUTPUT_FILE) $(OBJS) $(USER_OBJS) $(LIBS)
+	$(FC) -o $(OUTPUT_FILE) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS) $(OUTPUT_FILE) *.mod *~
+	-$(RM) $(OBJS) $(OUTPUT_FILE) *.mod *~ out/*.dat
 	-@echo ' '

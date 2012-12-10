@@ -17,7 +17,6 @@ int xtoy (double x[], double y[], int n);
 int abyx (double a, double x[], int n);
 double distance (double x[], double y[], int n);
 int matinv (double x[], int n, int m, double space[]);
-void SetSeed (int seed);
 double rndu (void);
 
 int matby (double a[], double b[], double c[], int n,int m,int k);

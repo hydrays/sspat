@@ -12,8 +12,8 @@ ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
 N = 200
-pL = 600
-pH = 100
+pL = 400
+pH = 60
 .pwidth = 2048
 .pheight = 576
 

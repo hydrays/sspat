@@ -187,13 +187,15 @@ contains
 
     call ran2(u)
     u = u*a(i)
-    if (npack(i).ne.0) then
+    !if (npack(i).ne.0) then
        vr = max(0.0, difv*real(npack(i)-npack(i+1)))
        vl = max(0.0, difv*real(npack(i)-npack(i-1)))
-    else
-       vr = 0.0
-       vl = 0.0
-    end if
+       !vr = difv*real(npack(i))
+       !vl = difv*real(npack(i))
+    !else
+    !   vr = 0.0
+    !   vl = 0.0
+    !end if
 !!$    print *, 'event happen at ', i
 !!$    print *, 'u', u
 !!$    print *, 'a(i)', a(i)
@@ -494,6 +496,8 @@ contains
     real vr, vl
     vr = max(0.0, difv*real(npack(i)-npack(i+1)))
     vl = max(0.0, difv*real(npack(i)-npack(i-1)))
+    !vr = difv*real(npack(i))
+    !vl = difv*real(npack(i))
     if (npack(i).eq.0) then
        !       print *, vr, vl
     end if
@@ -512,6 +516,8 @@ contains
     real u, u1, p0, TGFbeta
     real vr, vl
     type(cell) new_cell
+    print *, 'not calling this here'
+    read(*,*)
     u = par_uni(kpar)
     u = u*a(i)
     if (npack(i).ne.0) then

@@ -1,6 +1,6 @@
 module setting
   implicit none
-  integer, parameter :: nx = 256
+  integer, parameter :: nx = 200
   integer, parameter :: n = nx+2
   integer, parameter :: n1 = nx+3
   real x(0:n1)
@@ -53,6 +53,7 @@ contains
     implicit none
     real phi_SC_old(0:n1), phi_PC_old(0:n1)
     real phi_TC_old(0:n1), phi_MC_old(0:n1)
+    real phi_SCdT(0:n1), phi_PCdT(0:n1), phi_TCdT(0:n1)
     integer i, j, file_index
     real dTdx_w, dTdx_e, dTdt, dTdx_west, dTdx_east
     real tp
@@ -89,6 +90,9 @@ contains
        do i = 1, n
           press(i) = phi_SC_old(i) + phi_PC_old(i) + &
                phi_TC_old(i) + phi_MC_old(i)
+          phi_SCdT(i) = phi_SC_old(i)/press(i)
+          phi_PCdT(i) = phi_PC_old(i)/press(i)
+          phi_TCdT(i) = phi_TC_old(i)/press(i)
        end do
 
        do i = 2, n-1
@@ -102,25 +106,43 @@ contains
        enddo
 
        do i = 2, n-1
-          dTdx_west = .5*(phi_SC_old(i) + phi_SC_old(i-1))*(press(i) - press(i-1))/dx
-          dTdx_east = .5*(phi_SC_old(i+1) + phi_SC_old(i))*(press(i+1) - press(i))/dx  
+          dTdx_west = .5*(phi_SCdT(i) + phi_SCdT(i-1))&
+               *(press(i) - press(i-1))/dx&
+               + .5*abs(press(i) - press(i-1))&
+               *(phi_SCdT(i) - phi_SCdT(i-1))
+          dTdx_east = .5*(phi_SCdT(i+1) + phi_SCdT(i))&
+               *(press(i+1) - press(i))/dx&  
+               + .5*abs(press(i+1) - press(i))&
+               *(phi_SCdT(i+1) - phi_SCdT(i))
           dTdt      = alpha1*(dTdx_east - dTdx_west)/dx + C1(i)
           phi_SC(i)    = phi_SC_old(i) + dTdt*dt
 
-          dTdx_west = .5*(phi_PC_old(i) + phi_PC_old(i-1))*(press(i) - press(i-1))/dx
-          dTdx_east = .5*(phi_PC_old(i+1) + phi_PC_old(i))*(press(i+1) - press(i))/dx  
+          dTdx_west = .5*(phi_PCdT(i) + phi_PCdT(i-1))&
+               *(press(i) - press(i-1))/dx&
+               + .5*abs(press(i) - press(i-1))&
+               *(phi_PCdT(i) - phi_PCdT(i-1))
+          dTdx_east = .5*(phi_PCdT(i+1) + phi_PCdT(i))&
+               *(press(i+1) - press(i))/dx&  
+               + .5*abs(press(i+1) - press(i))&
+               *(phi_PCdT(i+1) - phi_PCdT(i))
           dTdt      = alpha1*(dTdx_east - dTdx_west)/dx + C2(i)
           phi_PC(i)    = phi_PC_old(i) + dTdt*dt
 
-          dTdx_west = .5*(phi_TC_old(i) + phi_TC_old(i-1))*(press(i) - press(i-1))/dx
-          dTdx_east = .5*(phi_TC_old(i+1) + phi_TC_old(i))*(press(i+1) - press(i))/dx  
+          dTdx_west = .5*(phi_TCdT(i) + phi_TCdT(i-1))&
+               *(press(i) - press(i-1))/dx&
+               + .5*abs(press(i) - press(i-1))&
+               *(phi_TCdT(i) - phi_TCdT(i-1))
+          dTdx_east = .5*(phi_TCdT(i+1) + phi_TCdT(i))&
+               *(press(i+1) - press(i))/dx&  
+               + .5*abs(press(i+1) - press(i))&
+               *(phi_TCdT(i+1) - phi_TCdT(i))
           dTdt      = alpha1*(dTdx_east - dTdx_west)/dx + C3(i)
           phi_TC(i)    = phi_TC_old(i) + dTdt*dt
 
-          dTdx_west = .5*(phi_MC_old(i) + phi_MC_old(i-1))*(press(i) - press(i-1))/dx
-          dTdx_east = .5*(phi_MC_old(i+1) + phi_MC_old(i))*(press(i+1) - press(i))/dx
-          dTdt      = alpha3*(dTdx_east - dTdx_west)/dx + C4(i)
-          phi_MC(i)    = phi_MC_old(i) + dTdt*dt
+          !dTdx_west = .5*(phi_MC_old(i) + phi_MC_old(i-1))*(press(i) - press(i-1))/dx
+          !dTdx_east = .5*(phi_MC_old(i+1) + phi_MC_old(i))*(press(i+1) - press(i))/dx
+          !dTdt      = alpha3*(dTdx_east - dTdx_west)/dx + C4(i)
+          !phi_MC(i)    = phi_MC_old(i) + dTdt*dt
        enddo
        ! boundary conditions
 
@@ -256,5 +278,3 @@ contains
   end subroutine read_xdata
 
 end module setting
-
-

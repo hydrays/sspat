@@ -1,16 +1,16 @@
 ! Control parameters
 &xdata
-	xlen = 40.0,
+	xlen = 20.0,
 	Fo = 0.2,
 	tol = 5d-7,
-	alpha1 = 0.1,
-  	alpha2 = 200.0,
-  	alpha3 = 200.0
+	alpha1 = 0.04,
+  	alpha2 = 2.0,
+  	alpha3 = 2.0
  	alpha4 = 1.0,
   	gain1 = 1.0,
   	gainm = 0.008,
-  	tfinal = 10.0,
-  	tpinc = .1,
+  	tfinal = 600.0,
+  	tpinc = 5,
 	tm = 9999.0,
 	v_tc = 0.2,
 	p1 = 0.3,

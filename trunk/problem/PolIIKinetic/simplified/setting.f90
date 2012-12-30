@@ -21,11 +21,15 @@ module setting
   integer, parameter :: NReac=6
   real, parameter :: ep = 0.1
   integer, parameter :: E0 = 2
-  integer, parameter :: E1 = 10
+  integer, parameter :: E1 = 8
   real, parameter :: v_mature = 100.0
-  real, parameter :: t_on = 200.0
-  real, parameter :: t_off = 200.0
-  real, parameter :: pmu = 0.001
+!  real, parameter :: t_on = 1460.0
+!  real, parameter :: t_off = 1460.0
+
+  real, parameter :: t_on = 24.0
+  real, parameter :: t_off = 24.0
+
+  real, parameter :: pmu = 0.0
   real env
   real s(3)
   real a(NReac)
@@ -46,10 +50,11 @@ module setting
        )
 
   real, parameter, dimension(NReac) :: c =  &
-       (/0.1, 0.1, 1.0, 0.2, 10.0*(1.0-ep), 10.0*ep/)
+       (/0.1, 0.02, 1.0, 0.2, 10.0*(1.0-ep), 10.0*ep/)
+       !(/0.1, 0.05, 1.0, 0.1, 10.0*(1.0-ep), 10.0*ep/)
 
   real, parameter, dimension(NSpec) :: xinit =  &
-       (/1.0, 0.0, 50.0/)
+       (/0.0, 0.0, 50.0/)
 
   type cell
      integer id
@@ -130,20 +135,19 @@ contains
     real t, u, tau
     integer i, j, k
     real x(NSpec)
-    real cs, eff_prod
+    real cs
 
     x = CellPool(index)%x
-    eff_prod = env / (1.0 + env)
-    if ( env > 5.0 ) then 
+    if ( env > 0.5 ) then 
        cs = 1.0
     else
        cs = 0.0
     end if
-    if ( CellPool(index)%id .eq. 1 ) then
+    if ( CellPool(index)%id .eq. 3 ) then
        s = (/1.0, 1.0, cs/)
     else if ( CellPool(index)%id .eq. 2 ) then
        s = (/1.0, cs, 1.0/)
-    else if ( CellPool(index)%id .eq. 3 ) then
+    else if ( CellPool(index)%id .eq. 1 ) then
        s = (/cs, 1.0, 1.0/)
     else
        print *, "error in choosing s... stop"
@@ -170,7 +174,7 @@ contains
           x = x + nu(:, k)
           ! For model that consider Vita (x(5)) only. 
           if ( k.eq.5 .or. k.eq.6 ) then
-             x(3) = x(3) + eff_prod * real(E1)
+             x(3) = x(3) + env * real(E1)
           end if
           call expdev(u)
           if ( u.eq.0 ) then
@@ -205,14 +209,14 @@ contains
   subroutine output_to_file2(unit, time)
     implicit none
     integer, intent(in) :: unit
-    integer, intent(in) :: time
+    real, intent(in) :: time
     integer i
     integer np
 
-    write(unit, '(f10.2, f10.2, 3(I5, f10.2), 3(f10.2))'), time*0.1, env, &
+    write(unit, '(f10.2, f10.2, 3(I5, f10.2), 3(f10.2))'), time, env, &
          CellPool(1)%id, CellPool(1)%x(3), &
-         CellPool(2)%id, CellPool(1)%x(3), &
-         CellPool(2)%id, CellPool(1)%x(3), &
+         CellPool(2)%id, CellPool(2)%x(3), &
+         CellPool(3)%id, CellPool(3)%x(3), &
          pop_ratio
     
   end subroutine output_to_file2
@@ -243,11 +247,11 @@ contains
        env_t = 0.0
     end if
 
-    if ( t > env_t ) then
+    if ( t .ge. env_t ) then
        if ( env .eq. 0.0 ) then
-          env = 10.0
+          env = 1.0
           env_t = env_t + t_on
-       else if ( env .eq. 10.0 ) then
+       else if ( env .eq. 1.0 ) then
           env = 0.0
           env_t = env_t + t_off
        else

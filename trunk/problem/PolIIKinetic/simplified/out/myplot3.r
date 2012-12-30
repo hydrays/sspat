@@ -16,7 +16,7 @@ NSample = 2000
 .pheight = 576
 Nplot = 100000
 
-z <- matrix(scan('tr.dat', n=Nplot*11, quiet=TRUE),
+z <- matrix(scan('tr3.dat', n=Nplot*11, quiet=TRUE),
             Nplot, 11, byrow=TRUE)
 png("tr.png", width=.pwidth, height=.pheight)
 plot(c(0,Nplot*0.1),c(0,600),'n')

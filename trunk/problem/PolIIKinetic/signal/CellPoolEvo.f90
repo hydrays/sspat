@@ -10,30 +10,31 @@ program ssa
 
   call ran_seed(sequence=1234)
 
-  open (unit = 99, file="out/tr.dat", action="write")
+  open (unit = 99, file="out/tr1.dat", action="write")
 
   ! Initial value
   do index = 1, NSample
      CellPool(index)%x = xinit
-     CellPool(index)%id = 3
+     CellPool(index)%id = 1
   end do
   pindex = 0
   tp = 0.0
   exlevel = 0.0
+  call update_signal(0.0)
 
   ! Evolution
-  do index = 0, 1000
+  do index = 0, 1200
      t = 0.1*index
-     !if ( 0.1*index .ge. tp ) then
+     call update_signal(t)
+!     if ( 0.1*index .ge. tp ) then
      call output_to_file2(99, t)
-        !pindex = pindex + 1
-        !tp = tp + exwindow
+     pindex = pindex + 1
+     !tp = tp + exwindow
      exlevel = 0.0
      print *, index
      !end if
      ! Update all cells
      !print *, index
-     call update_signal(t)
      do i = 1, NSample
         call evolve_cell(i, 0.1)      
      end do

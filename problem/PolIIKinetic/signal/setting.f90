@@ -16,13 +16,13 @@
 
 module setting
   implicit none
-  integer, parameter :: NSample = 20000
+  integer, parameter :: NSample = 8000
   integer, parameter :: NSpec=2
   integer, parameter :: NReac=6
   real, parameter :: ep = 0.1
   real, parameter :: exwindow = 0.1
-  real, parameter :: t_on = 0.5
-  real, parameter :: t_off = 0.5
+  real, parameter :: t_on = 12.0
+  real, parameter :: t_off = 12.0
   real s(3)
   real a(NReac)
   real NT(NReac)
@@ -42,7 +42,8 @@ module setting
        )
 
   real, parameter, dimension(NReac) :: c =  &
-       (/0.1, 0.1, 1.0, 0.2, 10.0*(1.0-ep), 10.0*ep/)
+       (/0.1, 0.01, 1.0, 0.1, 10.0*(1.0-ep), 10.0*ep/)
+  !       (/0.1, 0.1, 1.0, 0.2, 10.0*(1.0-ep), 10.0*ep/)
 
   real, parameter, dimension(NSpec) :: xinit =  &
        (/0.0, 0.0/)
@@ -123,11 +124,11 @@ contains
 
     x = CellPool(index)%x
 
-    if ( CellPool(index)%id .eq. 1 ) then
+    if ( CellPool(index)%id .eq. 3 ) then
        s = (/1.0, 1.0, cs/)
     else if ( CellPool(index)%id .eq. 2 ) then
        s = (/1.0, cs, 1.0/)
-    else if ( CellPool(index)%id .eq. 3 ) then
+    else if ( CellPool(index)%id .eq. 1 ) then
        s = (/cs, 1.0, 1.0/)
     else
        print *, "error in choosing s... stop"
@@ -220,10 +221,11 @@ contains
     
     ! update scheme 2
     if (t .eq. 0.0) then
-       sig_t = 0.0
+       cs = 1.0
+       sig_t = t_on
     end if
 
-    if ( t > sig_t ) then
+    if ( t .ge. sig_t ) then
        if ( cs .eq. 0.0 ) then
           cs = 1.0
           sig_t = sig_t + t_on

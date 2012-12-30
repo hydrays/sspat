@@ -199,13 +199,13 @@ int main (int argc, char* argv[])
 int GetOptions (char *ctlf)
 {
   com.ncode = 4;
-  com.npoints = 8;
+  com.npoints = 4;
   com.ncatBeta = 5;
   com.UseMedianBeta = 0;   /* 1 to use the median */
   com.cleandata = 1;
   com.fix_locusrate = 0;
   com.seed = -1;
-  com.ndata = 5;
+  com.ndata = 1;
   strcpy(com.outf, "out");
   strcpy(com.seqf, "seqfile.txt");
   com.getSE = 1;
@@ -257,12 +257,12 @@ double Models0123 (FILE *fout, FILE *frub, FILE *frst, double x[], double space[
     LASTROUND = 0;
     printf("\n\n*** Model %d (%s) ***\n", com.model, ModelStr[com.model]);
     GetInitials (np, x, xb);
-    x[0] = 2.0;
-    x[1] = 3.0;
-    x[2] = 4.0;
-    x[3] = 0.5;
-    x[4] = 2.0;
-    x[5] = 2.0;
+    x[0] = 0.4;
+    x[1] = 0.5;
+    x[2] = 0.2;
+    x[3] = 0.1;
+    x[4] = 0.1;
+    x[5] = 20.0;
     var = space + np;
 		
     lnL = lfun(x, np);
@@ -793,6 +793,13 @@ double lfun (double x[], int np)
 	  }
 	} /* end else */
 	for(s=0;s<8;s++){
+	  /* if (Gtree == 5) { */
+	  /*   if (Gtree == G2c){ */
+	  /*     printf("OK"); */
+	  /*     getchar(); */
+	  /*   } */
+	  /*   printf(" Gtree = %d, s =%d, t0 = %e , t1 = %e, f = %e \n", Gtree, s, t[0], t[1], f[s]); */
+	  /* } */
 	  com.wwprior[Gtree][igrid][s] = f[s] * my_coeff;
 	}
 	p0124Fromb0b1(com.bp0124[Gtree]+igrid*5, b);
@@ -804,11 +811,13 @@ double lfun (double x[], int np)
   //}
   //getchar();
 
+  printf(" ==== debug here === %d \n", com.state[0]);
   for(locus=0; locus<com.ndata; locus++) {
-    Li = lnpD_locus(locus, com.state[locus]);
+    Li = lnpD_locus(locus, com.state[locus]-1);
     lnL += Li;
     n = com.Nij + locus*5;
-    //printf("%d\t%d\t%d\t%d\t%d\t%.6f\n", n[0],n[1],n[2],n[3],n[4], Li);
+    printf(" state %d \n", com.state[locus]);
+    printf("%d\t%d\t%d\t%d\t%d\t%.6f\n", n[0],n[1],n[2],n[3],n[4], Li);
   }
   return(-lnL);
 }
@@ -839,11 +848,13 @@ double lnpD_locus (int locus, int state)
 	  p[k] = com.bp0124[Gtree][igrid*5+k];
       }
       f = -com.lnLmax[locus];
+      //printf("Step 1: %e \n", f);
       if(n[0]) f += n[0]*log(p[0]);
       if(n[4]) f += n[4]*log(p[4]);
       if(Gtree==G1c||Gtree==G2c||Gtree==G3c||Gtree==G4c||Gtree==G5c||Gtree==G6c){
 	if(n[1]) f+= n[1]*log(p[1]);
 	if(n[2]+n[3]) f+=(n[2]+n[3])*log(p[2]);
+	//printf("Step 2: %e \n", f);
       }
       else if(Gtree==G1a||Gtree==G2a||Gtree==G3a||Gtree==G4a||Gtree==G5a||Gtree==G6a){
 	if(n[2]) f+= n[2]*log(p[1]);
@@ -854,13 +865,14 @@ double lnpD_locus (int locus, int state)
 	if(n[1]+n[2]) f+=(n[1]+n[2])*log(p[2]);
       }
       f = (f<-200 ? 0 : exp(f));
-      //if (Gtree == 5) {
-      //printf("%-3s %-6d f %9.3e %9.3e\n", GtreeStr[Gtree], igrid+1, f, com.wwprior[Gtree][igrid][state]);
-      //getchar();
-      //}
+      if (Gtree == 8) {
+      printf("%-3s %-6d p = %e f = %e\n", GtreeStr[Gtree], igrid+1, f, com.wwprior[Gtree][igrid][state]);
+      printf("value should be %e \n", exp(com.lnLmax[locus])*f*com.wwprior[Gtree][igrid][state]);
+      getchar();
+      }
       pD += f*com.wwprior[Gtree][igrid][state];
     }  /* for(igrid) over the grid */
-    //printf("%-3s %9.3e\n", GtreeStr[Gtree], pD);
+    //printf("%-3s %10.4e\n", GtreeStr[Gtree], pD);
     //printf("gtree %d  %d  %d  pd %e \n", Gtree, flag, state, pD);
     //getchar();
   }     /* for(Gtree) */
@@ -871,6 +883,7 @@ double lnpD_locus (int locus, int state)
     lnL += -1e100 + com.lnLmax[locus];
   }
   else
+    //printf("%10.4e --- %10.4e\n", log(pD), com.lnLmax[locus]);
     lnL += log(pD) + com.lnLmax[locus];
   if(error) {
     matout(F0, para, 1, 4+(com.model==M1DiscreteBeta)+(com.model==M2SIM3s));

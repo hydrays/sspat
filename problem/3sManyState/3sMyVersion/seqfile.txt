@@ -1,20 +1,7 @@
- 3 10
-2         CTAAAACGTT
-1         CTAAAACGTT
-1         CTAAAACGTT
- 3 10
-1         CGATCACGTA
-1         CGATCACGTA
-2         TGATCACGTA
- 3 10
-2         AGAAACATAC
-1         TGAAACATAC
-1         TGAAACATAC
- 3 10
-2         TCCGGCGGCA
-1         ACCGGCGGCA
-1         TCCGGCGGCA
- 3 10
-2         ACGGATGCCC
-1         TCGGATGCCC
-1         GCGGATGCCC
+
+
+     3    10 
+
+1                            GTGATCCTAA 
+1                            GTGATCCTAA 
+2                            GTGATCCTAA 

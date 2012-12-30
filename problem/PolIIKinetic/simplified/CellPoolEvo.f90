@@ -10,9 +10,9 @@ program ssa
   real death_toll(NSample)
   real t_now
 
-  call ran_seed(sequence=1234)
+  call ran_seed(sequence=12341)
 
-  open (unit = 99, file="out/tr.dat", action="write")
+  open (unit = 99, file="out/tr2.Rdat", action="write")
 
   ! Initial value
   pop_ratio = 0.0
@@ -24,17 +24,18 @@ program ssa
   pindex = 1
   t_now = t_off
   env = 0.0
+  call update_env(0.0)
 
   ! Evolution
-  do ClockTime = 1, 100000
-     call output_to_file2(99, ClockTime)
-     if ( mod(ClockTime, 100).eq.0 ) then
+  do ClockTime = 1, 50000
+     ! Update enviornment
+     call update_env(0.1*real(ClockTime))
+     if ( mod(ClockTime, 10).eq.0 ) then
         call output_to_file(pindex)
+        call output_to_file2(99, 0.1*real(ClockTime))
         pindex = pindex + 1
         print *, pindex
      end if
-     ! Update enviornment
-     call update_env(0.1*real(ClockTime))
      ! Update all cells
      do index = 1, NSample
         call evolve_cell(index, 0.1)      

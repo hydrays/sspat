@@ -1,0 +1,24 @@
+! Control parameters
+&xdata
+	xlen = 80.0,
+	btype = 3,
+	Fo = 0.2,
+	tol = 5d-7,
+	alpha1 = 2.0,
+  	alpha2 = 10.0,
+  	alpha3 = 0.001,
+ 	alpha_TGF = 10.0,
+  	gain1 = 1.5,
+  	xi = 0.5,
+  	beta_prod = 0.5,
+  	beta_decay = 1.0,
+  	tfinal = 200.0,
+  	tpinc = 1.0,
+  	v0max = 1,
+  	v0min = 0.5,
+	tm = 500.0,
+	v_tc = 0.2,
+	v_m = 1.0,
+	p_m = 1.0,
+	l_d = 1.01
+/

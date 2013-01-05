@@ -9,10 +9,11 @@ program ssa
   integer i, j, k, index, pindex
   real death_toll(NSample)
   real t_now
+  integer n_counter
 
   call ran_seed(sequence=12341)
 
-  open (unit = 99, file="out/trr1.Rdat", action="write")
+  open (unit = 99, file="out/tron.Rdat", action="write")
 
   ! Initial value
   pop_ratio = 0.0
@@ -25,12 +26,13 @@ program ssa
   t_now = t_off
   env = 0.0
   call update_env(0.0)
+  n_counter = 0
 
   ! Evolution
-  do ClockTime = 1, 1440000
+  do ClockTime = 1, 10000
      ! Update enviornment
      call update_env(0.1*real(ClockTime))
-     if ( mod(ClockTime, 1000).eq.0 ) then
+     if ( mod(ClockTime, 10).eq.0 ) then
         call output_to_file(pindex)
         call output_to_file2(99, 0.1*real(ClockTime))
         pindex = pindex + 1
@@ -42,6 +44,9 @@ program ssa
         if (CellPool(index)%x(3) > v_mature) then
            ! Kill a cell
            !print *, "attempting to kill a cell...", index, CellPool(index)%x(5)
+           if(ClockTime > 2000) then 
+              n_counter = n_counter + 1
+           end if
            death_toll = 0.0
            death_toll(1) = 1.0 / CellPool(1)%x(3)
            do i = 2, NSample
@@ -64,4 +69,5 @@ program ssa
      end do
   end do
   close(99)
+  print *, "n_counter", n_counter
 end program ssa

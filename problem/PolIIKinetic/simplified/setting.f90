@@ -23,11 +23,11 @@ module setting
   integer, parameter :: E0 = 2
   integer, parameter :: E1 = 8
   real, parameter :: v_mature = 100.0
-!  real, parameter :: t_on = 1460.0
-!  real, parameter :: t_off = 1460.0
+  real, parameter :: t_on = 1460.0
+  real, parameter :: t_off = 1460.0
 
-  real, parameter :: t_on = 0.5
-  real, parameter :: t_off = 0.5
+!  real, parameter :: t_on = 72.0
+!  real, parameter :: t_off = 72.0
 
   real env
   real s(3)

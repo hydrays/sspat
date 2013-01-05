@@ -27,7 +27,7 @@ program ssa
   call update_env(0.0)
 
   ! Evolution
-  do ClockTime = 1, 50000
+  do ClockTime = 1, 2000
      ! Update enviornment
      call update_env(0.1*real(ClockTime))
      if ( mod(ClockTime, 1).eq.0 ) then
@@ -57,34 +57,9 @@ program ssa
            pop_ratio(CellPool(j)%id) = pop_ratio(CellPool(j)%id) - 1.0
            pop_ratio(CellPool(index)%id) = pop_ratio(CellPool(index)%id) + 1.0
            CellPool(index)%x(3) = floor(CellPool(index)%x(3) / 2.0)
-           CellPool(j) = CellPool(index)
-           if (CellPool(j)%x(1) .eq. 1) then
-              CellPool(j)%x(3) = CellPool(j)%x(3) - real(E0)
-           else if (CellPool(j)%x(2) .eq. 1) then
-              CellPool(j)%x(3) = CellPool(j)%x(3) - 2.0*real(E0)
-           end if
-           call ran2(u)
-           if ( u < 0.25*pmu ) then
-              pop_ratio(CellPool(j)%id) = pop_ratio(CellPool(j)%id) - 1.0
-              CellPool(j)%id = mod(CellPool(j)%id + 1, 3)+1
-              pop_ratio(CellPool(j)%id) = pop_ratio(CellPool(j)%id) + 1.0
-           else if ( u < 0.5*pmu ) then
-              pop_ratio(CellPool(j)%id) = pop_ratio(CellPool(j)%id) - 1.0
-              CellPool(j)%id = mod(CellPool(j)%id + 2, 3)+1
-              pop_ratio(CellPool(j)%id) = pop_ratio(CellPool(j)%id) + 1.0
-           else if ( u < 0.75*pmu ) then
-              pop_ratio(CellPool(index)%id)=pop_ratio(CellPool(index)%id)-1.0
-              CellPool(index)%id = mod(CellPool(index)%id + 1, 3)+1
-              pop_ratio(CellPool(index)%id)=pop_ratio(CellPool(index)%id)+1.0
-
-           else if ( u .le. pmu ) then
-              pop_ratio(CellPool(index)%id)=pop_ratio(CellPool(index)%id)-1.0
-              CellPool(index)%id = mod(CellPool(index)%id + 2, 3)+1
-              pop_ratio(CellPool(index)%id)=pop_ratio(CellPool(index)%id)+1.0
-           !else
-              !print *, "not suppose to be here!"
-              !read(*,*)
-           end if
+           CellPool(j)%id = CellPool(index)%id
+           CellPool(j)%x(1) = 0.0
+           CellPool(j)%x(2) = 0.0
         end if
      end do
   end do

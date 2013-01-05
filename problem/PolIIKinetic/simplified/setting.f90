@@ -26,10 +26,9 @@ module setting
 !  real, parameter :: t_on = 1460.0
 !  real, parameter :: t_off = 1460.0
 
-  real, parameter :: t_on = 2400.0
-  real, parameter :: t_off = 2400.0
+  real, parameter :: t_on = 0.5
+  real, parameter :: t_off = 0.5
 
-  real, parameter :: pmu = 0.0
   real env
   real s(3)
   real a(NReac)

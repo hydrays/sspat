@@ -12,7 +12,7 @@ program ssa
 
   call ran_seed(sequence=12341)
 
-  open (unit = 99, file="out/tr2.Rdat", action="write")
+  open (unit = 99, file="out/tron.Rdat", action="write")
 
   ! Initial value
   pop_ratio = 0.0
@@ -30,7 +30,7 @@ program ssa
   do ClockTime = 1, 50000
      ! Update enviornment
      call update_env(0.1*real(ClockTime))
-     if ( mod(ClockTime, 10).eq.0 ) then
+     if ( mod(ClockTime, 1).eq.0 ) then
         call output_to_file(pindex)
         call output_to_file2(99, 0.1*real(ClockTime))
         pindex = pindex + 1

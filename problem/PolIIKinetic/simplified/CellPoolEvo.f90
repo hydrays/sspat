@@ -29,10 +29,10 @@ program ssa
   n_counter = 0
 
   ! Evolution
-  do ClockTime = 1, 10000
+  do ClockTime = 1, 2000
      ! Update enviornment
      call update_env(0.1*real(ClockTime))
-     if ( mod(ClockTime, 10).eq.0 ) then
+     if ( mod(ClockTime, 1).eq.0 ) then
         call output_to_file(pindex)
         call output_to_file2(99, 0.1*real(ClockTime))
         pindex = pindex + 1
@@ -69,5 +69,5 @@ program ssa
      end do
   end do
   close(99)
-  print *, "n_counter", n_counter
+  !print *, "n_counter", n_counter
 end program ssa

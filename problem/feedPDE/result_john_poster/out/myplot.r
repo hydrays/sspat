@@ -29,7 +29,7 @@ for (i in seq(N)) {
                border=FALSE,
                lines=list(
                pch=c(1,1,1,NA,NA,NA,NA,NA),
-               col=c("red","green","black","pink","grey",
+               col=c("red","green", "black","pink","grey",
                "grey","green","red","black"),
                type=c("b","b","b","l","l","l","l","l","l"),
                lty=c(1,1,1,2,2,3,3,3,3),
@@ -46,15 +46,15 @@ for (i in seq(N)) {
                    panel.lines(x, z[,2], type='b', col='green')
                    panel.lines(x, z[,3], type='b', col='black')
                    panel.lines(x, z[,4], type='l',
-                               lwd = 4, lty = 2, col='pink')
-                   #panel.lines(x, z[,5], type='l',
-                   #            lwd = 1, lty=1, col='blue')
-                   #panel.lines(x, z[,6], type='l',
-                   #            lwd = 2, lty=2, col='red')
-                   #panel.lines(x, z[,7], type='l',
-                   #            lwd = 2, lty=2, col='black')
-                   panel.lines(x, z[,8], type="l",
+                               lwd = 4, col='blue')
+                   panel.lines(x, z[,5], type='l', lwd = 4,
+                               lty = "dotted", col='red')
+                   panel.lines(x, z[,6], type='l', lwd = 4,
+                               lty = "dotted", col='black')
+                   panel.lines(x, z[,7], type="l",
                                lwd = 6, lty="dotted", col='grey')
+                   panel.lines(x, z[,8], type="l",
+                               lwd = 6, lty="dotted", col='pink')
                    grid.text(my.label.time,
                              y = unit(0.9, "npc"), gp=gpar(fontsize=30))
                }

@@ -112,6 +112,13 @@ contains
           file_index = file_index + 1
           tp = tp + tpinc
           write(*, *), time
+
+          do i = 2, n-1
+             if (phi_MC_old(i) < tol .and. time .ge. 600) then
+                phi_MC_old(i) = 0.0
+             end if
+          end do
+
        endif
 
        if (time .ge. tm) then
@@ -135,42 +142,24 @@ contains
        end do
 
        do i = 2, n-1
-          if (phi_MC_old(i) < tol) then
-             phi_MC_old(i) = 0.0
-          end if
-       end do
-
-       do i = 2, n-1
           p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.0)
-!!$          if ( press(i) > 0.8) then
-!!$             q(i) = 0.0
-!!$          else
-!!$             q(i) = 1.0
-!!$          end if
-          !q(i) = 1.0 / (1.0 + exp(1.0*(press(i)-1.5)))
-          q(i) = 1.0
+          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-0.6)))
+          !q(i) = 1.0
           !q(i) = 1.0/(1.0 + 2.0*press(i))
-          d(i) = max(0.0, xi*(press(i)-1.0))
-          v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
+          d(i) = max(0.1, xi*(press(i)-0.65))
+          !v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
+          v0(i) = 1.0
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = q(i)*v0(i)*(2.0*(1-p0(i)))*phi_SC_old(i) - &
                v_tc*phi_TC_old(i)
-!!$          if ( time > 15 ) then
-!!$             if ( sum(phi_MC_old(2:n-1)) > 0.01 ) then
-!!$                !print *, time, sum(phi_MC_old(2:n-1))
-!!$                C2(2:2) = C2(2:2) - 10.0*phi_TC_old(2:2)
-!!$             else
-!!$                phi_MC_old(2:n-1) = 0.0
-!!$             end if
-!!$          end if
           C3(i) = q(i)*v_m*(2.0*p_m-1.0)*phi_MC_old(i) - d(i)*phi_MC_old(i)
        enddo
 
-       do i = 2, n-1
-          if (time > 120.0) then
-             C2(i) = C2(i) - 1000.0*phi_MC_old(i)*phi_TC_old(i)
-          end if
-       end do
+       ! do i = 2, n-1
+       !    if (time > 600.0) then
+       !       C2(i) = C2(i) - 100.0*phi_MC_old(i)*phi_TC_old(i)
+       !    end if
+       ! end do
 
        do i = 3, n-2
           dTdx_west = (phi_SC_old(i) - phi_SC_old(i-1))/dx
@@ -305,11 +294,14 @@ contains
     do i=2,n-1
        !write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
        !     phi_MC(i), p0(i), TGF(i), d(i), v0(i), press(i)
-       write(11,'(10(e16.4e3))') phi_SC(i), phi_TC(i), &
-            phi_MC(i), TGF(i), q(i)*v0(i), &
-            !q(i)*v0(i)*(2.0*p0(i)-1.0), &
+       write(11,'(10(e16.4e3))') phi_SC(i), &
+            phi_TC(i), &
+            phi_MC(i), &
             p0(i), &
-            d(i), press(i)
+            q(i)*v0(i)*(2.0*p0(i)-1.0) - d(i), &
+            q(i)*v_m - d(i), &
+            press(i), &
+            TGF(i)
     end do
 
     close(11)
@@ -381,7 +373,7 @@ contains
     ! defining the initial conditions
     ! dsin(pi*x/xlen)
     do i = 1, n
-       phi_SC(i) = 0.5
+       phi_SC(i) = 0.3
        phi_TC(i) = 1.3
        phi_MC(i) = 0.0
     enddo

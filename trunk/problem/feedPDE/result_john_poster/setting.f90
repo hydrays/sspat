@@ -181,8 +181,8 @@ contains
        ! west
        i = 2
        if (btype == 1) then
-          print *, 'not implemented here!'
-          stop
+          !print *, 'not implemented here!'
+          !stop
           dTdx_w = (-phi_SC_old(i+1) + 9*phi_SC_old(i) -&
                8*phi_SC_old(i-1))/(3*dx)
           dTdx_e = (phi_SC_old(i+1) - phi_SC_old(i))/dx
@@ -216,12 +216,20 @@ contains
        ! east
        i = n-1
        if (btype == 1) then
-          print *, 'not implemented here!'
-          stop
-          !dTdx_w = (TN(i) - TN(i-1))/dx
-          !dTdx_e = (8*TN(i+1) - 9*TN(i) + TN(i-1))/(3*dx)
-          !dTdt   = alpha*(dTdx_e - dTdx_w)/dx + C(i)
-          !phi(i) = TN(i) + dTdt*dt
+          !print *, 'not implemented here!'
+          !stop
+          dTdx_w = (phi_SC_old(i) - phi_SC_old(i-1))/dx
+          dTdx_e = -(-phi_SC_old(i-1) + 9*phi_SC_old(i) -&
+               8*phi_SC_old(i+1))/(3*dx)
+          dTdt   = alpha1*(dTdx_e - dTdx_w)/dx + C1(i)
+          phi_SC(i) = phi_SC_old(i) + dTdt*dt
+
+          dTdx_w = (phi_TC_old(i) - phi_TC_old(i-1))/dx
+          dTdx_e = -(-phi_TC_old(i-1) + 9*phi_TC_old(i) -&
+               8*phi_TC_old(i+1))/(3*dx)
+          dTdt   = alpha2*(dTdx_e - dTdx_w)/dx + C2(i)
+          phi_TC(i) = phi_TC_old(i) + dTdt*dt
+
        elseif (btype == 2) then
           print *, 'not implemented here!'
           stop
@@ -254,11 +262,11 @@ contains
        ! calculation of heat fluxes at boundaries (flux is proportional to
        ! the negative of slope of the temperature curve)
        if (btype == 1) then
-          qw1 = -(-phi_SC(3) + 9*phi_SC(2) - 8*phi_SC(1)) /(3*dx)
-          qe1 = -(8*phi_SC(n) - 9*phi_SC(n-1) + phi_SC(n-2)) /(3*dx)
+          !qw1 = -(-phi_SC(3) + 9*phi_SC(2) - 8*phi_SC(1)) /(3*dx)
+          !qe1 = -(8*phi_SC(n) - 9*phi_SC(n-1) + phi_SC(n-2)) /(3*dx)
 
-          qw2 = -(-phi_TC(3) + 9*phi_TC(2) - 8*phi_TC(1)) /(3*dx)
-          qe2 = -(8*phi_TC(n) - 9*phi_TC(n-1) + phi_TC(n-2)) /(3*dx)
+          !qw2 = -(-phi_TC(3) + 9*phi_TC(2) - 8*phi_TC(1)) /(3*dx)
+          !qe2 = -(8*phi_TC(n) - 9*phi_TC(n-1) + phi_TC(n-2)) /(3*dx)
        elseif (btype == 2) then
           qw1 = -(-phi_SC(3) + 9*phi_SC(2) - 8*phi_SC(1)) /(3*dx)
           phi_SC(n) = (9*phi_SC(n-1) - phi_SC(n-2) + 3*qe1*dx) /8d0
@@ -352,10 +360,10 @@ contains
     ! btype: 2  - Dirichlet - left;   Neumann - right
     ! btype: 3  - Neumann - right
     if (btype == 1) then
-       phi_SC(1) = tw
-       phi_SC(n) = te
-       phi_TC(1) = tw
-       phi_TC(n) = te
+       phi_SC(1) = 0.449
+       phi_SC(n) = 0.449
+       phi_TC(1) = 1.01
+       phi_TC(n) = 1.01
     elseif (btype == 2) then
        phi_SC(1) = tw
        phi_TC(1) = tw
@@ -363,8 +371,8 @@ contains
        ! do nothing
     endif
 
-    TGF(n) = 0.0
-    TGF(1) = 0.0
+    TGF(n) = 1.01
+    TGF(1) = 1.01
   end SUBROUTINE BOUNDARY_COND
 
   SUBROUTINE INITIAL_COND

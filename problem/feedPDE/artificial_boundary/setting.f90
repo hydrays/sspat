@@ -48,34 +48,37 @@ contains
 
        if (time .ge. tp) then
           call output_to_file(file_index)
+          do i = 2, n-1
+             if (phi_MC_old(i) < tol) then
+                phi_MC_old(i) = 0.0
+             end if
+          end do
           file_index = file_index + 1
           tp = tp + tpinc
           write(*, *), time
        endif
 
-       do i = 2, n-1
+       do i = 1, n
           press(i) = phi_SC_old(i) + phi_MC_old(i)
-!!$          if (press(i) > 0.65) then
-!!$             press(1:i) = press(1:i) + 0.05
-!!$          end if
-          !press(i) = press(i) / (1.0 - 0.1*press(i))
-          press(i) = press(i)
        end do
 
-       do i = 2, n-1
-          if (phi_MC_old(i) < 0.000000001) then
-             phi_MC_old(i) = 0.0
-          end if
-       end do
+       ! do i = 2, n-1
+       !    if (phi_MC_old(i) < tol) then
+       !       phi_MC_old(i) = 0.0
+       !    end if
+       ! end do
 
        p0 = 0.55
-       p0(150:200) = 0.5
+       p0(80:130) = 0.51
+       p0(130:256) = 0.99
+       p0(256:(512-130)) = 0.99
+       p0((512-130):(512-130+50)) = 0.51
        !q = 1.0
        q = 1.0 / (1.0 + exp(100.0*(press-1.0)))
        do i = 2, n-1
-          if ( phi_MC_old(i) > 0.00001 .and. phi_MC_old(i+30) > 0.2) then
-             p0(i) = 0.99
-          end if
+          !if ( phi_MC_old(i) > 0.00001 .and. phi_MC_old(i+30) > 0.2) then
+          !   p0(i) = 0.99
+          !end if
           !q(i) = 1.0
           !q(i) = 1.0/(1.0 + 2.0*press(i))
           d(i) = max(0.1, xi*(press(i)-1.0))
@@ -115,8 +118,8 @@ contains
        ! phi_MC(i) = phi_MC_old(i) + dTdt*dt
        ! east
        i = n-1
-       phi_SC(i) = 0.0
-       phi_MC(i) = 1.0
+       phi_SC(i) = 0.5
+       phi_MC(i) = 0.0
        ! dTdx_w = (phi_SC_old(i) - phi_SC_old(i-1))/dx
        ! dTdx_e = qe1
        ! dTdt   = alpha1*(dTdx_e - dTdx_w)/dx + C1(i)
@@ -148,8 +151,8 @@ contains
        !     phi_MC(i), p0(i), TGF(i), d(i), v0(i), press(i)
        write(11,'(10(e16.4e3))') phi_SC(i), &
             phi_MC(i), &
-            q(i)*v0(i)*(2.0*p0(i)-1.0) - d(i), &
             p0(i), &
+            q(i)*v0(i)*(2.0*p0(i)-1.0) - d(i), &
             q(i)*v_m - d(i), &
             press(i)
     end do
@@ -197,14 +200,14 @@ contains
   SUBROUTINE INITIAL_COND
     implicit none
     integer i, j 
-    do i = 1, n/2
-       phi_SC(i) = 0.5
-       phi_MC(i) = 0.0
-    enddo
-    do i = n/2+1, n
-       phi_SC(i) = 0.0
-       phi_MC(i) = 1.0
-    enddo
+    phi_SC(1:200) = 0.5
+    phi_MC(1:200) = 0.0
+
+    phi_SC(312:512) = 0.5
+    phi_MC(312:512) = 0.0
+
+    phi_SC(200:312) = 0.0
+    phi_MC(200:312) = 1.0
   end SUBROUTINE INITIAL_COND
 
   subroutine read_xdata()

@@ -102,7 +102,7 @@ contains
     phi_MC_old = phi_MC
 
     time = 0.0
-    tp = 400.0
+    tp = 0.0
     file_index = 0
 
     do ntimestp = 1, maxntimestp
@@ -114,7 +114,7 @@ contains
           write(*, *), time
 
           do i = 2, n-1
-             if (phi_MC_old(i) < tol .and. time .ge. 600) then
+             if (phi_MC_old(i) < tol .and. time .ge. 100) then
                 phi_MC_old(i) = 0.0
              end if
           end do
@@ -143,12 +143,12 @@ contains
 
        do i = 2, n-1
           p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.0)
-          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-0.6)))
+          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-1.0)))
           !q(i) = 1.0
           !q(i) = 1.0/(1.0 + 2.0*press(i))
-          d(i) = max(0.1, xi*(press(i)-0.65))
-          !v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
-          v0(i) = 1.0
+          d(i) = max(0.1, xi*(press(i)-1.0))
+          v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
+          !v0(i) = 1.0
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = q(i)*v0(i)*(2.0*(1-p0(i)))*phi_SC_old(i) - &
                v_tc*phi_TC_old(i)
@@ -306,8 +306,10 @@ contains
             phi_TC(i), &
             phi_MC(i), &
             p0(i), &
-            q(i)*v0(i)*(2.0*p0(i)-1.0) - d(i), &
-            q(i)*v_m - d(i), &
+            !q(i)*v0(i)*(2.0*p0(i)-1.0) - d(i), &
+            !q(i)*v_m - d(i), &
+            q(i), &
+            d(i), &
             press(i), &
             TGF(i)
     end do

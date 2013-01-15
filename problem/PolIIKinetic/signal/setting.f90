@@ -21,8 +21,8 @@ module setting
   integer, parameter :: NReac=6
   real, parameter :: ep = 0.1
   real, parameter :: exwindow = 0.1
-  real, parameter :: t_on = 12.0
-  real, parameter :: t_off = 12.0
+  real, parameter :: t_on = 0.5
+  real, parameter :: t_off = 0.5
   real s(3)
   real a(NReac)
   real NT(NReac)
@@ -42,7 +42,7 @@ module setting
        )
 
   real, parameter, dimension(NReac) :: c =  &
-       (/0.1, 0.01, 1.0, 0.1, 10.0*(1.0-ep), 10.0*ep/)
+       (/0.1, 0.02, 1.0, 0.2, 10.0*(1.0-ep), 10.0*ep/)
   !       (/0.1, 0.1, 1.0, 0.2, 10.0*(1.0-ep), 10.0*ep/)
 
   real, parameter, dimension(NSpec) :: xinit =  &

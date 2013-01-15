@@ -10,7 +10,7 @@ program ssa
 
   call ran_seed(sequence=1234)
 
-  open (unit = 99, file="out/tr1.dat", action="write")
+  open (unit = 99, file="out/trrb1.dat", action="write")
 
   ! Initial value
   do index = 1, NSample

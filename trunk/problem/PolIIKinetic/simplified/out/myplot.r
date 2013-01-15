@@ -15,8 +15,8 @@ N = 1000
 NSample = 2000
 #pL = 400
 #pH = 60
-.pwidth = 2048
-.pheight = 576
+.pwidth = 1024
+.pheight = 480
 
 cat("processing file ...[",N,"]\n")
 for (i in seq(N)) {
@@ -25,7 +25,12 @@ for (i in seq(N)) {
   z <- matrix(scan(datafile, n=2000*4, quiet=TRUE),
               2000, 4, byrow=TRUE)
   png(outfile, width=.pwidth, height=.pheight)
-  plot(c(0,2000),c(0,700),'n')
+  plot(c(0,2000),c(0,150),'n', main=list("Controling site 3", cex=2),
+       xlab = list("Cell index", cex=2),
+       ylab = list("Energy level (arbitary unit)", cex = 2))
+  text(1000, 130, paste("time =", i), cex = 2)
+  axis(1, cex=2)
+  
   for (j in seq(NSample)){
     points(j, z[j,4], col=(z[j,1]))
   }

@@ -11,9 +11,9 @@ program ssa
   real t_now
   integer n_counter
 
-  call ran_seed(sequence=12341)
+  call ran_seed(sequence=1234)
 
-  open (unit = 99, file="out/tron.Rdat", action="write")
+  open (unit = 99, file="out/trtest.Rdat", action="write")
 
   ! Initial value
   pop_ratio = 0.0
@@ -32,7 +32,7 @@ program ssa
   do ClockTime = 1, 2000
      ! Update enviornment
      call update_env(0.1*real(ClockTime))
-     if ( mod(ClockTime, 1).eq.0 ) then
+     if ( mod(ClockTime, 10).eq.0 ) then
         call output_to_file(pindex)
         call output_to_file2(99, 0.1*real(ClockTime))
         pindex = pindex + 1
@@ -65,6 +65,7 @@ program ssa
            CellPool(j)%id = CellPool(index)%id
            CellPool(j)%x(1) = 0.0
            CellPool(j)%x(2) = 0.0
+           CellPool(j)%x(3) = CellPool(index)%x(3)
         end if
      end do
   end do

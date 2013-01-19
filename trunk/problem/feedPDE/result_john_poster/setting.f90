@@ -114,7 +114,7 @@ contains
           write(*, *), time
 
           do i = 2, n-1
-             if (phi_MC_old(i) < tol .and. time .ge. 100) then
+             if (phi_MC_old(i) < tol .and. time .ge. 300) then
                 phi_MC_old(i) = 0.0
              end if
           end do
@@ -132,21 +132,16 @@ contains
        call update_TGF()
 
        do i = 2, n-1
-          !press(i) = phi_TC_old(i) + phi_SC_old(i) + phi_MC_old(i)
           press(i) = phi_SC_old(i) + phi_MC_old(i)
-!!$          if (press(i) > 0.65) then
-!!$             press(1:i) = press(1:i) + 0.05
-!!$          end if
-          !press(i) = press(i) / (1.0 - 0.1*press(i))
           press(i) = press(i)
        end do
 
        do i = 2, n-1
-          p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.0)
-          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-1.0)))
+          p0(i) = 1.0 / (l_d + (gain1*TGF(i))**1.5)
+          q(i) = 1.0 / (1.0 + exp(100.0*(press(i)-1.2)))
           !q(i) = 1.0
           !q(i) = 1.0/(1.0 + 2.0*press(i))
-          d(i) = max(0.1, xi*(press(i)-1.0))
+          d(i) = max(0.0, xi*(press(i)-1.2))
           v0(i) = 1 / (1.0/v0max + gain1*TGF(i)*(1.0/v0min - 1.0/v0max))
           !v0(i) = 1.0
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)

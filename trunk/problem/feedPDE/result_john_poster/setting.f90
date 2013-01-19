@@ -113,11 +113,11 @@ contains
           tp = tp + tpinc
           write(*, *), time
 
-          do i = 2, n-1
-             if (phi_MC_old(i) < tol .and. time .ge. 300) then
-                phi_MC_old(i) = 0.0
-             end if
-          end do
+          ! do i = 2, n-1
+          !    if (phi_MC_old(i) < tol .and. time .ge. 300) then
+          !       phi_MC_old(i) = 0.0
+          !    end if
+          ! end do
 
        endif
 

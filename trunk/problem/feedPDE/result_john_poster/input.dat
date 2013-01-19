@@ -5,7 +5,7 @@
 	Fo = 0.2,
 	tol = 5d-3,
 	alpha1 = 0.1,
-  	alpha2 = 0.01,
+  	alpha2 = 0.1,
   	alpha3 = 0.0001,
  	alpha_TGF = 1.0,
   	gain1 = 1.0,

@@ -12,6 +12,7 @@ contains
     integer output_index, i, j, active_index
     integer k, shift_i
     real t_update_nutri
+    integer kill_number
     open (unit = 100, file='./out/logfile', action="write")
     call ran_seed(sequence=iseed)
     call init_cell_pool()
@@ -35,7 +36,19 @@ contains
        end if
 
        if (t .ge. tm) then
-          cmat(1000, 1)%type = 4
+          kill_number = 1000
+          if ( cmat(kill_number, 1)%type .eq. 1 ) then
+             SC(i) = SC(i) - 1
+          else if ( cmat(kill_number, 1)%type .eq. 2 ) then
+             TAC(i) = TAC(i) - 1
+          else if ( cmat(kill_number, 1)%type .eq. 3 ) then
+             TDC(i) = TDC(i) - 1
+          else
+             print *, "do not suppose to find a mutantion cell now...error"
+             read(*, *)
+          end if
+          cmat(kill_number, 1)%type = 4
+          MC(i) = MC(i) + 1
           tm = tm + 10000.0
        end if
 

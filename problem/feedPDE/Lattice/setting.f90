@@ -132,7 +132,7 @@ contains
 
     cmat(1:L, 1)%type = 1
     cmat(1:L, 2:3)%type = 2
-    cmat(1:L, 3:4)%type = 3
+    cmat(1:L, 3:10)%type = 3
     do i = 1, L
        call ran2(u)
        cmat(i, 1)%gene1 = scstick
@@ -857,11 +857,17 @@ contains
     implicit none
     real, intent(in) :: dt
     integer i
+    real nutri_flag
     Nutri_old(0:L+1) = Nutri(0:L+1)
     do i = 1, L
+       if ( TDC(i) .eq. 0 ) then
+          nutri_flag = 0.0
+       else
+          nutri_flag = 1.0
+       end if
        Nutri(i) = Nutri_old(i) + &
             (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt+&
-            NutriGrowthRate*dt - &
+            NutriGrowthRate*nutri_flag*dt - &
             NutriConsumeRate*(SC(i)+MC(i))*dt
        Nutri(i) = max(0.0, Nutri(i))
        Nutri(i) = min(10.0, Nutri(i))

@@ -1,6 +1,6 @@
 library("lattice")
 library("grid")
-jet.colors <- colorRampPalette(c("white", "red", "blue", "green"))
+jet.colors <- colorRampPalette(c("white", "red", "blue", "green", "black"))
 
 parainfo <- read.csv("control.csv", strip.white=TRUE)
 L <- parainfo$VALUE[parainfo$PARAMETER=='L']
@@ -11,8 +11,8 @@ H <- parainfo$VALUE[parainfo$PARAMETER=='H']
 ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
-N = 800
-pL = 2000
+N = 2000
+pL = 1000
 pH = 100
 .pwidth = 2048
 .pheight = 576
@@ -76,6 +76,10 @@ for (i in seq(N)) {
               L, dataH, byrow=TRUE)
   nutri <- z[, H+1]
   z <- z[1:pL, 1:pH]
+  if(max(z)<4){
+	z[1, pH] <- 4
+  	z[pL, pH] <- 4
+  }
 
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
   p1 <- levelplot(z, col.regions=jet.colors,
@@ -83,7 +87,7 @@ for (i in seq(N)) {
             ylab="",
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), nutri*pH/10, lwd=4, type='l', col='black')
+              panel.lines(seq(pL), nutri*pH/20 + .5*pH, lwd=4, type='l', col='black')
               grid.text(my.label.time,
                         y = unit(0.9, "npc"), gp=gpar(fontsize=30))
             },

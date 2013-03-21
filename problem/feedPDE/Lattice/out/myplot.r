@@ -77,8 +77,8 @@ for (i in seq(N)) {
   nutri <- z[, H+1]
   z <- z[1:pL, 1:pH]
   if(max(z)<4){
-	z[1, pH] <- 4
-  	z[pL, pH] <- 4
+    z[1, pH] <- 4
+    z[pL, pH] <- 4
   }
 
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")

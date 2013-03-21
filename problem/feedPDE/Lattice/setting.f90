@@ -400,6 +400,9 @@ contains
                 npack(i) = npack(i) + 1
              else
                 call ran2(ud)
+                if ( Nutri(i) < 0.001 ) then
+                   ud = ud * 0.1
+                end if
                 if ( ud < NutriKillrate ) then
                    ! death
                    do k=j, H-1
@@ -446,6 +449,9 @@ contains
                 npack(i) = npack(i) + 1
              else
                 call ran2(ud)
+                if ( Nutri(i) < 0.001 ) then
+                   ud = ud * 0.1
+                end if
                 if ( ud < NutriKillrate ) then
                    ! death
                    do k=j, H-1

@@ -401,7 +401,7 @@ contains
              else
                 call ran2(ud)
                 if ( Nutri(i) < 0.001 ) then
-                   ud = ud * 0.1
+                   ud = ud * 0.02
                 end if
                 if ( ud < NutriKillrate ) then
                    ! death
@@ -450,7 +450,7 @@ contains
              else
                 call ran2(ud)
                 if ( Nutri(i) < 0.001 ) then
-                   ud = ud * 0.1
+                   ud = ud * 0.02
                 end if
                 if ( ud < NutriKillrate ) then
                    ! death

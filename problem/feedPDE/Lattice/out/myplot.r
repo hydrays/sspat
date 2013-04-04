@@ -13,9 +13,11 @@ parainfo <- parainfo[1:(.divide-1),]
 
 N = 2000
 pL = 1000
-pH = 100
-.pwidth = 2048
-.pheight = 576
+pH = 80
+#.pwidth = 2048
+#.pheight = 576
+.pwidth = 1028
+.pheight = 256
 
 dataH <- H + 6
 
@@ -26,7 +28,7 @@ outfile <- sprintf("%s%05d%s", "slice", i, ".png")
 png(outfile, width=.pwidth, height=.pheight)
 z <- matrix(scan(datafile, n=L*dataH, quiet=TRUE),
             L, dataH, byrow=TRUE)
-z <- z[1:pL, 1:pH]
+z <- z[200:pL-200, 1:pH]
 my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
 p1 <- levelplot(z, col.regions=jet.colors,
                 colorkey=FALSE, xlab="",
@@ -75,10 +77,11 @@ for (i in seq(N)) {
   z <- matrix(scan(datafile, n=L*dataH, quiet=TRUE),
               L, dataH, byrow=TRUE)
   nutri <- z[, H+1]
+  #z <- z[200:pL-200, 1:pH]
   z <- z[1:pL, 1:pH]
   if(max(z)<4){
-    z[1, pH] <- 4
-    z[pL, pH] <- 4
+    z[200, pH] <- 4
+    #z[pL, pH] <- 4
   }
 
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
@@ -88,8 +91,9 @@ for (i in seq(N)) {
             panel=function(...){
               panel.levelplot(...)
               panel.lines(seq(pL), nutri*pH/20 + .5*pH, lwd=4, type='l', col='black')
+              panel.lines(seq(pL), pH/20 + .5*pH, lwd=1, type='l', col='grey')
               grid.text(my.label.time,
-                        y = unit(0.9, "npc"), gp=gpar(fontsize=30))
+                        y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },
             scales=list(cex=2))
 

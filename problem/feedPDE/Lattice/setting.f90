@@ -237,8 +237,10 @@ contains
     real u1, ua, ud
 
     !Effective Nutrition
+    !if ( Nutri(i) > 1.0 ) then
     ENutri = min(5.0, Nutri(i))
-    if ( ENutri < 1.0 ) then
+    !end if
+    if ( Nutri(i) < 1.0 ) then
        ENutri = 0.0
     end if
     ENutri = ENutri / 5.0
@@ -866,7 +868,7 @@ contains
     real nutri_flag
     Nutri_old(0:L+1) = Nutri(0:L+1)
     do i = 1, L
-       if ( TDC(i) .eq. 0 ) then
+       if ( TDC(i) < 3 ) then
           nutri_flag = 0.0
        else
           nutri_flag = 1.0

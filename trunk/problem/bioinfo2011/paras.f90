@@ -2,20 +2,27 @@ module paras
   use nrtype
 
   implicit none
+  ! Sample size
   integer(I4B), parameter :: Nsample=100
+  ! Population size
   integer(I4B), parameter :: N=1000
+  ! Base mutation rate
   real(kind=8), parameter :: mu0=1e-3
+  ! Number of mutations to wait
   integer(I4B), parameter :: m=4
   integer(I4B), parameter :: mplusone=m+1
   integer(I4B), parameter :: msminusone=mplusone*mplusone-1  
   integer(I4B), parameter :: ms=mplusone*mplusone
+  ! Selective advantage increment
   real(kind=8), parameter :: delta_s = 0.01
   real(kind=8), parameter :: delta_mu = 0.0
 
   integer(I4B) nu(0:m, 0:msminusone)
 
-  integer(I4B), parameter :: MSN=1
-  real(kind=8), parameter :: null_a=50.0*MSN
+  ! Control parameters in hybrid method
+  ! Rate for null event
+  real(kind=8), parameter :: null_a=50.0
+  ! Critical value for SSA
   integer(I4B), parameter :: Nc=10
 
 contains

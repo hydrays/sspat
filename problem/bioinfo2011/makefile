@@ -1,12 +1,12 @@
 RM := rm -rf
 
-FC = ifort
-#FC = gfortran
+#FC = ifort
+FC = gfortran
 
 
 OBJS_HYBRID += \
-../../lib/nrtype.o \
-../../lib/random.o \
+./nrtype.o \
+./random.o \
 ./paras.o \
 ./hybrid.o
 

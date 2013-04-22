@@ -96,13 +96,13 @@ program hybrid
            end do
         end if
         t = t + tau
-        write (*, forstr1), i, tau, x
-        write (11, forstr1), i, tau, x
+        !write (*, forstr1), i, tau, x
+        !write (11, forstr1), i, tau, x
      end do
-!     print *, counter
-!     write (*, forstr1), i, t, x
-!     write (11, forstr1), i, t, x
-!     pause
+     !print *, counter
+     write (*, forstr1), i, t, x
+     write (11, forstr1), i, t, x
+     !read(*,*)
   end do
   close(unit=11)
 end program hybrid

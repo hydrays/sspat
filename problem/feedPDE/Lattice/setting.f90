@@ -25,6 +25,7 @@ module setting
   real, allocatable :: Nutri(:), Nutri_old(:)
   real NutriGrowthRate
   real NutriConsumeRate
+  real NutriDecayRate
   real NutriMobility
   real NutriTimestep
   real NutriKillrate
@@ -41,7 +42,7 @@ module setting
   namelist /xdataomp/ useomp, is64bit, timestep, npar
 
   namelist /ndata/ NutriGrowthRate, NutriConsumeRate, &
-       NutriMobility, NutriTimestep, NutriKillrate
+       NutriDecayRate, NutriMobility, NutriTimestep, NutriKillrate
 
 contains
   subroutine read_xdata()
@@ -70,6 +71,7 @@ contains
     write(*, '(a20, f10.2)'), 'tm = ', tm
     write(*, '(a20, f10.2)'), 'NutriGrowthRate = ', NutriGrowthRate
     write(*, '(a20, f10.2)'), 'NutriConsumeRate = ', NutriConsumeRate
+    write(*, '(a20, f10.2)'), 'NutriDecayRate = ', NutriDecayRate
     write(*, '(a20, f10.2)'), 'NutriMobility = ', NutriMobility
     write(*, '(a20, f10.2)'), 'NutriTimestep = ', NutriTimestep
     write(*, '(a20, f10.2)'), 'NutriKillrate = ', NutriKillrate
@@ -103,6 +105,7 @@ contains
     write(9, '(a20, I10)'), 'npar,', npar
     write(9, '(a20, f10.2)'), 'NutriGrowthRate,', NutriGrowthRate
     write(9, '(a20, f10.2)'), 'NutriConsumeRate,', NutriConsumeRate
+    write(9, '(a20, f10.2)'), 'NutriDecayRate,', NutriDecayRate
     write(9, '(a20, f10.2)'), 'NutriMobility,', NutriMobility
     write(9, '(a20, f10.2)'), 'NutriTimestep,', NutriTimestep
     write(9, '(a20, f10.2)'), 'NutriKillrate,', NutriKillrate
@@ -401,11 +404,13 @@ contains
                 end if
                 npack(i) = npack(i) + 1
              else
-                call ran2(ud)
-                if ( Nutri(i) < 0.001 ) then
-                   ud = ud * 0.02
-                end if
-                if ( ud < NutriKillrate ) then
+                !call ran2(ud)
+                !if ( Nutri(i) < 0.001 ) then
+                !   ud = ud * 0.02
+                !end if
+                !if ( ud < NutriKillrate ) then
+                !if ( Pa .eq. 0.0 ) then
+                if ( Nutri(i) < 0.05 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -450,11 +455,13 @@ contains
                 MC(i) = MC(i) + 1
                 npack(i) = npack(i) + 1
              else
-                call ran2(ud)
-                if ( Nutri(i) < 0.001 ) then
-                   ud = ud * 0.02
-                end if
-                if ( ud < NutriKillrate ) then
+                !call ran2(ud)
+                !if ( Nutri(i) < 0.001 ) then
+                !   ud = ud * 0.02
+                !end if
+                !if ( ud < NutriKillrate ) then
+                !if ( Pa .eq. 0.0 ) then
+                if ( Nutri(i) < 0.05 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -872,13 +879,17 @@ contains
           nutri_flag = 0.0
        else
           nutri_flag = 1.0
+          !nutri_flag = TDC(i)
        end if
+       !nutri_flag = 1.0
+       !nutri_flag = TDC(i)
        Nutri(i) = Nutri_old(i) + &
-            (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt+&
-            NutriGrowthRate*nutri_flag*dt - &
-            NutriConsumeRate*(SC(i)+MC(i))*dt
+            (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
+            + NutriGrowthRate*nutri_flag*dt &
+            - NutriConsumeRate*(SC(i)+MC(i))*dt &
+            - NutriDecayRate*Nutri(i)*dt
        Nutri(i) = max(0.0, Nutri(i))
-       Nutri(i) = min(10.0, Nutri(i))
+       !Nutri(i) = min(10.0, Nutri(i))
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)

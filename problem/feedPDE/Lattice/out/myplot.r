@@ -13,11 +13,11 @@ parainfo <- parainfo[1:(.divide-1),]
 
 N = 2000
 pL = 1000
-pH = 80
-#.pwidth = 2048
-#.pheight = 576
-.pwidth = 1028
-.pheight = 256
+pH = 200
+.pwidth = 2048
+.pheight = 576
+#.pwidth = 1028
+#.pheight = 256
 
 dataH <- H + 6
 
@@ -90,19 +90,19 @@ for (i in seq(N)) {
             ylab="",
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), nutri*pH/20 + .5*pH, lwd=4, type='l', col='black')
-              panel.lines(seq(pL), pH/20 + .5*pH, lwd=1, type='l', col='grey')
+              panel.lines(seq(pL), nutri*2.0 + .5*pH, lwd=4, type='l', col='black')
+              panel.lines(seq(pL), 1 + .5*pH, lwd=1, type='l', col='grey')
               grid.text(my.label.time,
                         y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },
             scales=list(cex=2))
 
-  ## p2 <- xyplot(nutri~seq(pL))
+  #p2 <- xyplot(nutri~seq(pL))
   print(p1)
 
   ## print(p2)
-  ## print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
-  ## print(p2, position=c(0, 0, 1, 0.5))
+  #print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
+  #print(p2, position=c(0, 0, 1, 0.5))
 
   ## --------------
   ## draw the customized legend

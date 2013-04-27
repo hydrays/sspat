@@ -30,25 +30,25 @@ contains
           tp = tp + tpinc
        end if
 
-       if (t .ge. t_update_nutri) then
+       if (t .ge. t_update_nutri .and. t .ge. 50.0 ) then
           call update_nutri(NutriTimestep)
           t_update_nutri = t_update_nutri + NutriTimestep
        end if
 
        if (t .ge. tm) then
-          kill_number = 500
+          kill_number = 500 
           if ( cmat(kill_number, 1)%type .eq. 1 ) then
-             SC(i) = SC(i) - 1
+             SC(kill_number) = SC(kill_number) - 1
           else if ( cmat(kill_number, 1)%type .eq. 2 ) then
-             TAC(i) = TAC(i) - 1
+             TAC(kill_number) = TAC(kill_number) - 1
           else if ( cmat(kill_number, 1)%type .eq. 3 ) then
-             TDC(i) = TDC(i) - 1
+             TDC(kill_number) = TDC(kill_number) - 1
           else
              print *, "do not suppose to find a mutantion cell now...error"
              read(*, *)
           end if
           cmat(kill_number, 1)%type = 4
-          MC(i) = MC(i) + 1
+          MC(kill_number) = MC(kill_number) + 1
           tm = tm + 10000.0
        end if
 
@@ -58,6 +58,17 @@ contains
        if ( (k .le. 2).or.(k .ge. L-1) ) then
           call Perodic_BC(k)
        end if
+       ! Check
+       if ( MC(k) .ne. 0 .and. k < 300) then
+          print *, "error at", k
+          print *, TDC(k-3:k+3)
+          print *, SC(k-3:k+3)
+          print *, TAC(k-3:k+3)
+          print *, MC(k-3:k+3)
+          print *, npack(k-3:k+3)
+          read(*,*)
+       end if
+
 
        do i = 1, L
           NT(i) = NT(i) + a(i)*tau

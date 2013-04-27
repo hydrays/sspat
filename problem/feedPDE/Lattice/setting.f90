@@ -875,11 +875,13 @@ contains
     real nutri_flag
     Nutri_old(0:L+1) = Nutri(0:L+1)
     do i = 1, L
-       if ( TDC(i) < 3 ) then
+       if ( TDC(i) < 0 ) then
+          print *, i, TDC(i), SC(i), TAC(i), MC(i), npack(i)
+          read(*,*)
           nutri_flag = 0.0
        else
-          nutri_flag = 1.0
-          !nutri_flag = TDC(i)
+          !nutri_flag = 1.0
+          nutri_flag = TDC(i)
        end if
        !nutri_flag = 1.0
        !nutri_flag = TDC(i)
@@ -893,6 +895,8 @@ contains
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
+    !Nutri(400) = 15.0
+    !Nutri(600) = 15.0
     !print *, Nutri(1:3), SC(1:3)
     !read(*,*)
   end subroutine update_nutri

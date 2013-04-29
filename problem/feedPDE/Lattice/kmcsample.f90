@@ -30,13 +30,13 @@ contains
           tp = tp + tpinc
        end if
 
-       if (t .ge. t_update_nutri .and. t .ge. 50.0 ) then
+       if (t .ge. t_update_nutri) then
           call update_nutri(NutriTimestep)
           t_update_nutri = t_update_nutri + NutriTimestep
        end if
 
        if (t .ge. tm) then
-          kill_number = 500 
+          kill_number = 300 
           if ( cmat(kill_number, 1)%type .eq. 1 ) then
              SC(kill_number) = SC(kill_number) - 1
           else if ( cmat(kill_number, 1)%type .eq. 2 ) then
@@ -59,7 +59,7 @@ contains
           call Perodic_BC(k)
        end if
        ! Check
-       if ( MC(k) .ne. 0 .and. k < 300) then
+       if ( MC(k) .ne. 0 .and. k < 100) then
           print *, "error at", k
           print *, TDC(k-3:k+3)
           print *, SC(k-3:k+3)

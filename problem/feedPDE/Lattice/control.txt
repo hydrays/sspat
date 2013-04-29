@@ -1,17 +1,17 @@
 ! Control parameters
 &xdata
-	L = 1000,
+	L = 600,
 	H = 400,
 	brange = 8,
-	tend = 1000.0,
+	tend = 400.0,
   	p1 = 0.3,
 	v = 1.0,
 	difv = 100.0,
 	mutv = 0.0,
 	fdgain1 = 0.01,
-	scstick = 0.98,
+	scstick = 0.96,
 	prelax = 0.2,
-	iseed = 1234,
+	iseed = 12341,
 	tpinc = 1.0,
 	tm = 100
 /
@@ -24,10 +24,10 @@
 /
 
 &ndata
-	NutriGrowthRate = 0.73,
-	NutriConsumeRate = 1.5,
+	NutriGrowthRate = 0.0,
+	NutriConsumeRate = 1.0,
 	NutriDecayRate = 0.1,
-	NutriMobility = 1000.0,
+	NutriMobility = 2500.0,
 	NutriTimestep = 0.0001,
 	NutriKillrate = 0.02
 /

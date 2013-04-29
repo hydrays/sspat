@@ -895,8 +895,10 @@ contains
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
-    !Nutri(400) = 15.0
-    !Nutri(600) = 15.0
+    Nutri(1) = 100.0
+    Nutri(600) = 100.0
+    !Nutri(100) = 15.0
+    !Nutri(500) = 15.0
     !print *, Nutri(1:3), SC(1:3)
     !read(*,*)
   end subroutine update_nutri

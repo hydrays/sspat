@@ -12,9 +12,9 @@ ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
 N = 2000
-pL = 1000
+pL = 600
 pH = 200
-.pwidth = 2048
+.pwidth = 2048/2
 .pheight = 576
 #.pwidth = 1028
 #.pheight = 256
@@ -90,8 +90,9 @@ for (i in seq(N)) {
             ylab="",
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), nutri*2.0 + .5*pH, lwd=4, type='l', col='black')
-              panel.lines(seq(pL), 1 + .5*pH, lwd=1, type='l', col='grey')
+              panel.lines(seq(pL), nutri*1.0 + .5*pH, lwd=2, type='l', col='black')
+              panel.lines(seq(pL), 5 + .5*pH, lwd=2, type='l', col='red')
+              panel.lines(seq(pL), 0 + .5*pH, lwd=2, type='l', col='grey')
               grid.text(my.label.time,
                         y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },

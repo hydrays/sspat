@@ -90,7 +90,7 @@ for (i in seq(N)) {
             ylab="",
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), nutri*1.0 + .5*pH, lwd=2, type='l', col='black')
+              panel.lines(seq(pL), nutri*.1 + .5*pH, lwd=2, type='l', col='black')
               panel.lines(seq(pL), 5 + .5*pH, lwd=2, type='l', col='red')
               panel.lines(seq(pL), 0 + .5*pH, lwd=2, type='l', col='grey')
               grid.text(my.label.time,

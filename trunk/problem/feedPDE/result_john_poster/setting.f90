@@ -143,8 +143,8 @@ contains
           !q(i) = 1.0
           !q(i) = 1.0/(1.0 + 2.0*press(i))
           d(i) = max(0.0, xi*(press(i)-1.2))
-          v0(i) = 1 / (1.0/v0max + TGF(i)*(1.0/v0min - 1.0/v0max))
-          !v0(i) = 1.0
+          !v0(i) = 1 / (1.0/v0max + TGF(i)*(1.0/v0min - 1.0/v0max))
+          v0(i) = 1.0
           C1(i) = q(i)*v0(i)*(2.0*p0(i)-1.0)*phi_SC_old(i) - d(i)*phi_SC_old(i)
           C2(i) = q(i)*v0(i)*(2.0*(1-p0(i)))*phi_SC_old(i) - &
                v_tc*phi_TC_old(i)

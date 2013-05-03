@@ -14,10 +14,10 @@ parainfo <- parainfo[1:(.divide-1),]
 N = 2000
 pL = 600
 pH = 200
-.pwidth = 2048/2
-.pheight = 576
-#.pwidth = 1028
-#.pheight = 256
+#.pwidth = 2048/2
+#.pheight = 576
+.pwidth = 1028
+.pheight = 256
 
 dataH <- H + 6
 
@@ -90,7 +90,7 @@ for (i in seq(N)) {
             ylab="",
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), nutri*.1 + .5*pH, lwd=2, type='l', col='black')
+              panel.lines(seq(pL), nutri + .5*pH, lwd=2, type='l', col='black')
               panel.lines(seq(pL), 5 + .5*pH, lwd=2, type='l', col='red')
               panel.lines(seq(pL), 0 + .5*pH, lwd=2, type='l', col='grey')
               grid.text(my.label.time,

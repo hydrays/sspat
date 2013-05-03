@@ -241,17 +241,18 @@ contains
 
     !Effective Nutrition
     !if ( Nutri(i) > 1.0 ) then
-    ENutri = Nutri(i)/100.0
+    !ENutri = min(5.0, Nutri(i))
     !end if
-    if ( Nutri(i) < 1.0 ) then
-       ENutri = 0.0
-    end if
-    ENutri = ENutri / 5.0
+    !if ( Nutri(i) < 1.0 ) then
+    !   ENutri = 0.0
+    !end if
+    !ENutri = ENutri / 5.0
     ! Pa is the probability of accepting the division of 
     ! stem cell and mutation cell effected by the nutrition
     ! supply from the basal layer, Nutri.
     ! Pa controls the division rate of SC and MC.
-    Pa = 2.0*ENutri/(1.0+ENutri)
+    !Pa = 2.0*ENutri/(1.0+ENutri)
+    Pa = ((Nutri(i))**2)/(1.0+((Nutri(i))**2))
 
     call ran2(u)
     u = u*a(i)
@@ -410,7 +411,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( ENutri < 0.05 ) then
+                if ( Nutri(i) < 0.05 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -461,7 +462,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( ENutri < 0.05 ) then
+                if ( Nutri(i) < 0.05 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -888,16 +889,15 @@ contains
        Nutri(i) = Nutri_old(i) + &
             (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
             + NutriGrowthRate*nutri_flag*dt &
-            !- NutriConsumeRate*(SC(i)+MC(i))*dt &
-            - NutriConsumeRate*(npack(i))*dt &
+            - NutriConsumeRate*(SC(i)+MC(i))*dt &
             - NutriDecayRate*Nutri(i)*dt
        Nutri(i) = max(0.0, Nutri(i))
        !Nutri(i) = min(10.0, Nutri(i))
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
-    Nutri(1) = 1000.0
-    Nutri(600) = 1000.0
+    Nutri(1) = 65.0
+    Nutri(600) = 65.0
     !Nutri(100) = 15.0
     !Nutri(500) = 15.0
     !print *, Nutri(1:3), SC(1:3)

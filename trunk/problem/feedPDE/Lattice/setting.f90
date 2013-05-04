@@ -133,6 +133,7 @@ contains
     allocate(Nutri(0:L+1))
     allocate(Nutri_old(0:L+1))
 
+!    cmat(200, 1)%type = 1
     cmat(1:L, 1)%type = 1
     cmat(1:L, 2:3)%type = 2
     cmat(1:L, 3:10)%type = 3
@@ -896,8 +897,8 @@ contains
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
-    Nutri(1) = 65.0
-    Nutri(600) = 65.0
+    Nutri(1) = 25.0
+    Nutri(600) = 25.0
     !Nutri(100) = 15.0
     !Nutri(500) = 15.0
     !print *, Nutri(1:3), SC(1:3)

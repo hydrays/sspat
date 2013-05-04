@@ -1,9 +1,9 @@
 ! Control parameters
 &xdata
-	L = 600,
+	L = 400,
 	H = 400,
 	brange = 8,
-	tend = 300.0,
+	tend = 500.0,
   	p1 = 0.3,
 	v = 1.0,
 	difv = 100.0,
@@ -11,7 +11,7 @@
 	fdgain1 = 0.01,
 	scstick = 0.96,
 	prelax = 0.2,
-	iseed = 1234,
+	iseed = 12341,
 	tpinc = 1.0,
 	tm = 100
 /

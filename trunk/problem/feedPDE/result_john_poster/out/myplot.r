@@ -20,7 +20,7 @@ for (i in seq(N)) {
   outfile <- sprintf("%s%05d%s", "slice", i, ".png")
   png(outfile, width=.pwidth, height=.pheight)
   z <- matrix(scan(datafile, quiet=TRUE), ncol=NumCol, byrow=TRUE)
-  my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
+  my.label.time <- sprintf("%s%d%s", "t = ", 400+as.integer(i*.tpinc), " (day)")
 
   p1 <- xyplot(c(0,2)~c(0, max(x)),
                type='n', xlab="", ylab="",

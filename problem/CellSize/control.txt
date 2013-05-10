@@ -1,24 +1,22 @@
 ! Control parameters
 &xdata
-	L = 2000,
-	H = 100,
-	brange = 8,
-	tend = 1000.0,
-  	p1 = 0.3,
-	v = 1.0,
-	difv = 200.0,
-	mutv = 0.0,
-	fdgain1 = 0.01,
-	scstick = 0.98,
-	prelax = 0.2,
+	NPool = 2000,
 	iseed = 1234,
 	tpinc = 1.0,
-	tm = 200
+	tend = 200,
+	timestep = 0.01,
+	lambda1 = 4000.0,
+	gamma1 = 2.0,
+	lambda2 = 0.2,
+	gamma2 = 0.1,
+	alpha1 = 0.0,
+	alpha2 = 0.0,
+	s0 = 1000.0,
+	newcell_delta = 68.8,
+	kappa = 4.0,
+	size_critical = 1800.0,
+	age_critical = 8.0,
+	omega = 1.0,
+	eta = 2.0
 /
 
-&xdataomp
-	useomp = 0,
-	is64bit = 0,
-	timestep = 0.01,
-	npar = 4
-/

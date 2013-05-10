@@ -52,6 +52,9 @@ contains
           call getrate(lx, lage, a)
           do j = 1, lReac
              r(j) = poidev(a(j)*timestep)
+             if (r(2) > lx(1) ) then
+                r(2) = lx(1)
+             end if
              lx = lx + nu(:, j)*r(j)
              !print *, j, r(j), a(j)
           end do

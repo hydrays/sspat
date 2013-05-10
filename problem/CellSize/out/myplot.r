@@ -17,16 +17,16 @@ i <- 190
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 
 outfile <- sprintf("%s%05d%s", "slice", i, ".png")
-png(outfile, width=.pwidth, height=.pheight)
+png(outfile, width=340, height=300)
 z <- matrix(scan(datafile, n=NPool*5, quiet=TRUE),
             NPool, 5, byrow=TRUE)
 my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
-p1 <- xyplot(z[,1]-z[,2]~z[,1])
+p1 <- xyplot(200*(z[,1]-z[,2])/max(z[,1]-z[,2])~z[,1], xlim=c(0, 250000), grid=TRUE)
 print(p1)
 dev.off()
 
 outfile <- sprintf("%s%05d%s", "fa", i, ".png")
-png(outfile, width=.pwidth, height=.pheight)
+png(outfile, width=1080, height=640)
 my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
 p1 <- histogram(z[,1], nint=30)
 print(p1)

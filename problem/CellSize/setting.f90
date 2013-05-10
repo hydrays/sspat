@@ -114,7 +114,7 @@ contains
     open (unit = 11, file=filename, action="write")
 
     do i = 1, NPool
-       write(11, '(6(F10.2))'), CellPool(i)%Csize, CellPool(i)%Csize_old, &
+       write(11, '(6(F16.2))'), CellPool(i)%Csize, CellPool(i)%Csize_old, &
             CellPool(i)%Cage, CellPool(i)%mRNA, &
             CellPool(i)%nRibsome
     end do
@@ -176,7 +176,7 @@ contains
     real, intent(out) :: a(lReac)
 
     a = 0.0
-    a(1) = lambda1*kappa*age/(1.0+kappa*age)
+    a(1) = lambda1*((kappa*age)**2)/(1.0+((kappa*age)**2))
     a(2) = gamma1*x(1)
     a(3) = lambda2*min(x(1), x(2))
     a(4) = gamma2*x(2)

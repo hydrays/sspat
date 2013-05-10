@@ -8,7 +8,7 @@ contains
     use setting
     implicit none
 
-    real t, tp, u
+    real t, tp, tm, u
     real lsize, lage
     integer output_index, i, j, r(lReac)
     integer is_nag, m_flag
@@ -20,6 +20,7 @@ contains
 
     t = 0.0
     tp = 0.0
+    tm = 0.0
     output_index = 0
 
     do while (t < tend)
@@ -33,46 +34,34 @@ contains
           print *, t
        end if
 
+       if (t .ge. tm) then
+          do i = 1, NPool
+             if ( CellPool(i)%Cage > tminc ) then
+                CellPool(i)%Csize_old = CellPool(i)%Csize
+             end if
+          end do
+          tm = tm + tminc
+       end if
+
        do i = 1, NPool
           lsize = CellPool(i)%Csize
           lage = CellPool(i)%Cage
           lx(1) = CellPool(i)%mRNA
-          lx(3) = CellPool(i)%nRibsome
-          lx(2) = min(lx(1), lx(3))
+          lx(2) = CellPool(i)%nRibsome
 
           call getrate(lx, lage, a)
           do j = 1, lReac
              r(j) = poidev(a(j)*timestep)
              lx = lx + nu(:, j)*r(j)
-
-
-             ! if ( j .eq. 3 ) then
-             !    if ( r(j) > lx(1) ) then
-             !       r(j) = lx(1)
-             !    end if
-             !    if ( r(j) + lx(2) > lx(3) ) then
-             !       r(j) = lx(3) - lx(2)
-             !    end if
-             ! end if
-             ! if ( j .eq. 4 .and. r(j) > lx(2) ) then
-             !    r(j) = lx(2)
-             ! end if
-
              !print *, j, r(j), a(j)
           end do
-          call checkx(lx, is_nag)          
-          if ( lsize < lx(3) ) then
-             CellPool(i)%Crate = 0.0
-          else
-             CellPool(i)%Crate = (a(5) - a(6))
-          end if
-          lsize = max(lsize, lx(3))
+          call checkx(lx, a, r, is_nag)          
+          lsize = max(lsize, lx(2))
           lage = lage + timestep
           CellPool(i)%Csize = lsize
           CellPool(i)%Cage = lage
           CellPool(i)%mRNA = lx(1)
-          CellPool(i)%nActiveRibsome = lx(2)
-          CellPool(i)%nRibsome = lx(3)
+          CellPool(i)%nRibsome = lx(2)
           
           call check_mitosis(lsize, lage, m_flag)
           if ( m_flag .eq. 1 ) then
@@ -81,10 +70,9 @@ contains
        end do
        t = t + timestep
 
-       print *, t, CellPool(1)%Csize, CellPool(1)%Cage, & 
-            CellPool(1)%Crate, CellPool(1)%mRNA, &
-            CellPool(1)%nActiveRibsome, CellPool(1)%nRibsome 
-       if (CellPool(1)%Cage.eq.0.0) read(*,*)
+       !print *, t, CellPool(1)%Csize, CellPool(1)%Cage, & 
+       !     CellPool(1)%Crate, CellPool(1)%mRNA, CellPool(1)%nRibsome 
+       !if (CellPool(1)%Cage.eq.0.0) read(*,*)
 
     end do
     close(unit=100)

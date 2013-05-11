@@ -1,22 +1,26 @@
 ! Control parameters
 &xdata
-	NPool = 2000,
+	NPool = 20000,
 	iseed = 1234,
 	tpinc = 1.0,
 	tminc = 1.0,
-	tend = 200,
+	tend = 2000,
 	timestep = 0.01,
 	lambda1 = 400000.0,
 	gamma1 = 2.0,
-	lambda2 = 0.2,
+	lambda2 = 0.18,
 	gamma2 = 0.1,
 	s0 = 100000.0,
 	newcell_delta = 6800.0,
 	kappa = 4.0,
 	size_critical = 130000.0,
 	age_critical = 6.0,
-	omega = 0.5,
-	eta = 0.4,
-	MC = 0.6
+	omega = 0.6,
+	eta = 0.75,
+	MC = 1.0,
+	NCollect = 10000,
+	NCollect2 = 10000,
+	tc = 100,
+	NSize = 50
 /
 

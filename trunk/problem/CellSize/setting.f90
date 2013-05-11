@@ -5,7 +5,7 @@ module setting
   real :: tend, timestep
   real :: lambda1, gamma1, lambda2, gamma2, kappa
   real :: s0, newcell_delta 
-  real :: age_critical, size_critical, omega, eta
+  real :: age_critical, size_critical, omega, eta, MC
   integer, parameter :: lReac = 4
   integer, parameter :: lSpec = 2
   ! Reactions within one cell
@@ -26,7 +26,7 @@ module setting
   namelist /xdata/ NPool, iseed, tpinc,	tminc, tend, timestep, &
 	lambda1, gamma1, lambda2, gamma2, &
 	s0, newcell_delta, kappa, size_critical, &
-        age_critical, omega, eta
+        age_critical, omega, eta, MC
 
   type cell
      real Csize
@@ -62,6 +62,7 @@ contains
     write(*, '(a20, f10.2)'), 'size_critical = ', size_critical
     write(*, '(a20, f10.2)'), 'omega = ', omega
     write(*, '(a20, f10.2)'), 'eta = ', eta
+    write(*, '(a20, f10.2)'), 'MC = ', MC
 
     open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
@@ -82,6 +83,7 @@ contains
     write(9, '(a20, f10.2)'), 'size_critical,', size_critical
     write(9, '(a20, f10.2)'), 'omega,', omega
     write(9, '(a20, f10.2)'), 'eta,', eta
+    write(9, '(a20, f10.2)'), 'MC,', MC
 
     close(8)
     close(9)
@@ -139,8 +141,8 @@ contains
     new_cell%Cage = 0.0
     CellPool(i)%mRNA = 0.0
     new_cell%mRNA = 0.0
-    CellPool(i)%nRibsome = CellPool(i)%Csize
-    new_cell%nRibsome = new_cell%Csize
+    CellPool(i)%nRibsome = MC*CellPool(i)%Csize
+    new_cell%nRibsome = MC*new_cell%Csize
 
     call ran2(u)
     np = ceiling(u*NPool)
@@ -176,7 +178,7 @@ contains
     real, intent(out) :: a(lReac)
 
     a = 0.0
-    a(1) = lambda1*((kappa*age)**2)/(1.0+((kappa*age)**2))
+    a(1) = lambda1*((kappa*age)**1)/(1.0+((kappa*age)**1))
     a(2) = gamma1*x(1)
     a(3) = lambda2*min(x(1), x(2))
     a(4) = gamma2*x(2)

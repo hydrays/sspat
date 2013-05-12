@@ -47,7 +47,8 @@ contains
        if (t .ge. tm) then
           do i = 1, NPool
              if ( CellPool(i)%Cage > tminc ) then
-                CellPool(i)%Csize_old = CellPool(i)%Csize
+                CellPool(i)%Csize_old1 = CellPool(i)%Csize_old2
+                CellPool(i)%Csize_old2 = CellPool(i)%Csize
              end if
           end do
           tm = tm + tminc
@@ -69,7 +70,7 @@ contains
              !print *, j, r(j), a(j)
           end do
           call checkx(lx, a, r, is_nag)          
-          lsize = max(lsize, lx(2))
+          lsize = max(lsize, lx(2)/rho)
           lage = lage + timestep
           CellPool(i)%Csize = lsize
           CellPool(i)%Cage = lage
@@ -160,7 +161,7 @@ contains
              !print *, j, r(j), a(j)
           end do
           call checkx(lx, a, r, is_nag)          
-          lsize = max(lsize, lx(2))
+          lsize = max(lsize, lx(2)/rho)
           lage = lage + timestep
           NewbornPool(i)%Csize = lsize
           NewbornPool(i)%Cage = lage
@@ -201,7 +202,7 @@ contains
                 !print *, j, r(j), a(j)
              end do
              call checkx(lx, a, r, is_nag)          
-             lsize = max(lsize, lx(2))
+             lsize = max(lsize, lx(2)/rho)
              lage = lage + timestep
              NewbornPool2(i)%Csize = lsize
              NewbornPool2(i)%Cage = lage
@@ -211,7 +212,7 @@ contains
              call check_mitosis(lsize, lage, m_flag)
              if ( m_flag .eq. 1 ) then
                 NewbornPool2(i)%Csize = -1.0
-                print *, i, ' cell die ...'
+                !print *, i, ' cell die ...'
              end if
              
           end if
@@ -223,7 +224,7 @@ contains
           open (unit = 11, file=filename, action="write")
           do i = 1, NCollect2
              write(11, '(6(F16.2))'), NewbornPool2(i)%Csize
-             write(*, '(6(F16.2))'), prodiv(i)
+             !write(*, '(6(F16.2))'), prodiv(i)
           end do
           close(11)
           tp = tp + 1.0

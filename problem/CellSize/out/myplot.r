@@ -138,8 +138,8 @@ x <- seq(M)
 num1 <- seq(M)
 num2 <- seq(M)
 
-datafile1 <- sprintf("%s%02d%s", "prodiv", 6, ".dat")
-datafile2 <- sprintf("%s%02d%s", "prodiv", 7, ".dat")
+datafile1 <- sprintf("%s%02d%s", "prodiv", 7, ".dat")
+datafile2 <- sprintf("%s%02d%s", "prodiv", 8, ".dat")
 z1 <- matrix(scan(datafile1, n=NCollect2*1, quiet=TRUE),
             NCollect2, 1, byrow=TRUE)
 z2 <- matrix(scan(datafile2, n=NCollect2*1, quiet=TRUE),
@@ -165,8 +165,8 @@ for ( i in seq(M) ) {
   data1[i] <- 1 - num2[i]/num1[i]
 }
 
-datafile1 <- sprintf("%s%02d%s", "prodiv", 9, ".dat")
-datafile2 <- sprintf("%s%02d%s", "prodiv", 10, ".dat")
+datafile1 <- sprintf("%s%02d%s", "prodiv", 10, ".dat")
+datafile2 <- sprintf("%s%02d%s", "prodiv", 11, ".dat")
 z1 <- matrix(scan(datafile1, n=NCollect2*1, quiet=TRUE),
             NCollect2, 1, byrow=TRUE)
 z2 <- matrix(scan(datafile2, n=NCollect2*1, quiet=TRUE),
@@ -201,9 +201,9 @@ z <- matrix(scan("trace.dat", n=25*1000, quiet=TRUE),
             25, 1000, byrow=TRUE)
 x <- matrix(0, 25, 1)
 y <- matrix(0, 25, 1)
-plot(c(0, 25000), c(0, 4000))
+plot(c(0, 250000), c(0, 40000))
 for ( j in seq(1000) ) {
-  if ( (z[1, j] - 10000)^2 < 400){
+  if ( (z[1, j] - 100000)^2 < 100000){
   for (i in seq(25)) {
     x[i] <- z[i, j]
     if ( i < 2 ) {

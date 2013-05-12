@@ -3,6 +3,7 @@ module setting
   integer :: iseed
   real :: tpinc, tminc
   real :: tend, timestep
+  real :: rho
   real :: lambda1, gamma1, lambda2, gamma2, kappa
   real :: s0, newcell_delta 
   real :: age_critical, size_critical, omega, eta
@@ -28,14 +29,15 @@ module setting
        )
 
   namelist /xdata/ NPool, iseed, tpinc,	tminc, tend, timestep, &
-	lambda1, gamma1, lambda2, gamma2, &
-	s0, newcell_delta, kappa, size_critical, &
-        age_critical, omega, eta, MC, NCollect, NCollect2, &
-        tc, NSize
+       rho, lambda1, gamma1, lambda2, gamma2, &
+       s0, newcell_delta, kappa, size_critical, &
+       age_critical, omega, eta, MC, NCollect, NCollect2, &
+       tc, NSize
 
   type cell
      real Csize
-     real Csize_old
+     real Csize_old1
+     real Csize_old2
      real Cage
      real mRNA
      real nRibsome
@@ -59,6 +61,7 @@ contains
     write(*, '(a20, f10.2)'), 'tminc = ', tminc
     write(*, '(a20, f10.2)'), 'tend = ', tend
     write(*, '(a20, f10.2)'), 'timestep = ', timestep
+    write(*, '(a20, f10.2)'), 'rho = ', rho
     write(*, '(a20, f10.2)'), 'lambda1 = ', lambda1
     write(*, '(a20, f10.2)'), 'gamma1 = ', gamma1
     write(*, '(a20, f10.2)'), 'lambda2 = ', lambda2
@@ -80,10 +83,11 @@ contains
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
     write(9, '(a20, i10)'), 'NPool,', NPool
     write(9, '(a20, i10)'), 'iseed,', iseed
-    write(9, '(a20, f10.2)'), 'tpinc', tpinc
-    write(9, '(a20, f10.2)'), 'tminc', tminc
+    write(9, '(a20, f10.2)'), 'tpinc,', tpinc
+    write(9, '(a20, f10.2)'), 'tminc,', tminc
     write(9, '(a20, f10.2)'), 'tend,', tend
     write(9, '(a20, f10.2)'), 'timestep,', timestep
+    write(9, '(a20, f10.2)'), 'rho,', rho
     write(9, '(a20, f10.2)'), 'lambda1,', lambda1
     write(9, '(a20, f10.2)'), 'gamma1,', gamma1
     write(9, '(a20, f10.2)'), 'lambda2,', lambda2
@@ -104,6 +108,8 @@ contains
     close(8)
     close(9)
 
+    print *, "Multiply lambda1 by rho"
+    lambda1 = lambda1*rho
   end subroutine read_xdata
 
   subroutine init_cell_pool()
@@ -119,10 +125,11 @@ contains
 
     do i = 1, NPool
        CellPool(i)%Csize = s0
-       CellPool(i)%Csize_old = s0
+       CellPool(i)%Csize_old1 = s0
+       CellPool(i)%Csize_old2 = s0
        CellPool(i)%Cage = 0.0
        CellPool(i)%mRNA = 0.0
-       CellPool(i)%nRibsome = s0
+       CellPool(i)%nRibsome = s0*rho
     end do
   end subroutine init_cell_pool
 
@@ -137,7 +144,9 @@ contains
        open (unit = 11, file=filename, action="write")
        
        do i = 1, NPool
-          write(11, '(6(F16.2))'), CellPool(i)%Csize, CellPool(i)%Csize_old, &
+          write(11, '(6(F16.2))'), CellPool(i)%Csize, &
+               CellPool(i)%Csize_old1, &
+               CellPool(i)%Csize_old2, &
                CellPool(i)%Cage, CellPool(i)%mRNA, &
                CellPool(i)%nRibsome
        end do
@@ -147,7 +156,9 @@ contains
     if ( index .eq. -1 ) then
        open (unit = 11, file="./out/CellMitosis.dat", action="write")
        do i = 1, NCollect
-          write(11, '(6(F16.2))'), MitosisPool(i)%Csize, MitosisPool(i)%Csize_old, &
+          write(11, '(6(F16.2))'), MitosisPool(i)%Csize, &
+               MitosisPool(i)%Csize_old1, &
+               MitosisPool(i)%Csize_old2, &
                MitosisPool(i)%Cage, MitosisPool(i)%mRNA, &
                MitosisPool(i)%nRibsome
        end do
@@ -157,7 +168,9 @@ contains
     if ( index .eq. -2 ) then
        open (unit = 11, file="./out/CellNewborn.dat", action="write")
        do i = 1, NCollect
-          write(11, '(6(F16.2))'), NewbornPool(i)%Csize, NewbornPool(i)%Csize_old, &
+          write(11, '(6(F16.2))'), NewbornPool(i)%Csize, &
+               NewbornPool(i)%Csize_old1, &
+               NewbornPool(i)%Csize_old2, &
                NewbornPool(i)%Cage, NewbornPool(i)%mRNA, &
                NewbornPool(i)%nRibsome
        end do
@@ -171,11 +184,13 @@ contains
     integer, intent(in) :: index
     character(30) filename
     integer i
-    WRITE(filename,'(A7,I5.5,A4)') './out/syn', index, '.dat'
+    WRITE(filename,'(A7,I5.5,A4)') './out/s', index, '.dat'
     open (unit = 11, file=filename, action="write")
     
     do i = 1, NCollect
-       write(11, '(6(F16.2))'), NewbornPool(i)%Csize, NewbornPool(i)%Csize_old, &
+       write(11, '(6(F16.2))'), NewbornPool(i)%Csize, &
+            NewbornPool(i)%Csize_old1, &
+            NewbornPool(i)%Csize_old2, &
             NewbornPool(i)%Cage, NewbornPool(i)%mRNA, &
             NewbornPool(i)%nRibsome
     end do
@@ -199,14 +214,16 @@ contains
     if ( CellPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
        print *, 'Cell born to be negative size, abort ...'
     end if
-    CellPool(i)%Csize_old = CellPool(i)%Csize
-    new_cell%Csize_old = new_cell%Csize
+    CellPool(i)%Csize_old1 = CellPool(i)%Csize
+    new_cell%Csize_old1 = new_cell%Csize
+    CellPool(i)%Csize_old2 = CellPool(i)%Csize
+    new_cell%Csize_old2 = new_cell%Csize
     CellPool(i)%Cage = 0.0
     new_cell%Cage = 0.0
     CellPool(i)%mRNA = 0.0
     new_cell%mRNA = 0.0
-    CellPool(i)%nRibsome = MC*CellPool(i)%Csize
-    new_cell%nRibsome = MC*new_cell%Csize
+    CellPool(i)%nRibsome = rho*CellPool(i)%Csize
+    new_cell%nRibsome = rho*new_cell%Csize
 
     call ran2(u)
     np = ceiling(u*NPool)
@@ -235,14 +252,16 @@ contains
     if ( NewbornPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
        print *, 'Cell born to be negative size, abort ...'
     end if
-    NewbornPool(i)%Csize_old = NewbornPool(i)%Csize
-    new_cell%Csize_old = new_cell%Csize
+    NewbornPool(i)%Csize_old1 = NewbornPool(i)%Csize
+    new_cell%Csize_old1 = new_cell%Csize
+    NewbornPool(i)%Csize_old2 = NewbornPool(i)%Csize
+    new_cell%Csize_old2 = new_cell%Csize
     NewbornPool(i)%Cage = 0.0
     new_cell%Cage = 0.0
     NewbornPool(i)%mRNA = 0.0
     new_cell%mRNA = 0.0
-    NewbornPool(i)%nRibsome = MC*NewbornPool(i)%Csize
-    new_cell%nRibsome = MC*new_cell%Csize
+    NewbornPool(i)%nRibsome = rho*NewbornPool(i)%Csize
+    new_cell%nRibsome = rho*new_cell%Csize
 
     call ran2(u)
     np = ceiling(u*NCollect)
@@ -262,8 +281,8 @@ contains
     real u, p
     m_flag = 0
     call ran2(u)
-    p = omega*( max(0.0, (size - size_critical)/size_critical) )**1 + &
-         (1-omega)*( max(0.0, (age - age_critical)/age_critical) )**1
+    p = omega*( log(max(1.0, 100*(size - size_critical)/size_critical)) ) + &
+         (1-omega)*( log(max(1.0, 50*(age - age_critical)/age_critical)) )
     p = eta * p * timestep
     !print *, p
     if ( u < p ) then
@@ -278,7 +297,7 @@ contains
     real, intent(out) :: a(lReac)
 
     a = 0.0
-    a(1) = lambda1*((kappa*age)**1)/(1.0+((kappa*age)**1))
+    a(1) = lambda1*((kappa*age)**2)/(1.0+((kappa*age)**2))
     a(2) = gamma1*x(1)
     a(3) = lambda2*min(x(1), x(2))
     a(4) = gamma2*x(2)

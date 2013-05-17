@@ -7,7 +7,7 @@ module setting
   real :: lambda1, gamma1, lambda2, gamma2, kappa
   real :: s0, newcell_delta 
   real :: age_critical, size_critical, omega, eta
-  real :: tc, MC
+  real :: tc
   integer :: NCollect, NCollect2
   integer :: NSize
 
@@ -31,7 +31,7 @@ module setting
   namelist /xdata/ NPool, iseed, tpinc,	tminc, tend, timestep, &
        rho, lambda1, gamma1, lambda2, gamma2, &
        s0, newcell_delta, kappa, size_critical, &
-       age_critical, omega, eta, MC, NCollect, NCollect2, &
+       age_critical, omega, eta, NCollect, NCollect2, &
        tc, NSize
 
   type cell
@@ -73,7 +73,6 @@ contains
     write(*, '(a20, f10.2)'), 'size_critical = ', size_critical
     write(*, '(a20, f10.2)'), 'omega = ', omega
     write(*, '(a20, f10.2)'), 'eta = ', eta
-    write(*, '(a20, f10.2)'), 'MC = ', MC
     write(*, '(a20, I10)'), 'NCollect = ', NCollect
     write(*, '(a20, I10)'), 'NCollect2 = ', NCollect2
     write(*, '(a20, f10.2)'), 'tc ', tc
@@ -99,7 +98,6 @@ contains
     write(9, '(a20, f10.2)'), 'size_critical,', size_critical
     write(9, '(a20, f10.2)'), 'omega,', omega
     write(9, '(a20, f10.2)'), 'eta,', eta
-    write(9, '(a20, f10.2)'), 'MC,', MC
     write(9, '(a20, I10)'), 'NCollect,', NCollect
     write(9, '(a20, I10)'), 'NCollect2,', NCollect2
     write(9, '(a20, f10.2)'), 'tc,', tc
@@ -206,10 +204,10 @@ contains
     integer np
     type(cell) new_cell
     call normdev(0.0, newcell_delta, u)
-    u = min(u, .25*CellPool(i)%CSize)
-    u = max(u, -.25*CellPool(i)%CSize)
+    u = min(u, .5*CellPool(i)%CSize)
+    u = max(u, -.5*CellPool(i)%CSize)
     temp = CellPool(i)%Csize
-    CellPool(i)%Csize = temp/2.0 + u
+    CellPool(i)%Csize = (temp + u)/2.0
     new_cell%Csize = temp - CellPool(i)%Csize
     if ( CellPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
        print *, 'Cell born to be negative size, abort ...'
@@ -247,7 +245,7 @@ contains
     u = min(u, .25*NewbornPool(i)%CSize)
     u = max(u, -.25*NewbornPool(i)%CSize)
     temp = NewbornPool(i)%Csize
-    NewbornPool(i)%Csize = temp/2.0 + u
+    NewbornPool(i)%Csize = (temp + u)/2.0
     new_cell%Csize = temp - NewbornPool(i)%Csize
     if ( NewbornPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
        print *, 'Cell born to be negative size, abort ...'
@@ -278,12 +276,70 @@ contains
     real, intent(in) :: size, age
     integer, intent(out) :: m_flag
     integer j
-    real u, p
+    real u, p, p1, p2
+    real esize, eage
+
     m_flag = 0
     call ran2(u)
-    p = omega*( log(max(1.0, 100*(size - size_critical)/size_critical)) ) + &
-         (1-omega)*( log(max(1.0, 50*(age - age_critical)/age_critical)) )
-    p = eta * p * timestep
+
+    !p1 = omega*log(max(1.0, size - size_critical + 1.0))
+    !p2 = eta*log(max(1.0, age - age_critical + 1.0))
+    !p = p1 + p2
+
+    !p1 = omega*sqrt(max(0.0, size - size_critical))
+    !p2 = eta*max(0.0, age - age_critical)
+    !p = p1 + p2
+
+    p1 = omega*max(0.0, (size - size_critical)/size_critical)
+    p2 = eta*max(0.0, (age - age_critical)/age_critical)
+    p = p1 + p2
+
+    !esize = min(size, 2000.0)
+    !eage = age
+    ! if (eage > 6.0 ) then
+    !p1 = omega*max(0.0, (esize - size_critical)/size_critical)
+    ! else
+    !    p1 = 0.0
+    ! end if
+    ! if (esize > 1300.0 ) then
+    !p2 = eta*max(0.0, (eage - age_critical)/age_critical)
+    ! else
+    !    p2 = 0.0
+    ! end if
+    ! p = max(p1, p2)
+    p = p1 + p2
+    ! p = 0.0
+    ! if ( eage > age_critical ) then
+    !    p = max(p1, p2)
+    ! else
+    !    p = 0
+    ! end if
+    ! if ( esize > size_critical ) then    
+    !    p = max(p1, p2)
+    ! end if
+    ! else
+    !    p = 0.0
+    ! end if
+
+
+    !if (size > size_critical .and. age > age_critical) then
+    !   p = 1.0
+    !else
+    !   p = 0.0
+    !end if
+    
+    !if (size > size_critical) then
+    !   p = omega + &
+    !        (1-omega)*( max(0.0, (age - age_critical)/age_critical) )
+    !else 
+
+    !if (size > 1300.0) then
+    !   p =  (1-omega)*( max(0.0, (age - age_critical)/age_critical) )       
+    !else
+    !   p = 0.0
+    !end if
+
+    p = p * timestep
     !print *, p
     if ( u < p ) then
        m_flag = 1
@@ -297,7 +353,7 @@ contains
     real, intent(out) :: a(lReac)
 
     a = 0.0
-    a(1) = lambda1*((kappa*age)**2)/(1.0+((kappa*age)**2))
+    a(1) = lambda1*((kappa*age)**4)/(1.0+((kappa*age)**4))
     a(2) = gamma1*x(1)
     a(3) = lambda2*min(x(1), x(2))
     a(4) = gamma2*x(2)

@@ -136,7 +136,7 @@ contains
     t = 0.0
     tp = 0.0
     output_index = 0
-    do while (t < tend)
+    do while (t < 25)
        if (t .ge. tp) then
           call output_to_file_syn(output_index)
           output_index = output_index + 1
@@ -183,6 +183,7 @@ contains
     tp = 0.0
     tm = 0.0
     open (unit = 12, file='./out/trace.dat', action="write")
+    open (unit = 13, file='./out/lifespan.dat', action="write")
     do while (t < 24)
        do i = 1, NCollect2
           if ( NewbornPool2(i)%Csize > 0.0 ) then
@@ -212,6 +213,7 @@ contains
              call check_mitosis(lsize, lage, m_flag)
              if ( m_flag .eq. 1 ) then
                 NewbornPool2(i)%Csize = -1.0
+                write(13, '((F16.2))'), NewbornPool2(i)%Cage
                 !print *, i, ' cell die ...'
              end if
              
@@ -220,7 +222,7 @@ contains
        t = t + timestep
 
        if ( t > tp ) then
-          WRITE(filename,'(A12,I2.2,A4)') './out/prodiv', floor(tm), '.dat'
+          WRITE(filename,'(A12,I2.2,A4)') './out/prodiv', floor(tp), '.dat'
           open (unit = 11, file=filename, action="write")
           do i = 1, NCollect2
              write(11, '(6(F16.2))'), NewbornPool2(i)%Csize
@@ -241,6 +243,7 @@ contains
        end if
     end do
     close(12)
+    close(13)
 
   end subroutine cell_grow
 

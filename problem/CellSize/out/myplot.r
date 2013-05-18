@@ -21,7 +21,7 @@ k <- 1.0
 L = 6
 .pwidth = 800
 .pheight = 600
-i <- 190
+i <- 490
 
 # Generate the growth curve of mRNA and Ribosome
 y0 <- c(0, 1000)

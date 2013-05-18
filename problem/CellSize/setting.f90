@@ -204,6 +204,8 @@ contains
     integer np
     type(cell) new_cell
     call normdev(0.0, newcell_delta, u)
+    !call normdev(0.0, newcell_delta*CellPool(i)%Csize/500, u)
+    !write(17, '(6(F16.2))'), u
     u = min(u, .5*CellPool(i)%CSize)
     u = max(u, -.5*CellPool(i)%CSize)
     temp = CellPool(i)%Csize
@@ -242,6 +244,7 @@ contains
     integer np
     type(cell) new_cell
     call normdev(0.0, newcell_delta, u)
+    !call normdev(0.0, newcell_delta*NewbornPool(i)%Csize/500, u)
     u = min(u, .25*NewbornPool(i)%CSize)
     u = max(u, -.25*NewbornPool(i)%CSize)
     temp = NewbornPool(i)%Csize
@@ -290,24 +293,41 @@ contains
     !p2 = eta*max(0.0, age - age_critical)
     !p = p1 + p2
 
-    p1 = omega*max(0.0, (size - size_critical)/size_critical)
-    p2 = eta*max(0.0, (age - age_critical)/age_critical)
-    p = p1 + p2
+    !p1 = omega*max(0.0, (size - size_critical)/size_critical)
+    !p2 = eta*max(0.0, (age - age_critical)/age_critical)
+    !p = p1 + p2
 
     !esize = min(size, 2000.0)
     !eage = age
-    ! if (eage > 6.0 ) then
-    !p1 = omega*max(0.0, (esize - size_critical)/size_critical)
-    ! else
-    !    p1 = 0.0
-    ! end if
-    ! if (esize > 1300.0 ) then
-    !p2 = eta*max(0.0, (eage - age_critical)/age_critical)
-    ! else
-    !    p2 = 0.0
-    ! end if
+    if (age > 6.0 ) then
+       p1 = omega*max(0.0, (size - size_critical)/size_critical)
+       !if ( size > 1800 ) then
+       !   p1 = 0.6
+       !end if
+    else
+       p1 = 0.0
+    end if
+    if (size > 1000.0 ) then
+       p2 = eta*max(0.0, (age - age_critical)/age_critical)
+    else
+       p2 = 0.0
+    end if
+    if ( size*size/(1000.0*age) > 800 .and. age > 6.0 ) then
+       p1 = p1/6.0
+       p2 = 0
+    else if ( size*size/(1000.0*age) > 600 .and. age > 6.0 ) then
+       p1 = p1/3
+       p2 = 0
+    else if ( size*size/(1000.0*age) > 500 .and. age > 6.0 ) then
+       p1 = p1/2
+       p2 = 0
+    else if ( size*size/(1000.0*age) > 450 .and. age > 6.0 ) then
+       p1 = p1/1.5
+       p2 = 0
+    end if
+    !p2 = min(p2, eta*(12.0-age_critical)/age_critical)
     ! p = max(p1, p2)
-    p = p1 + p2
+    p = p1**2.0 + p2**2.0
     ! p = 0.0
     ! if ( eage > age_critical ) then
     !    p = max(p1, p2)

@@ -24,6 +24,8 @@ contains
     open (unit = 100, file='./out/logfile', action="write")
     call ran_seed(sequence=iseed)
     call init_cell_pool()
+    open (unit = 17, file="randomnumber", action="write")
+
 
     t = 0.0
     tp = 0.0
@@ -244,7 +246,7 @@ contains
     end do
     close(12)
     close(13)
-
+    close(17)
   end subroutine cell_grow
 
 end module cellgrow

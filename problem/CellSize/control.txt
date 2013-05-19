@@ -17,7 +17,7 @@
 	size_critical = 1100.0
 	age_critical = 6,
 	omega = 0.85,
-	eta = 0.85,
+	eta = 0.8,
 	NCollect = 10000,
 	NCollect2 = 10000,
 	tc = 300,

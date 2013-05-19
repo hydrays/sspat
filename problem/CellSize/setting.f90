@@ -299,6 +299,8 @@ contains
 
     !esize = min(size, 2000.0)
     !eage = age
+    !esize = size
+    !if (size )
     if (age > 6.0 ) then
        p1 = omega*max(0.0, (size - size_critical)/size_critical)
        !if ( size > 1800 ) then
@@ -312,18 +314,25 @@ contains
     else
        p2 = 0.0
     end if
-    if ( size*size/(1000.0*age) > 800 .and. age > 6.0 ) then
-       p1 = p1/6.0
-       p2 = 0
-    else if ( size*size/(1000.0*age) > 600 .and. age > 6.0 ) then
-       p1 = p1/3
-       p2 = 0
-    else if ( size*size/(1000.0*age) > 500 .and. age > 6.0 ) then
-       p1 = p1/2
-       p2 = 0
+    if ( size*size/(1000.0*age) > 500 .and. age > 6.0 ) then
+       p1 = p1/2.0
+       p2 = p2/6.0
+       !p2 = 0
+!!$    else if ( size*size/(1000.0*age) > 480 .and. age > 6.0 ) then
+!!$       p1 = p1/1.8
+!!$       p2 = p2/5.0
+!!$    else if ( size*size/(1000.0*age) > 470 .and. age > 6.0 ) then
+!!$       p1 = p1/1.6
+!!$       p2 = p2/4.0
+!!$       !p2 = 0
+!!$    else if ( size*size/(1000.0*age) > 460 .and. age > 6.0 ) then
+!!$       p1 = p1/1.4
+!!$       p2 = p2/3.0
+!!$       !p2 = 0
     else if ( size*size/(1000.0*age) > 450 .and. age > 6.0 ) then
-       p1 = p1/1.5
-       p2 = 0
+       p1 = p1/1.2
+       p2 = p2/2.0
+       !p2 = 0
     end if
     !p2 = min(p2, eta*(12.0-age_critical)/age_critical)
     ! p = max(p1, p2)

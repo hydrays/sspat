@@ -12,8 +12,8 @@ NCollect2 <- parainfo$VALUE[parainfo$PARAMETER=='NCollect2']
 .tpinc <- parainfo$VALUE[parainfo$PARAMETER=='tpinc']
 .tminc <- parainfo$VALUE[parainfo$PARAMETER=='tminc']
 
-lambda1 <- 10000
-gamma1 <- 5.0
+lambda1 <- 4000
+gamma1 <- 2.0
 lambda2 <- 0.25
 gamma2 <- 0.15
 k <- 1.0
@@ -45,24 +45,24 @@ for ( j in seq(2, N) ) {
   y[j,2] <- y1[j,2] + dt * (lambda2*min(y1[j,1], y1[j,2]) - gamma2*y1[j,2])
   z[j] <- min(y[j, 1], y[j, 2])
   s[j] <- max(s[j-1], y[j,2])
-  if ( s[j] == y[j,2] && index1 == 0) {
-    index1 <- j
+  if ( y[j,1] > y[j,2] && index1 == 0) {
+    index1 <- j-1
   }
   if ( y[j,1] < y[j,2]  && index2 == 0 && index1 != 0 ){
     index2 <- j
   }
 }
 pdf("ode1.pdf", width=7, height=5)
-p1 <- xyplot(z~a, xlim=c(0, 12),
-             ylim=c(0, 2500),
-             xlab=list("cell age (hours)", cex = 2),
-             ylab=list("s (cell size, fl)", cex=2),
+p1 <- xyplot(z~a, xlim=c(0, 15),
+             ylim=c(0, 3000),
+             xlab=list("cell age (hours)", cex = 1.5),
+             ylab=list("s (cell size, fl)", cex=1.5),
              type = "l",
              lwd = 8,
              lty = 6,
              col = "red",
-             scales = list(cex = 2),
-             key = list(x = 0.2, y=0.26,
+             scales = list(cex = 1.5, x=list(at=c(2,4,6,8,10,12,14))),
+             key = list(x = 0.1, y=0.95,
                border=TRUE,
                lines=list(
                  col=c("black", "blue", 'red', 'green'),
@@ -83,25 +83,25 @@ p1 <- xyplot(z~a, xlim=c(0, 12),
                panel.lines(a, y[,1], lwd=4, type='l', lty = 4, col='black')
                panel.lines(a, y[,2], lwd=4, type='l', lty = 1, col='blue')
                panel.lines(c(a[index1], a[index1]),
-                           c(0, s[index1]), lwd=4, type='l',
+                           c(0, s[index1]-125), lwd=4, type='l',
                            lty = 2, col='grey')
                panel.lines(c(a[index2], a[index2]),
                            c(0, s[index2]), lwd=4, type='l',
                            lty = 2, col='grey')
                grid.text('I',
                          just="left",
-                         x = unit(0.09, "npc"),
-                         y = unit(0.08, "npc"),
+                         x = unit(0.03, "npc"),
+                         y = unit(0.2, "npc"),
                          gp=gpar(fontsize=20) )
                grid.text('II',
                          just="left",
                          x = unit(0.43, "npc"),
-                         y = unit(0.42, "npc"),
+                         y = unit(0.3, "npc"),
                          gp=gpar(fontsize=20) )
                grid.text('III',
                          just="left",
                          x = unit(0.84, "npc"),
-                         y = unit(0.6, "npc"),
+                         y = unit(0.4, "npc"),
                          gp=gpar(fontsize=20) )                              
              },)
 print(p1)
@@ -137,16 +137,25 @@ s[1:N/2] <- seq(0, 1000, 1000/N/2)
 v[1:N/2] <- seq(0, 100, 100/N/2)
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 outfile <- sprintf("%s%05d%s", "slice", i, ".png")
-png(outfile, width=.pwidth, height=.pheight)
+pdf("slice1.pdf", width=7, height=6)
+#png(outfile, width=.pwidth, height=.pheight)
 #pdf(outfile, width=.pwidth, height=.pheight)
 z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
             NPool, L, byrow=TRUE)
 p1 <- xyplot((z[,3]-z[,2])/.tminc~(z[,3]+z[,2])/2, xlim=c(0, 2500), grid=TRUE,
+             xlab=list("s (cell size, fl)", cex = 1.5),
+             ylab=list("growth rate (fl/hour)", cex=1.5),
+             scales=list(cex=1.5),
              panel=function(...){
                panel.xyplot(...)
                panel.lines(s, v, 
                            lwd=2, type='l', lty=2, col='black')
-               },)
+               grid.text(expression(rho==100),
+                         just="left",
+                         x = unit(0.15, "npc"),
+                         y = unit(0.8, "npc"),
+                         gp=gpar(fontsize=30) )
+             },)
 print(p1)
 dev.off()
 s.save <- s
@@ -197,7 +206,7 @@ dev.off()
 ########################
 #png("rate.png", width=.pwidth, height=.pheight)
 trellis.par.set(clip=list(panel = "on"))
-pdf("rate.pdf", width=7, height=6)
+pdf("rate.pdf", width=7, height=6.3)
 g <- (z[,3]-z[,2])/.tminc
 index <- 25
 Nbin <- 50
@@ -231,9 +240,9 @@ for (i in seq(Nbin)){
 p1 <- xyplot(m~x, xlim=c(0, 2500), grid=TRUE,
              lty = 1, type='b', col='black',
              lwd = 2,
-             xlab=list("s (cell size, fl)", cex = 1.5),
-             ylab=list("growth rate (fl/hour)", cex=1.5),
-             scales=list(cex=1.5),
+             xlab=list("s (cell size, fl)", cex = 2),
+             ylab=list("growth rate (fl/hour)", cex=2),
+             scales=list(cex=2),
              panel = function(...){
                panel.xyplot(...)
                panel.lines(s.save, v, 
@@ -290,7 +299,7 @@ z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
 y.lim = c(0, 3e-3)
 y.at <- pretty(y.lim)
 y.labels <- formatC(1000*y.at, format = "g")
-p1 <- histogram(z[,1], nint=30, xlim=c(250, 3000),
+p1 <- histogram(z[,1], nint=20, xlim=c(250, 3000),
                 ylim=y.lim,
                 type = c("density"),
                 xlab=list("s (cell size, fl)", cex = 1.5),

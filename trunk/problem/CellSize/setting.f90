@@ -380,8 +380,10 @@ contains
     real, intent(in) :: x(lSpec)
     real, intent(in) :: age
     real, intent(out) :: a(lReac)
+    !integer, intent(in) :: i
 
     a = 0.0
+    
     a(1) = lambda1*((kappa*age)**4)/(1.0+((kappa*age)**4))
     a(2) = gamma1*x(1)
     a(3) = lambda2*min(x(1), x(2))

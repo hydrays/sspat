@@ -4,7 +4,7 @@
 	iseed = 1234,
 	tpinc = 1.0,
 	tminc = 0.1,
-	tend = 500,
+	tend = 10000,
 	timestep = 0.05,
 	rho = 100.0,
 	lambda1 = 4000.0,
@@ -12,7 +12,7 @@
 	lambda2 = 0.25,
 	gamma2 = 0.15,
 	s0 = 1000.0,
-	newcell_delta = 68.8,
+	newcell_delta = 268.8,
 	kappa = 1.0,
 	size_critical = 1100.0
 	age_critical = 6,
@@ -20,7 +20,7 @@
 	eta = 0.8,
 	NCollect = 10000,
 	NCollect2 = 10000,
-	tc = 300,
+	tc = 9800,
 	NSize = 50
 /
 

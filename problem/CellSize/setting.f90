@@ -41,6 +41,10 @@ module setting
      real Cage
      real mRNA
      real nRibsome
+     real size_c
+     real age_c
+     real omega
+     real eta
   end type cell
 
   type(cell), allocatable :: CellPool(:)
@@ -114,6 +118,7 @@ contains
     use random
     implicit none
     integer i
+    real u
 
     allocate(CellPool(NPool))
 
@@ -128,6 +133,14 @@ contains
        CellPool(i)%Cage = 0.0
        CellPool(i)%mRNA = 0.0
        CellPool(i)%nRibsome = s0*rho
+       call ran2(u)
+       CellPool(i)%size_c = 2000.0*u
+       call ran2(u)
+       CellPool(i)%age_c = 20.0*u
+       call ran2(u)
+       CellPool(i)%omega = 10.0*u
+       call ran2(u)
+       CellPool(i)%eta = 10.0*u
     end do
   end subroutine init_cell_pool
 
@@ -142,11 +155,15 @@ contains
        open (unit = 11, file=filename, action="write")
        
        do i = 1, NPool
-          write(11, '(6(F16.2))'), CellPool(i)%Csize, &
+          write(11, '(10(F16.2))'), CellPool(i)%Csize, &
                CellPool(i)%Csize_old1, &
                CellPool(i)%Csize_old2, &
                CellPool(i)%Cage, CellPool(i)%mRNA, &
-               CellPool(i)%nRibsome
+               CellPool(i)%nRibsome, &
+               CellPool(i)%size_c, &
+               CellPool(i)%age_c, &
+               CellPool(i)%omega, &
+               CellPool(i)%eta               
        end do
        close(11)
     end if
@@ -158,7 +175,11 @@ contains
                MitosisPool(i)%Csize_old1, &
                MitosisPool(i)%Csize_old2, &
                MitosisPool(i)%Cage, MitosisPool(i)%mRNA, &
-               MitosisPool(i)%nRibsome
+               MitosisPool(i)%nRibsome, &
+               CellPool(i)%size_c, &
+               CellPool(i)%age_c, &
+               CellPool(i)%omega, &
+               CellPool(i)%eta               
        end do
        close(11)
     end if
@@ -170,12 +191,15 @@ contains
                NewbornPool(i)%Csize_old1, &
                NewbornPool(i)%Csize_old2, &
                NewbornPool(i)%Cage, NewbornPool(i)%mRNA, &
-               NewbornPool(i)%nRibsome
+               NewbornPool(i)%nRibsome, &
+               CellPool(i)%size_c, &
+               CellPool(i)%age_c, &
+               CellPool(i)%omega, &
+               CellPool(i)%eta               
        end do
        close(11)
     end if
   end subroutine output_to_file
-
 
   subroutine output_to_file_syn(index)
     implicit none
@@ -203,6 +227,16 @@ contains
     real u, temp
     integer np
     type(cell) new_cell
+    if ( CellPool(i)%Csize < 1200.0 ) then
+       CellPool(i)%Csize = 0.0
+       CellPool(i)%Cage = 0.0
+       CellPool(i)%mRNA = 0.0
+       CellPool(i)%nRibsome = 0.0
+       CellPool(i)%omega = 0.0
+       CellPool(i)%eta = 0.0
+       return
+    end if
+    new_cell = CellPool(i)
     call normdev(0.0, newcell_delta, u)
     !call normdev(0.0, newcell_delta*CellPool(i)%Csize/500, u)
     !write(17, '(6(F16.2))'), u
@@ -213,6 +247,8 @@ contains
     new_cell%Csize = temp - CellPool(i)%Csize
     if ( CellPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
        print *, 'Cell born to be negative size, abort ...'
+       print *, temp, u
+       read(*,*)
     end if
     CellPool(i)%Csize_old1 = CellPool(i)%Csize
     new_cell%Csize_old1 = new_cell%Csize
@@ -243,6 +279,16 @@ contains
     real u, temp
     integer np
     type(cell) new_cell
+    if ( CellPool(i)%Csize < 1200.0 ) then
+       CellPool(i)%Csize = 0.0
+       CellPool(i)%Cage = 0.0
+       CellPool(i)%mRNA = 0.0
+       CellPool(i)%nRibsome = 0.0
+       CellPool(i)%omega = 0.0
+       CellPool(i)%eta = 0.0
+       return
+    end if
+    new_cell = CellPool(i)
     call normdev(0.0, newcell_delta, u)
     !call normdev(0.0, newcell_delta*NewbornPool(i)%Csize/500, u)
     u = min(u, .25*NewbornPool(i)%CSize)
@@ -273,103 +319,26 @@ contains
     NewbornPool(np) = new_cell
   end subroutine cell_division_syn
 
-  subroutine check_mitosis(size, age, m_flag)
+  subroutine check_mitosis(size, age, m_flag, i)
     use random
     implicit none
     real, intent(in) :: size, age
     integer, intent(out) :: m_flag
+    integer, intent(in) :: i
     integer j
     real u, p, p1, p2
     real esize, eage
 
     m_flag = 0
+    size_critical = CellPool(i)%size_c
+    age_critical = CellPool(i)%age_c
+    omega = CellPool(i)%omega
+    eta = CellPool(i)%eta
     call ran2(u)
-
-    !p1 = omega*log(max(1.0, size - size_critical + 1.0))
-    !p2 = eta*log(max(1.0, age - age_critical + 1.0))
-    !p = p1 + p2
-
-    !p1 = omega*sqrt(max(0.0, size - size_critical))
-    !p2 = eta*max(0.0, age - age_critical)
-    !p = p1 + p2
-
-    !p1 = omega*max(0.0, (size - size_critical)/size_critical)
-    !p2 = eta*max(0.0, (age - age_critical)/age_critical)
-    !p = p1 + p2
-
-    !esize = min(size, 2000.0)
-    !eage = age
-    !esize = size
-    !if (size )
-    if (age > 6.0 ) then
-       p1 = omega*max(0.0, (size - size_critical)/size_critical)
-       !if ( size > 1800 ) then
-       !   p1 = 0.6
-       !end if
-    else
-       p1 = 0.0
-    end if
-    if (size > 1000.0 ) then
-       p2 = eta*max(0.0, (age - age_critical)/age_critical)
-    else
-       p2 = 0.0
-    end if
-    if ( size*size/(1000.0*age) > 500 .and. age > 6.0 ) then
-       p1 = p1/2.0
-       p2 = p2/6.0
-       !p2 = 0
-!!$    else if ( size*size/(1000.0*age) > 480 .and. age > 6.0 ) then
-!!$       p1 = p1/1.8
-!!$       p2 = p2/5.0
-!!$    else if ( size*size/(1000.0*age) > 470 .and. age > 6.0 ) then
-!!$       p1 = p1/1.6
-!!$       p2 = p2/4.0
-!!$       !p2 = 0
-!!$    else if ( size*size/(1000.0*age) > 460 .and. age > 6.0 ) then
-!!$       p1 = p1/1.4
-!!$       p2 = p2/3.0
-!!$       !p2 = 0
-    else if ( size*size/(1000.0*age) > 450 .and. age > 6.0 ) then
-       p1 = p1/1.2
-       p2 = p2/2.0
-       !p2 = 0
-    end if
-    !p2 = min(p2, eta*(12.0-age_critical)/age_critical)
-    ! p = max(p1, p2)
-    p = p1**2.0 + p2**2.0
-    ! p = 0.0
-    ! if ( eage > age_critical ) then
-    !    p = max(p1, p2)
-    ! else
-    !    p = 0
-    ! end if
-    ! if ( esize > size_critical ) then    
-    !    p = max(p1, p2)
-    ! end if
-    ! else
-    !    p = 0.0
-    ! end if
-
-
-    !if (size > size_critical .and. age > age_critical) then
-    !   p = 1.0
-    !else
-    !   p = 0.0
-    !end if
-    
-    !if (size > size_critical) then
-    !   p = omega + &
-    !        (1-omega)*( max(0.0, (age - age_critical)/age_critical) )
-    !else 
-
-    !if (size > 1300.0) then
-    !   p =  (1-omega)*( max(0.0, (age - age_critical)/age_critical) )       
-    !else
-    !   p = 0.0
-    !end if
-
+    p1 = max(0.0, (size - size_critical)/size_critical)
+    p2 = max(0.0, (age - age_critical)/age_critical)
+    p = omega*p1**2.0 + eta*p2**2.0
     p = p * timestep
-    !print *, p
     if ( u < p ) then
        m_flag = 1
     end if

@@ -14,7 +14,7 @@ OBJS += \
 %.o: ./%.f90
 	@echo 'Building file: $<'
 	@echo 'Invoking Fortran Compiler'
-	ifort -g -O0 -c -o "$@" "$<"
+	gfortran -g -O0 -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
@@ -30,7 +30,7 @@ main: $(OBJS) $(USER_OBJS)
 	@echo 'Output file name:'
 	@echo $(OUTPUT_FILE)
 	@echo 'Invoking Fortran Linker'
-	ifort -o $(OUTPUT_FILE) $(OBJS) $(USER_OBJS) $(LIBS)
+	gfortran -o $(OUTPUT_FILE) $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

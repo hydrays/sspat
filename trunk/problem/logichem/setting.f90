@@ -29,7 +29,7 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1000
+  integer(I4B) :: NSample = 1
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
   real(kind=8) ap, p0, p1, v0
@@ -110,8 +110,10 @@ contains
     p1 = 0.4
 
     p0 = 1.0/(1.01 + k1*TGFbeta/L)
-    v0 = v0max/(1.0 + k2*TGFbeta/L)
+    !p0 = 1.0/(1.01 + k1*TGFbeta/(x(1)+x(2)+x(3)))
+    !v0 = v0max/(1.0 + k2*TGFbeta/L)
     !v0 = 0.65
+    v0 = 1.0
 
     !pm = 1.0/(1.01 + km1*TGFbeta/L)
     !vm = vmmax/(1.0 + km2*TGFbeta/L)

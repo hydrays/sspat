@@ -199,6 +199,9 @@ contains
     integer, intent(in) :: index
     character(30) filename, filename2
     integer i, j
+    
+    integer k, shift_i
+    real TGFbeta, p0
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
     WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
@@ -215,6 +218,22 @@ contains
        write(11, '(I5)', advance="no"), TDC(i)
        write(11, '(I5)', advance="no"), MC(i)
        write(11, '(I5)', advance="no"), npack(i)
+
+       TGFbeta = 0.0
+       do k = -brange, brange
+          shift_i = k + i
+          if ( shift_i .le. 0 ) then
+             shift_i = shift_i + L
+          else if ( shift_i > L ) then
+             shift_i = shift_i - L
+          end if
+          TGFbeta = TGFbeta + &
+               bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
+       end do
+       p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+
+       write(11, '(f10.2)', advance="no"), p0
+       write(11, '(f10.2)', advance="no"), ((Nutri(i))**2)/(1.0+((Nutri(i))**2))
        write(11, *)
     end do
     do i = 1, L

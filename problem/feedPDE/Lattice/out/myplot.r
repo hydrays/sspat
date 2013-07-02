@@ -19,7 +19,7 @@ pH = 60
 .pwidth = 1028
 .pheight = 256
 
-dataH <- H + 6
+dataH <- H + 8
 
 cat("processing file ...[",N,"]\n")
 i <- 0
@@ -76,8 +76,10 @@ for (i in seq(N)) {
   png(outfile, width=.pwidth, height=.pheight)
   z <- matrix(scan(datafile, n=L*dataH, quiet=TRUE),
               L, dataH, byrow=TRUE)
-  nutri <- z[, H+1]
-  #z <- z[200:pL-200, 1:pH]
+  nutri <- 2*z[, H+1]
+  p0 <- 50*z[,H+7]
+  v0 <- 50*z[,H+8]  
+                                        #z <- z[200:pL-200, 1:pH]
   z <- z[1:pL, 1:pH]
   if(max(z)<4){
     z[200, pH] <- 4
@@ -91,6 +93,8 @@ for (i in seq(N)) {
             panel=function(...){
               panel.levelplot(...)
               panel.lines(seq(pL), nutri, lwd=4, type='l', col='black')
+              panel.lines(seq(pL), p0, lwd=4, type='l', col='blue')
+              panel.lines(seq(pL), v0, lwd=4, type='l', col='red')              
               #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
               grid.text(my.label.time,
                         x = unit(0.85, "npc"),

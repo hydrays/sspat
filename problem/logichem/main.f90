@@ -16,13 +16,15 @@ program ssa
   real(kind=8) N_mutation
   real(kind=8) xbar(NSpec), tbar, xbar_counter
 
-  call ran_seed(sequence=1234)
-  te = 800.0
+  call ran_seed(sequence=12341)
+  te = 4002.0
   !te = huge(1.0)
   
   !do pm = 0.0, 1.0001, 0.01
   !do vm = 0.1, 3.01, 0.01
 !  xbar = 0.0
+  pm = 1.0
+  vm = 1.0
   takeover_counter = 0.0
   nottakeover_counter = 0.0
   coexist_counter = 0.0
@@ -31,7 +33,7 @@ program ssa
      x = xinit
      t = 0.0
      tp = 0.0
-     td = 10000.0
+     td = 200.0
      tbar = 0.0
      xbar_counter = 0.0
      takeover_flag = 0.0
@@ -68,6 +70,8 @@ program ssa
            pause
         end if
         
+!           write (*, '(F10.2, 10F8.2)'), t, x, sum(x), a(7:9), a(15)
+
         if(t > tp) then
            write (*, '(F10.2, 10F8.2)'), t, x, sum(x)
            tp =  tp + 1.0
@@ -77,7 +81,7 @@ program ssa
            if ( x(4) .eq. 0 ) then
               x(4) = 1
            end if
-           td =  td + 400000.0
+           td =  td + 200.0
         end if
 
         if ( x(1) .gt. max_SCnum ) then

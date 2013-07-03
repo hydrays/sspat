@@ -13,7 +13,7 @@ parainfo <- parainfo[1:(.divide-1),]
 
 N = 2000
 pL = 400
-pH = 60
+pH = 80
 #.pwidth = 2048/2
 #.pheight = 288
 .pwidth = 1028
@@ -72,11 +72,14 @@ print(p1)
 for (i in seq(N)) {
 
   datafile <- sprintf("%s%05d%s", "m", i, ".dat")
-  outfile <- sprintf("%s%05d%s", "slice", i, ".png")
-  png(outfile, width=.pwidth, height=.pheight)
+  #outfile <- sprintf("%s%05d%s", "slice", i, ".png")
+  #png(outfile, width=.pwidth, height=.pheight)
+  outfile <- sprintf("%s%05d%s", "slice", i, ".pdf")
+  pdf(outfile, width=.pwidth/60, height=.pheight/60)
+  
   z <- matrix(scan(datafile, n=L*dataH, quiet=TRUE),
               L, dataH, byrow=TRUE)
-  nutri <- 2*z[, H+1]
+  nutri <- 50*z[, H+1]
   p0 <- 50*z[,H+7]
   v0 <- 50*z[,H+8]  
                                         #z <- z[200:pL-200, 1:pH]
@@ -88,8 +91,9 @@ for (i in seq(N)) {
 
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
   p1 <- levelplot(z, col.regions=jet.colors,
-            colorkey=FALSE, xlab="",
-            ylab="",
+                  colorkey=FALSE, xlab="",
+                  ylab="",
+                  ylim = c(0,60),
             panel=function(...){
               panel.levelplot(...)
               panel.lines(seq(pL), nutri, lwd=4, type='l', col='black')
@@ -100,7 +104,9 @@ for (i in seq(N)) {
                         x = unit(0.85, "npc"),
                         y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },
-            scales=list(cex=2))
+            scales=list(cex=2, y=list(relation="free",
+                                 at=list(c(0, 25, 50)),
+                                 labels=list(c(0, 0.5, 1)))))
 
   #p2 <- xyplot(nutri~seq(pL))
   print(p1)

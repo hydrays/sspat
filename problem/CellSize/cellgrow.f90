@@ -68,9 +68,6 @@ contains
              if (r(2) > lx(1) ) then
                 r(2) = lx(1)
              end if
-             if (r(4) > lx(2) ) then
-                r(4) = lx(2)
-             end if
              lx = lx + nu(:, j)*r(j)
              !print *, j, r(j), a(j)
           end do
@@ -82,8 +79,7 @@ contains
           CellPool(i)%mRNA = lx(1)
           CellPool(i)%nRibsome = lx(2)
           
-          call check_mitosis(lsize, lage, m_flag, i)
-
+          call check_mitosis(lsize, lage, m_flag)
           if ( m_flag .eq. 1 ) then
              ! Collect the size of mitosis cell
              if ( t > tc .and. n_mitosis < NCollect) then
@@ -163,9 +159,6 @@ contains
              if (r(2) > lx(1) ) then
                 r(2) = lx(1)
              end if
-             if (r(4) > lx(2) ) then
-                r(4) = lx(2)
-             end if
              lx = lx + nu(:, j)*r(j)
              !print *, j, r(j), a(j)
           end do
@@ -177,7 +170,7 @@ contains
           NewbornPool(i)%mRNA = lx(1)
           NewbornPool(i)%nRibsome = lx(2)
           
-          call check_mitosis(lsize, lage, m_flag, i)
+          call check_mitosis(lsize, lage, m_flag)
           if ( m_flag .eq. 1 ) then
              !print *, "2"
              call cell_division_syn(i)
@@ -208,9 +201,6 @@ contains
                 if (r(2) > lx(1) ) then
                    r(2) = lx(1)
                 end if
-             if (r(4) > lx(2) ) then
-                r(4) = lx(2)
-             end if
                 lx = lx + nu(:, j)*r(j)
                 !print *, j, r(j), a(j)
              end do
@@ -222,7 +212,7 @@ contains
              NewbornPool2(i)%mRNA = lx(1)
              NewbornPool2(i)%nRibsome = lx(2)
              
-             call check_mitosis(lsize, lage, m_flag, i)
+             call check_mitosis(lsize, lage, m_flag)
              if ( m_flag .eq. 1 ) then
                 NewbornPool2(i)%Csize = -1.0
                 write(13, '((F16.2))'), NewbornPool2(i)%Cage

@@ -189,7 +189,7 @@ contains
     end do
 
     ! Nutrition inital is high
-    Nutri(0:L+1) = 10.0
+    Nutri(0:L+1) = 1.0
 
   end subroutine init_cell_pool
 
@@ -272,7 +272,7 @@ contains
     ! supply from the basal layer, Nutri.
     ! Pa controls the division rate of SC and MC.
     !Pa = 2.0*ENutri/(1.0+ENutri)
-    Pa = ((Nutri(i))**2)/(1.0+((Nutri(i))**2))
+    Pa = ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
 
     call ran2(u)
     u = u*a(i)
@@ -431,7 +431,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( Nutri(i) < 0.05 ) then
+                if ( Nutri(i) < 0.05*0.04 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -482,7 +482,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( Nutri(i) < 0.05 ) then
+                if ( Nutri(i) < 0.05*0.04 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -916,8 +916,8 @@ contains
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
-    Nutri(1) = 25.0
-    Nutri(600) = 25.0
+    Nutri(1) = 1.0
+    Nutri(600) = 1.0
     !Nutri(100) = 15.0
     !Nutri(500) = 15.0
     !print *, Nutri(1:3), SC(1:3)

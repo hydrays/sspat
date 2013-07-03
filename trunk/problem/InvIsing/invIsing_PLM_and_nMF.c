@@ -33,25 +33,37 @@ main()
   int i,j,k,l,r,info,ipiv[p-1],index[p],X[p];
   char states[2]={-1,1};
   double C[p][p]={0},m[p]={0},delta=0,J[p][p],Jest[p][p],Jnaive[p][p];
+  double h[p];
 
   FILE *fpJ;	
   FILE *fp;	
 
   //srandom(time(NULL));	
-  srandom(SEED);	
-  for(i=0;i<p;i++) {
-    for(j=i;j<p;j++) {
-      if (i==j) J[i][j]=0;
-      else {	
-	if (unirnd()<connprob)  {
-	  J[i][j]=J[j][i]=1.0/sqrt(p*connprob)*randn();
-	}
-	else J[i][j]=J[j][i]=0;
+  /* srandom(SEED);	 */
+  /* for(i=0;i<p;i++) { */
+  /*   for(j=i;j<p;j++) { */
+  /*     if (i==j) J[i][j]=0; */
+  /*     else {	 */
+  /* 	if (unirnd()<connprob)  { */
+  /* 	  J[i][j]=J[j][i]=1.0/sqrt(p*connprob)*randn(); */
+  /* 	} */
+  /* 	else J[i][j]=J[j][i]=0; */
 				
-      }
-    }
+  /*     } */
+  /*   } */
 
-  }
+  /* } */
+
+  J[0][0] = 0.0;
+  J[1][1] = 0.0;
+  J[2][2] = 0.0;
+  J[0][1] = 0.0;
+  J[1][0] = 0.0;
+  //J[0][2] = J[2][0] = 1.0;
+  //J[1][2] = J[2][1] = 0.0;
+  h[0] = 1.0;
+  h[1] = 0.0;
+  //h[2] = 0.0;
 
   for(i=0;i<p;i++) {	
     X[i]=states[random() % 2];	
@@ -64,7 +76,7 @@ main()
       for(i=0;i<p;i++) {
 	deltaE+=J[i][j]*X[i];	
       }
-      deltaE*=2*B*X[j];
+      deltaE = (deltaE+h[j])*2*B*X[j];
       if (deltaE < 0 || unirnd() < exp(-deltaE)) {
 	X[j]=-X[j];
       }
@@ -79,7 +91,8 @@ main()
       for(i=0;i<p;i++) {
 	deltaE+=J[i][o]*X[i];	
       }
-      deltaE*=2*B*X[o];
+      deltaE = (deltaE+h[o])*2*B*X[o];
+      //deltaE*=2*B*X[o];
       if (deltaE < 0 || unirnd() < exp(-deltaE)) {
 	X[o]=-X[o];
       }
@@ -195,23 +208,24 @@ main()
     }
   }
 
-  fpJ=fopen("Bconnprob.dat","w");
-  fprintf(fpJ,"%f %f ",B,connprob);
-  fclose(fpJ);
+  /* fpJ=fopen("Bconnprob.dat","w"); */
+  /* fprintf(fpJ,"%f %f ",B,connprob); */
+  /* fclose(fpJ); */
 
-  fpJ=fopen("parametersest.dat","w");
-  for(j=0;j<p;j++) {
-    for(i=0;i<p;i++) {
-      fprintf(fpJ,"%.12lf ",Jest[j][i]);		
-    }
-    fprintf(fpJ,"\n");	
+  /* fpJ=fopen("parametersest.dat","w"); */
+  /* for(j=0;j<p;j++) { */
+  /*   for(i=0;i<p;i++) { */
+  /*     fprintf(fpJ,"%.12lf ",Jest[j][i]);		 */
+  /*   } */
+  /*   fprintf(fpJ,"\n");	 */
 				
-  }
-  fclose(fpJ);	
+  /* } */
+  /* fclose(fpJ);	 */
 
   fpJ=fopen("parameters.dat","w");
 
   for(j=0;j<p;j++) {
+    fprintf(fpJ,"%.16lf ",h[j]);
     for(i=0;i<p;i++) {
       fprintf(fpJ,"%.16lf ",J[j][i]);
     }
@@ -229,19 +243,19 @@ main()
   }
   fclose(fp);
 
-  fp=fopen("m.dat","w");
-  fpJ=fopen("C.dat","w");
+  /* fp=fopen("m.dat","w"); */
+  /* fpJ=fopen("C.dat","w"); */
 
-  for(j=0;j<p;j++) {
-    fprintf(fp,"%.16lf\n",m[j]);
-    for(i=0;i<p;i++) {
-      fprintf(fpJ,"%.16lf ",C[j][i]);
-    }
-    fprintf(fpJ,"\n");	
-  }
-  fclose(fpJ);
-  fclose(fp);
-  system("octave egenpnaive.m");
+  /* for(j=0;j<p;j++) { */
+  /*   fprintf(fp,"%.16lf\n",m[j]); */
+  /*   for(i=0;i<p;i++) { */
+  /*     fprintf(fpJ,"%.16lf ",C[j][i]); */
+  /*   } */
+  /*   fprintf(fpJ,"\n");	 */
+  /* } */
+  /* fclose(fpJ); */
+  /* fclose(fp); */
+  /* system("octave egenpnaive.m"); */
 	
 }	
 	

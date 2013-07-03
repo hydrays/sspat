@@ -18,10 +18,10 @@ lambda2 <- 0.25
 gamma2 <- 0.15
 k <- 1.0
 
-L = 10
+L = 6
 .pwidth = 800
 .pheight = 600
-i <- 1990
+i <- 490
 
 # Generate the growth curve of mRNA and Ribosome
 y0 <- c(0, 1000)
@@ -166,7 +166,7 @@ s.save <- s
 #outfile <- sprintf("%s%05d%s", "fa", i, ".png")
 #png(outfile, width=.pwidth, height=.pheight)
 #pdf(outfile, width=.pwidth, height=.pheight)
-pdf("fasyn.pdf", width=7, height=7)
+pdf("fasyn.pdf", width=7, height=5)
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
             NPool, L, byrow=TRUE)
@@ -197,20 +197,6 @@ p1 <- histogram(z[,1], nint=30, xlim=c(250, 3000),
                              rot=c(0,90),
                              text.cex=1.4)
                 })
-print(p1)
-dev.off()
-
-#######################################
-## Phenotype distribution
-#######################################
-#outfile <- sprintf("%s%05d%s", "fa", i, ".png")
-#png(outfile, width=.pwidth, height=.pheight)
-#pdf(outfile, width=.pwidth, height=.pheight)
-pdf("fpheno.pdf", width=7, height=7)
-datafile <- sprintf("%s%05d%s", "m", i, ".dat")
-z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
-            NPool, L, byrow=TRUE)
-p1 <- xyplot(z[,10]~z[,8])
 print(p1)
 dev.off()
 
@@ -262,6 +248,56 @@ p1 <- xyplot(m~x, xlim=c(0, 2500), grid=TRUE,
                panel.lines(s.save, v, 
                            lwd=2, type='l',
                            lty=2, col='red', xlim=c(0, 2500))
+             })
+#panel.lines(s, v, 
+#                         lwd=2, type='l', lty=2, col='black')
+print(p1)
+dev.off()
+
+########################
+### Averaged Growth Rate vs time
+########################
+#png("rate.png", width=.pwidth, height=.pheight)
+trellis.par.set(clip=list(panel = "on"))
+pdf("ratevstime.pdf", width=7, height=6.3)
+g <- (z[,3]-z[,2])/.tminc
+index <- 25
+Nbin <- 50
+lx <- 0
+ux <- 15
+dx <- (ux-lx)/Nbin
+m <- seq(Nbin)
+nn <- seq(Nbin)
+va <- seq(Nbin)
+x <- seq(Nbin)
+for (i in seq(Nbin)){
+  x[i] <- lx + (i-0.5)*dx
+  m[i] <- 0
+  va[i] <- 0
+  nn[i] <- 0
+}
+for (i in seq(NPool)){
+  s <- z[i,4]
+  #s <- z[i,2]
+  s <- min(ux, s)
+  s <- max(lx, s)     
+  index <- floor((s-lx)/dx)+1
+  nn[index] <- nn[index] + 1
+  va[index] <- va[index] + g[i]*g[i]
+  m[index] <- m[index] + g[i]
+}
+for (i in seq(Nbin)){
+  m[i] <- m[i] / nn[i]
+  va[i] <- va[i] / nn[i] - m[i]*m[i]
+}
+p1 <- xyplot(m~x, xlim=c(0, 15), grid=TRUE,
+             lty = 1, type='b', col='black',
+             lwd = 2,
+             xlab=list("s (cell size, fl)", cex = 2),
+             ylab=list("growth rate (fl/hour)", cex=2),
+             scales=list(cex=2),
+             panel = function(...){
+               panel.xyplot(...)
              })
 #panel.lines(s, v, 
 #                         lwd=2, type='l', lty=2, col='black')
@@ -382,119 +418,119 @@ p1 <- levelplot(data[1:T, lM:M]/NCollect,
 print(p1)
 dev.off()
 
-## Make figure 4
-#png("fig4.png", width=.pwidth, height=.pheight)
-pdf("fig4.pdf", width=7, height=7)
-ls <- 1400
-us <- 2600
-M <- 20
-ds <- (us-ls)/M
-data1 <- seq(M)
-data2 <- seq(M)
-x <- seq(M)
-num1 <- seq(M)
-num2 <- seq(M)
+## ## Make figure 4
+## #png("fig4.png", width=.pwidth, height=.pheight)
+## pdf("fig4.pdf", width=7, height=7)
+## ls <- 1400
+## us <- 2600
+## M <- 20
+## ds <- (us-ls)/M
+## data1 <- seq(M)
+## data2 <- seq(M)
+## x <- seq(M)
+## num1 <- seq(M)
+## num2 <- seq(M)
 
-datafile1 <- sprintf("%s%02d%s", "prodiv", 7, ".dat")
-datafile2 <- sprintf("%s%02d%s", "prodiv", 8, ".dat")
-z1 <- matrix(scan(datafile1, n=NCollect2*1, quiet=TRUE),
-            NCollect2, 1, byrow=TRUE)
-z2 <- matrix(scan(datafile2, n=NCollect2*1, quiet=TRUE),
-            NCollect2, 1, byrow=TRUE)
-for (i in seq(M)){
-  num1[i] <- 0
-  num2[i] <- 0
-}
+## datafile1 <- sprintf("%s%02d%s", "prodiv", 7, ".dat")
+## datafile2 <- sprintf("%s%02d%s", "prodiv", 8, ".dat")
+## z1 <- matrix(scan(datafile1, n=NCollect2*1, quiet=TRUE),
+##             NCollect2, 1, byrow=TRUE)
+## z2 <- matrix(scan(datafile2, n=NCollect2*1, quiet=TRUE),
+##             NCollect2, 1, byrow=TRUE)
+## for (i in seq(M)){
+##   num1[i] <- 0
+##   num2[i] <- 0
+## }
 
-for (j in seq(NCollect2)){
-    if ( z1[j,1] > 0 ) {
-      z1[j,1]  = min(us, z1[j,1])
-      z1[j,1] = max(ls, z1[j,1])         
-      Mindex <- floor( (z1[j,1]-ls)/ds ) + 1
-      num1[Mindex] = num1[Mindex] + 1
-      if (z2[j,1] > 0 ) {
-        num2[Mindex] = num2[Mindex] + 1
-      }
-    }
-  }
-for ( i in seq(M) ) {
-  x[i] = ls + i*ds - 0.5*ds
-  data1[i] <- 1 - num2[i]/num1[i]
-}
+## for (j in seq(NCollect2)){
+##     if ( z1[j,1] > 0 ) {
+##       z1[j,1]  = min(us, z1[j,1])
+##       z1[j,1] = max(ls, z1[j,1])         
+##       Mindex <- floor( (z1[j,1]-ls)/ds ) + 1
+##       num1[Mindex] = num1[Mindex] + 1
+##       if (z2[j,1] > 0 ) {
+##         num2[Mindex] = num2[Mindex] + 1
+##       }
+##     }
+##   }
+## for ( i in seq(M) ) {
+##   x[i] = ls + i*ds - 0.5*ds
+##   data1[i] <- 1 - num2[i]/num1[i]
+## }
 
-datafile1 <- sprintf("%s%02d%s", "prodiv", 10, ".dat")
-datafile2 <- sprintf("%s%02d%s", "prodiv", 11, ".dat")
-z1 <- matrix(scan(datafile1, n=NCollect2*1, quiet=TRUE),
-            NCollect2, 1, byrow=TRUE)
-z2 <- matrix(scan(datafile2, n=NCollect2*1, quiet=TRUE),
-            NCollect2, 1, byrow=TRUE)
-for (i in seq(M)){
-  num1[i] <- 0
-  num2[i] <- 0
-}
-for (j in seq(NCollect2)){
-    if ( z1[j,1] > 0 ) {
-      z1[j,1]  = min(us, z1[j,1])
-      z1[j,1] = max(ls, z1[j,1])         
-      Mindex <- floor( (z1[j,1]-ls)/ds ) + 1
-      num1[Mindex] = num1[Mindex] + 1
-      if (z2[j,1] > 0 ) {
-        num2[Mindex] = num2[Mindex] + 1
-      }
-    }
-  }
-for ( i in seq(M) ) {
-  data2[i] <- 1 - num2[i]/num1[i]
-}
+## datafile1 <- sprintf("%s%02d%s", "prodiv", 10, ".dat")
+## datafile2 <- sprintf("%s%02d%s", "prodiv", 11, ".dat")
+## z1 <- matrix(scan(datafile1, n=NCollect2*1, quiet=TRUE),
+##             NCollect2, 1, byrow=TRUE)
+## z2 <- matrix(scan(datafile2, n=NCollect2*1, quiet=TRUE),
+##             NCollect2, 1, byrow=TRUE)
+## for (i in seq(M)){
+##   num1[i] <- 0
+##   num2[i] <- 0
+## }
+## for (j in seq(NCollect2)){
+##     if ( z1[j,1] > 0 ) {
+##       z1[j,1]  = min(us, z1[j,1])
+##       z1[j,1] = max(ls, z1[j,1])         
+##       Mindex <- floor( (z1[j,1]-ls)/ds ) + 1
+##       num1[Mindex] = num1[Mindex] + 1
+##       if (z2[j,1] > 0 ) {
+##         num2[Mindex] = num2[Mindex] + 1
+##       }
+##     }
+##   }
+## for ( i in seq(M) ) {
+##   data2[i] <- 1 - num2[i]/num1[i]
+## }
 
-p1 <- xyplot(data1[1:(M-3)]~x[1:(M-3)],
-             xlab = list("s (cell size, fl)", cex=2),
-             ylab = list("Proportion of divisions", cex=2),
-             scales=list(cex=2),
-             type = 'b', lwd = 2, col="blue",
-             ylim = c(0, 1),
-             xlim = c(1400, 2600),
-             grid=TRUE,
-             cex = 1.5,
-             pch = 20,
-             panel = function(...){
-               panel.xyplot(...)
-               panel.lines(x[1:(M-3)], data2[1:(M-3)], 
-                         lwd=2, type='b', col='red', cex=1.5, pch=20)
-             }
-             )
-print(p1)
-dev.off()
+## p1 <- xyplot(data1[1:(M-3)]~x[1:(M-3)],
+##              xlab = list("s (cell size, fl)", cex=2),
+##              ylab = list("Proportion of divisions", cex=2),
+##              scales=list(cex=2),
+##              type = 'b', lwd = 2, col="blue",
+##              ylim = c(0, 1),
+##              xlim = c(1400, 2600),
+##              grid=TRUE,
+##              cex = 1.5,
+##              pch = 20,
+##              panel = function(...){
+##                panel.xyplot(...)
+##                panel.lines(x[1:(M-3)], data2[1:(M-3)], 
+##                          lwd=2, type='b', col='red', cex=1.5, pch=20)
+##              }
+##              )
+## print(p1)
+## dev.off()
 
 
-## Trajecotries in the second paper
-outfile <- sprintf("trace.png")
-png(outfile, width=.pwidth, height=.pheight)
-z <- matrix(scan("trace.dat", n=25*1000/.tminc, quiet=TRUE),
-            25/.tminc, 1000, byrow=TRUE)
-x <- matrix(0, 25/.tminc, 1)
-y <- matrix(0, 25/.tminc, 1)
-plot(c(0, 2500), c(0, 200))
-for ( j in seq(1000) ) {
-  if ( (z[1, j] - 1000)^2 < 1000){
-  for (i in seq(25/.tminc)) {
-    x[i] <- z[i, j]
-    if ( i < 2 ) {
-      y[i] <- 0
-    }
-    else {
-      y[i] <- (z[i, j] - z[i-1, j])/.tminc
-    }
-  }
-  lines(x, y, type="b", col=j)
-}
-}
+## ## Trajecotries in the second paper
+## outfile <- sprintf("trace.png")
+## png(outfile, width=.pwidth, height=.pheight)
+## z <- matrix(scan("trace.dat", n=25*1000/.tminc, quiet=TRUE),
+##             25/.tminc, 1000, byrow=TRUE)
+## x <- matrix(0, 25/.tminc, 1)
+## y <- matrix(0, 25/.tminc, 1)
+## plot(c(0, 2500), c(0, 200))
+## for ( j in seq(1000) ) {
+##   if ( (z[1, j] - 1000)^2 < 1000){
+##   for (i in seq(25/.tminc)) {
+##     x[i] <- z[i, j]
+##     if ( i < 2 ) {
+##       y[i] <- 0
+##     }
+##     else {
+##       y[i] <- (z[i, j] - z[i-1, j])/.tminc
+##     }
+##   }
+##   lines(x, y, type="b", col=j)
+## }
+## }
 
-## Generate lifespan
-outfile <- sprintf("lifespan.png")
-png(outfile, width=.pwidth, height=.pheight)
-z <- matrix(scan("lifespan.dat", n=NCollect2*1, quiet=TRUE),
-              NCollect2, 1, byrow=TRUE)
-p1 <- histogram(z, nint=30, scales=list(cex=2))
-print(p1)
-dev.off()
+## ## Generate lifespan
+## outfile <- sprintf("lifespan.png")
+## png(outfile, width=.pwidth, height=.pheight)
+## z <- matrix(scan("lifespan.dat", n=NCollect2*1, quiet=TRUE),
+##               NCollect2, 1, byrow=TRUE)
+## p1 <- histogram(z, nint=30, scales=list(cex=2))
+## print(p1)
+## dev.off()

@@ -40,6 +40,7 @@ module chem_data
   real(kind=8) qm1, qm2, qm3
   real(kind=8), parameter :: L = 200
   real(kind=8), parameter :: mu = 0.0
+  real d
 
 !!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
 !!$       10, & !SC
@@ -95,6 +96,8 @@ contains
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8) TGFbeta, g1
+
+    d = 0.3
     
     TGFbeta = x(3) + x(5)
     !TGFbeta = x(3)
@@ -111,9 +114,9 @@ contains
 
     p0 = 1.0/(1.01 + k1*TGFbeta/L)
     !p0 = 1.0/(1.01 + k1*TGFbeta/(x(1)+x(2)+x(3)))
-    !v0 = v0max/(1.0 + k2*TGFbeta/L)
+    v0 = v0max/(1.0 + k2*TGFbeta/L)
     !v0 = 0.65
-    v0 = 1.0
+    !v0 = 1.0
 
     !pm = 1.0/(1.01 + km1*TGFbeta/L)
     !vm = vmmax/(1.0 + km2*TGFbeta/L)
@@ -172,8 +175,8 @@ contains
     a(8) = qm2*vm*x(4)
     a(9) = qm3*vm*x(4)
     
-    a(10) = 0.2*x(3)
-    a(11) = 0.2*x(5)
+    a(10) = d*x(3)
+    a(11) = d*x(5)
 
     a(12) = ap*x(1)
     a(13) = ap*x(2)

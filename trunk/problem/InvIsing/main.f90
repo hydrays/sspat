@@ -1,8 +1,8 @@
 program InvIsing
   implicit none
-  integer, parameter :: p = 2 !/*system size*/
+  integer, parameter :: p = 3 !/*system size*/
   real, parameter :: connprob = 1.0 !/*sparsity factor*/
-  integer, parameter :: n = 10000	!/*number of samples*/
+  integer, parameter :: n = 20000	!/*number of samples*/
   integer, parameter :: JUMPS = 10000 !/*sampling period*/
   integer, parameter :: WARMUPS = 5000000 !/*MC warmups*/
   real, parameter :: B = 1.0 !/*inverse temperature*/
@@ -11,15 +11,15 @@ program InvIsing
 
   integer INFO
   integer SEED
-  integer i,j,k,l,r,ipiv(p-1),index(p),X(p)
+  integer i,j,k,l,r,ipiv(p)
   real C(p,p),m(p),Jtrue(p,p),Jest(p,p),Jnaive(p,p)
-  real C(p,p),m(p),htrue(p),hest(p),hnaive(p)
+  real htrue(p),hest(p),hnaive(p)
   real delta
-  real f(p-1),JAC(p-1,p-1)
+  real f(p),JAC(p,p)
   real gradnorm, gradmax
   real samples(n, p)
   integer samplev
-  real thetas(p-1)
+  real thetas(p)
   integer done, count
   integer rnd
   real z, A1, A2, A3
@@ -35,22 +35,16 @@ program InvIsing
      !end do
   end do
   close(21)
-  !   printf("\n Done sampling \n");
 
-  !   for(r=0;r<p;r++) {	
   do r = 1, p
-     !print *, 'check 1', r
      done = 0
      count = 0
-     do j = 1, p-1
-        thetas(j) = 0.0
-     end do
+     thetas = 0.0
      do while (done .eq. 0)
         f = 0.0
         JAC = 0.0
         gradnorm = 0.0
         gradmax = 0.0
-        !rnd= module(random(), HES)
         do l = 1, n
            z = 0.0
            do j = 1, p-1
@@ -61,15 +55,10 @@ program InvIsing
               end if
               z = z + thetas(j)*samples(l, ii)
            end do
-           z = exp(2.0*B*samples(l, r)*z)
+           z = exp(2.0*B*samples(l, r)*(z + thetas(p)))
            A1 = -1.0/n*2.0*B*samples(l, r)/(z+1.0)
-           ! 	if ((l % HES) == rnd) {
            A2 = 1.0/n*(4.0*B*B*z)/((z+1.0)*(z+1.0))
-
-           !print *, 'check 2', r
-
            do j = 1, p-1
-              !print *, 'check 2.5', j
               if (j .ge. r) then
                  ii = j + 1
               else
@@ -77,30 +66,31 @@ program InvIsing
               end if
               f(j) = f(j) + samples(l, ii) * A1;	
               A3 = samples(l, ii)*A2;
-              !print *, 'check 2.6', j			
               do k = 1, j
                  if (k .ge. r) then
                     ii = k + 1
                  else
                     ii = k
                  end if
-                 !print *, 'check 2.61', j, k, l, ii			
                  JAC(j,k) = JAC(j,k) + samples(l, ii)*A3;
               end do
            end do
-           ! 	}
-           ! 	else {
-           ! 	  for(j=0;j<p-1;j++) {
-           ! 	    f[j]+=(((samples[l] >> j+(j>=r))&1)*2-1)*A1;	
-           ! 	  }
-           ! 	}
+           f(p) = f(p) + A1;
+           do k = 1, p-1
+              if (k .ge. r) then
+                 ii = k + 1
+              else
+                 ii = k
+              end if
+              JAC(p,k) = JAC(p,k) + samples(l, ii)*A2;
+           end do
+           JAC(p,p) = JAC(p,p) + A2
         end do
 
-        !print *, 'check 3', r
+!        write (*, *), "withour symm", JAC
 
-        do j = 1, p-1
-           do k = j+1, p-1
-              ! 	for(k=j+1;k<p-1;k++) {
+        do j = 1, p
+           do k = j+1, p
               JAC(j,k) = JAC(k,j);
            end do
            gradnorm = gradnorm + f(j)*f(j)
@@ -109,18 +99,24 @@ program InvIsing
         gradnorm = sqrt(gradnorm)
 
         write (*, "(2(f20.10))"), gradmax, gradnorm
+!        write (*, *), r, thetas
+!        write (*, *), f
+!        write (*, *), JAC
         !       info = clapack_dgesv(CblasRowMajor, p-1, 1, &JAC[0][0], p-1, ipiv, &f[0], p-1);
-        call DGESV(p-1, 1, JAC, p-1, ipiv, f, p-1, INFO)
+        call DGESV(p, 1, JAC, p, ipiv, f, p, INFO)
         if (info .ne. 0) then
            write(*,*), "failure with error %d\n", info
            read(*,*)
         end if
 
         done = 1
-        do j = 1, p-1
+        do j = 1, p
            thetas(j) = thetas(j) - f(j)
            if (f(j)>TOL .or. f(j)<-TOL) done = 0
         end do
+!        write (*, *), f
+!        read(*,*)
+
         count = count + 1
      end do
      write(*,*) count, r
@@ -132,6 +128,7 @@ program InvIsing
         end if
         Jest(ii,r) = thetas(j)
      end do
+     hest(r) = thetas(p)
      !     /*put thetas as columns in jest*/
   end do
 
@@ -179,8 +176,9 @@ program InvIsing
 
   open(file="parametersest.dat",unit=101,action="write")
   do j = 1, p
+     write(101, "(f20.4)", advance="no"), hest(j);		
      do i = 1, p
-        write(101, "(f20.12)", advance="no"), Jest(j,i);		
+        write(101, "(f20.4)", advance="no"), Jest(j,i);		
      end do
      write(101,*)
   end do

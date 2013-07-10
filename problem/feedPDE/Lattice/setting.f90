@@ -233,7 +233,7 @@ contains
        p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
 
        write(11, '(f10.2)', advance="no"), p0
-       write(11, '(f10.2)', advance="no"), ((Nutri(i))**2)/(1.0+((Nutri(i))**2))
+       write(11, '(f10.2)', advance="no"), ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
        write(11, *)
     end do
     do i = 1, L

@@ -94,15 +94,16 @@ for (i in seq(N)) {
                   colorkey=FALSE, xlab="",
                   ylab="",
                   ylim = c(0,60),
+                  draw=FALSE,
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), nutri, lwd=4, type='l', col='black')
-              panel.lines(seq(pL), p0, lwd=4, type='l', col='blue')
-              panel.lines(seq(pL), v0, lwd=4, type='l', col='red')              
+              panel.lines(seq(pL), nutri, lwd=4, type='l', col=colors()[100])
+              panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
+              panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
               #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
-              grid.text(my.label.time,
-                        x = unit(0.85, "npc"),
-                        y = unit(0.85, "npc"), gp=gpar(fontsize=30))
+              #grid.text(my.label.time,
+              #           x = unit(0.85, "npc"),
+              #           y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },
             scales=list(cex=2, y=list(relation="free",
                                  at=list(c(0, 25, 50)),
@@ -111,6 +112,25 @@ for (i in seq(N)) {
   #p2 <- xyplot(nutri~seq(pL))
   print(p1)
 
+  ## p2 <- xyplot(c(0,0)~c(400, 60),
+  ##                 ylab="",
+  ##                 ylim = c(0,60),
+  ##              xlim = c(0,400),
+  ##                 draw=FALSE,
+  ##           panel=function(...){
+  ##             panel.lines(seq(pL), nutri, lwd=4, type='l', col=colors()[100])
+  ##             panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
+  ##             panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
+  ##             #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
+  ##             grid.text(my.label.time,
+  ##                       x = unit(0.85, "npc"),
+  ##                       y = unit(0.85, "npc"), gp=gpar(fontsize=30))
+  ##           },
+  ##           scales=list(cex=2, y=list(relation="free",
+  ##                                at=list(c(0, 25, 50)),
+  ##                                labels=list(c(0, 0.5, 1)))))
+
+  
   ## print(p2)
   #print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
   #print(p2, position=c(0, 0, 1, 0.5))

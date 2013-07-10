@@ -17,8 +17,8 @@ program ssa
 !       120, 140, 160, 180, 200, 220, 240, 260, 280, &
 !       300, 320, 340, 360, 380, 400/)
 
-  real(kind=8), parameter :: L_space(5) = (/40, 60, 100, &
-       200, 1000/)
+  real(kind=8), parameter :: L_space(7) = (/40, 60, 100, 200, &
+       1000, 2000, 20000/)
 
 !, 3000, 4000, 6000, 10000, &
 !       20000, 40000, 80000, 100000, 200000/)
@@ -34,13 +34,13 @@ program ssa
 
   Fid1 = 10
 
-  do CeilN = 1,5
+  do CeilN = 1,7
      L = L_space(CeilN)
      Xinit = (/2, 3, 15, 0, 0/)
      !Xinit = Xinit*(10**(CeilN-1))
      Xinit = Xinit*L/20.0
      print *, CeilN, L, Xinit
-     call prepare_output_files("mute_cuttdc_N", L, Fid1)
+     call prepare_output_files("mute_persist04_N", L, Fid1)
      do index = 1.0, NSample
         x = xinit
         t = 0.0
@@ -82,11 +82,11 @@ program ssa
            if(t > td) then
               if ( x(4) .eq. 0 .and. sum(x).ne.0 ) then
                  x(4) = 1
-                 x(3) = int(x(3)/4.0)
+                 !x(3) = int(x(3)/4.0)
                  !x(2) = int(x(2)/4.0)
                  !x(1) = int(x(1)/4.0)
               end if
-              td =  td + 5000.0
+              td =  td + 50.0
            end if
 
            if (sum(x).eq.0) then

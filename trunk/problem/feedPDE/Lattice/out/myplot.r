@@ -105,11 +105,10 @@ for (i in seq(N)) {
               #           x = unit(0.85, "npc"),
               #           y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },
-            scales=list(cex=2, y=list(relation="free",
+            scales=list(cex=4, y=list(relation="free",
                                  at=list(c(0, 25, 50)),
                                  labels=list(c(0, 0.5, 1)))))
 
-  #p2 <- xyplot(nutri~seq(pL))
   print(p1)
 
   ## p2 <- xyplot(c(0,0)~c(400, 60),
@@ -122,9 +121,9 @@ for (i in seq(N)) {
   ##             panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
   ##             panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
   ##             #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
-  ##             grid.text(my.label.time,
-  ##                       x = unit(0.85, "npc"),
-  ##                       y = unit(0.85, "npc"), gp=gpar(fontsize=30))
+  ##             #grid.text(my.label.time,
+  ##             #          x = unit(0.85, "npc"),
+  ##             #          y = unit(0.85, "npc"), gp=gpar(fontsize=30))
   ##           },
   ##           scales=list(cex=2, y=list(relation="free",
   ##                                at=list(c(0, 25, 50)),

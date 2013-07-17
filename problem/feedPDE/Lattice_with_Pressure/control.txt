@@ -1,0 +1,33 @@
+! Control parameters
+&xdata
+	L = 400,
+	H = 400,
+	brange = 8,
+	tend = 500.0,
+  	p1 = 0.3,
+	v = 1.0,
+	difv = 100.0,
+	mutv = 0.0,
+	fdgain1 = 0.01,
+	scstick = 0.96,
+	prelax = 0.2,
+	iseed = 12351,
+	tpinc = 1.0,
+	tm = 100
+/
+
+&xdataomp
+	useomp = 0,
+	is64bit = 0,
+	timestep = 0.01,
+	npar = 4
+/
+
+&ndata
+	NutriGrowthRate = 0.0,
+	NutriConsumeRate = 0.03,
+	NutriDecayRate = 0.1,
+	NutriMobility = 2500.0,
+	NutriTimestep = 0.0001,
+	NutriKillrate = 0.02
+/

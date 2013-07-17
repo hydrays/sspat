@@ -72,10 +72,10 @@ print(p1)
 for (i in seq(N)) {
 
   datafile <- sprintf("%s%05d%s", "m", i, ".dat")
-  #outfile <- sprintf("%s%05d%s", "slice", i, ".png")
-  #png(outfile, width=.pwidth, height=.pheight)
-  outfile <- sprintf("%s%05d%s", "slice", i, ".pdf")
-  pdf(outfile, width=.pwidth/60, height=.pheight/60)
+  outfile <- sprintf("%s%05d%s", "slice", i, ".png")
+  png(outfile, width=.pwidth, height=.pheight)
+  #outfile <- sprintf("%s%05d%s", "slice", i, ".pdf")
+  #pdf(outfile, width=.pwidth/60, height=.pheight/60)
   
   z <- matrix(scan(datafile, n=L*dataH, quiet=TRUE),
               L, dataH, byrow=TRUE)
@@ -101,9 +101,9 @@ for (i in seq(N)) {
               panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
               panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
               #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
-              #grid.text(my.label.time,
-              #           x = unit(0.85, "npc"),
-              #           y = unit(0.85, "npc"), gp=gpar(fontsize=30))
+              grid.text(my.label.time,
+                         x = unit(0.85, "npc"),
+                         y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },
             scales=list(cex=4, y=list(relation="free",
                                  at=list(c(0, 25, 50)),

@@ -36,7 +36,7 @@ contains
        end if
 
        if (t .ge. tm) then
-          kill_number = 200 
+          kill_number = 210 
           if ( cmat(kill_number, 1)%type .eq. 1 ) then
              SC(kill_number) = SC(kill_number) - 1
           else if ( cmat(kill_number, 1)%type .eq. 2 ) then

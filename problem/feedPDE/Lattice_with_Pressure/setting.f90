@@ -201,7 +201,7 @@ contains
     integer i, j
     
     integer k, shift_i
-    real TGFbeta, p0
+    real TGFbeta, p0, Pa
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
     WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
@@ -231,9 +231,10 @@ contains
                bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
        end do
        p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
+       Pa = ((25*Nutri(i))**4)/(1.0+((25*Nutri(i))**4))
 
        write(11, '(f10.2)', advance="no"), p0
-       write(11, '(f10.2)', advance="no"), ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
+       write(11, '(f10.2)', advance="no"), Pa
        write(11, *)
     end do
     do i = 1, L
@@ -272,7 +273,8 @@ contains
     ! supply from the basal layer, Nutri.
     ! Pa controls the division rate of SC and MC.
     !Pa = 2.0*ENutri/(1.0+ENutri)
-    Pa = ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
+    Pa = ((25*Nutri(i))**4)/(1.0+((25*Nutri(i))**4))
+    !Pa = 1.0/((Nutri(i))**2+1.0)
 
     call ran2(u)
     u = u*a(i)
@@ -893,35 +895,9 @@ contains
     implicit none
     real, intent(in) :: dt
     integer i
-    real nutri_flag
-    Nutri_old(0:L+1) = Nutri(0:L+1)
     do i = 1, L
-       if ( TDC(i) < 0 ) then
-          print *, i, TDC(i), SC(i), TAC(i), MC(i), npack(i)
-          read(*,*)
-          nutri_flag = 0.0
-       else
-          !nutri_flag = 1.0
-          nutri_flag = TDC(i)
-       end if
-       !nutri_flag = 1.0
-       !nutri_flag = TDC(i)
-       Nutri(i) = Nutri_old(i) + &
-            (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
-            + NutriGrowthRate*nutri_flag*dt &
-            - NutriConsumeRate*(SC(i)+MC(i))*dt &
-            - NutriDecayRate*Nutri(i)*dt
-       Nutri(i) = max(0.0, Nutri(i))
-       !Nutri(i) = min(10.0, Nutri(i))
+       Nutri(i) = 1.0/npack(i)
     end do
-    Nutri(L+1) = Nutri(1)
-    Nutri(0) = Nutri(L)
-    Nutri(1) = 1.0
-    Nutri(600) = 1.0
-    !Nutri(100) = 15.0
-    !Nutri(500) = 15.0
-    !print *, Nutri(1:3), SC(1:3)
-    !read(*,*)
   end subroutine update_nutri
 
 end module setting

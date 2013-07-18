@@ -916,8 +916,8 @@ contains
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
-    Nutri(1) = 1.0
-    Nutri(600) = 1.0
+    Nutri(1) = 0.5
+    Nutri(400) = 0.5
     !Nutri(100) = 15.0
     !Nutri(500) = 15.0
     !print *, Nutri(1:3), SC(1:3)

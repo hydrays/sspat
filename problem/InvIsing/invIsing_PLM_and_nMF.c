@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <atlas/clapack.h>
 
-#define p 2 /*system size*/
+#define p 4 /*system size*/
 #define connprob 1.0 /*sparsity factor*/
 #define n 10000	/*number of samples*/
 #define JUMPS 10000 /*sampling period*/
@@ -16,8 +16,6 @@
 
 
 long long int samples[n];
-
-
 
 inline double unirnd() {
   return (double)(random()+1.0)/(RAND_MAX+1.0);
@@ -57,13 +55,17 @@ main()
   J[0][0] = 0.0;
   J[1][1] = 0.0;
   J[2][2] = 0.0;
-  J[0][1] = 0.0;
-  J[1][0] = 0.0;
-  //J[0][2] = J[2][0] = 1.0;
-  //J[1][2] = J[2][1] = 0.0;
-  h[0] = 1.0;
+
+  J[0][1] = J[1][0] = 0.0;
+  J[0][2] = J[2][0] = 0.0;
+  J[0][3] = J[3][0] = 0.0;
+  J[1][2] = J[2][1] = 0.0;
+  J[1][3] = J[3][1] = 0.0;
+  J[2][3] = J[3][2] = 1.0;
+  h[0] = 0.0;
   h[1] = 0.0;
-  //h[2] = 0.0;
+  h[2] = 0.0;
+  h[3] = 0.0;
 
   for(i=0;i<p;i++) {	
     X[i]=states[random() % 2];	

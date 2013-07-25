@@ -1,6 +1,6 @@
 program InvIsing
   implicit none
-  integer, parameter :: p = 3 !/*system size*/
+  integer, parameter :: p = 4 !/*system size*/
   real, parameter :: connprob = 1.0 !/*sparsity factor*/
   integer, parameter :: n = 20000	!/*number of samples*/
   integer, parameter :: JUMPS = 10000 !/*sampling period*/

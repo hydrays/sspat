@@ -29,20 +29,41 @@
 module chem_data  
   use nrtype
   implicit none
-  integer(I4B) :: NSample = 1
+  integer(I4B) :: NSample = 100
   integer(I4B), parameter :: NSpec=5
   integer(I4B), parameter :: NReac=18
-  real(kind=8) ap, p0, v0
-  real(kind=8) pm, vm, p1, v1
-  real(kind=8) ksc1, ksc2, ktac1, ktac2, kmc1, kmc2
-  real(kind=8) v0max, v0min, v1min, v1max, vmmax, vmmin
+  real(kind=8) ap, p0, p1, v0
+  real(kind=8) pm, vm
+  real(kind=8) k1, k2, v0max, v0min
   real(kind=8) q1, q2, q3
   real(kind=8) qq1, qq2, qq3
   real(kind=8) qm1, qm2, qm3
-  real(kind=8) L
-  real(kind=8), parameter :: xi = 20.0
-  real(kind=8), parameter :: mu = 0.0
-  integer(I4B) Xinit(NSpec)
+  real(kind=8), parameter :: L = 200
+  real(kind=8), parameter :: mu = 0.0001
+
+!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
+!!$       10, & !SC
+!!$       0, & !TA
+!!$       0, & !TC
+!!$       00, & !MC
+!!$       00 & !TMC
+!!$       /)
+
+  integer(I4B), parameter :: Xinit(NSpec)=(/ &
+       30, & !SC
+       50, & !TA
+       120, & !TC
+       00, & !MC
+       00 & !TMC
+       /)
+
+!!$  integer(I4B), parameter :: Xinit(NSpec)=(/ &
+!!$       100, & !SC
+!!$       300, & !TA
+!!$       1600, & !TC
+!!$       00, & !MC
+!!$       00 & !TMC
+!!$       /)
 
   integer(I4B), parameter, dimension(NSpec,NReac) :: nu = reshape( &
        ! 1   2   3   4   5
@@ -69,10 +90,11 @@ module chem_data
        )
 
 contains
-  subroutine getrate(x, a)
+  subroutine getrate(x, a, pm)
     implicit none
     real(kind=8), intent(in) :: x(NSpec)
     real(kind=8), intent(out) :: a(NReac)
+    real(kind=8), intent(in) :: pm
     real(kind=8) TGFbeta 
 
     TGFbeta = x(3) + x(5)
@@ -80,29 +102,12 @@ contains
 
     v0max = 3.0
     v0min = 0.5
-    ksc1 = 1.0
-    ksc2 = v0max/v0min - 1.0
-    p0 = 1.0/(1.01 + ksc1*TGFbeta/L)
-    v0 = v0max/(1.0 + ksc2*TGFbeta/L)
-    !v0 = 0.65
-
-    !v1max = 1.3
-    !v1min = 0.7
-    !ktac1 = 0.8
-    !ktac2 = v1max/v1min - 1.0
-    !p1 = 0.6/(1.01 + ktac1*TGFbeta/L)
-    !v1 = v1max/(1.0 + ktac2*TGFbeta/L)    
+    k1 = 1.0
+    k2 = v0max/v0min - 1.0
     p1 = 0.4
-    v1 = 1.0
-
-    !vmmax = 3.0
-    !vmmin = 0.5
-    !kmc1 = 1.0
-    !kmc2 = v0max/v0min - 1.0
-    !pm = 1.0/(1.01 + kmc1*TGFbeta/L)
-    !vm = vmmax/(1.0 + kmc2*TGFbeta/L)    
-    !pm = 0.4
-    !vm = 1.0
+    p0 = 1.0/(1.01 + k1*TGFbeta/L)
+    v0 = v0max/(1.0 + k2*TGFbeta/L)
+!!$
 
     if ( p0 .le. 0.5 ) then
        q2 = 2.0*p0
@@ -115,45 +120,39 @@ contains
 !!$    q1 = p0
 !!$    q2 = 0.0
 !!$    q3 = 1.0 - q1
-!!$
 
-    if ( p1 .le. 0.5 ) then
-       qq2 = 2.0*p1
-    else
-       qq2 = -2.0*(p1 - 1.0)
-    end if
-    qq1 = p1 - qq2*0.5
+    qq1 = 0.0
+    qq2 = 2.0*p1
     qq3 = 1.0 - qq1 - qq2
+!!$
 !!$    qq1 = p1
 !!$    qq2 = 0.0
 !!$    qq3 = 1.0 - qq1 - qq2
 
-!!$    if ( pm .le. 0.5 ) then
-!!$       qm2 = 2.0*pm
-!!$    else
-!!$       qm2 = -2.0*(pm - 1.0)
-!!$    end if
-!!$    qm1 = pm - qm2*0.5
-!!$    qm3 = 1.0 - qm1 - qm2
-    qm1 = pm
-    qm2 = 0.0
-    qm3 = 1.0 - qm1
+    if ( pm .le. 0.5 ) then
+       qm2 = 2.0*pm
+    else
+       qm2 = -2.0*(pm - 1.0)
+    end if
+    qm1 = pm - qm2*0.5
+    qm3 = 1.0 - qm1 - qm2
+
+!!$    qm1 = pm
+!!$    qm2 = 0.0
+!!$    qm3 = 1.0 - qm1
 
     if (sum(x) > L) then
-       ap = xi*(sum(x)/L - 1.0)
+       ap = 0.1*(sum(x) - L)
     else
        ap = 0.0
     end if
-
-!!$    ap = 0.2*sum(x)
-
     a(1) = q1*v0*x(1)
     a(2) = q2*v0*x(1)
     a(3) = q3*v0*x(1)
 
-    a(4) = qq1*v1*x(2)
-    a(5) = qq2*v1*x(2)
-    a(6) = qq3*v1*x(2)
+    a(4) = qq1*x(2)
+    a(5) = qq2*x(2)
+    a(6) = qq3*x(2)
 
     a(7) = qm1*vm*x(4)
     a(8) = qm2*vm*x(4)
@@ -174,16 +173,5 @@ contains
 
   end subroutine getrate
 
-  subroutine prepare_output_files(BaseName, RunningPara, FileUnit, dt, dm)
-    character(len=13), intent(in) :: BaseName
-    real(kind=8), intent(in) :: RunningPara, dt, dm
-    Integer, intent(in) :: FileUnit
-    character(len=60) :: FileName
-    integer app
-    app = 100000000+int(RunningPara)
-    !call system("mkdir out")
-    WRITE(FileName,'(A,I9.9)'), BaseName, app
-    open(unit=FileUnit, file=FileName, action="write")
-  end subroutine prepare_output_files
-
 end module chem_data
+

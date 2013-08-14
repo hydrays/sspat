@@ -317,18 +317,6 @@ contains
     if ( size*size/(1000.0*age) > 500 .and. age > 6.0 ) then
        p1 = p1/2.0
        p2 = p2/6.0
-       !p2 = 0
-!!$    else if ( size*size/(1000.0*age) > 480 .and. age > 6.0 ) then
-!!$       p1 = p1/1.8
-!!$       p2 = p2/5.0
-!!$    else if ( size*size/(1000.0*age) > 470 .and. age > 6.0 ) then
-!!$       p1 = p1/1.6
-!!$       p2 = p2/4.0
-!!$       !p2 = 0
-!!$    else if ( size*size/(1000.0*age) > 460 .and. age > 6.0 ) then
-!!$       p1 = p1/1.4
-!!$       p2 = p2/3.0
-!!$       !p2 = 0
     else if ( size*size/(1000.0*age) > 450 .and. age > 6.0 ) then
        p1 = p1/1.2
        p2 = p2/2.0

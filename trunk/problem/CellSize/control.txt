@@ -1,6 +1,6 @@
 ! Control parameters
 &xdata
-	NPool = 10000,
+	NPool = 2000,
 	iseed = 1234,
 	tpinc = 1.0,
 	tminc = 0.1,
@@ -14,13 +14,14 @@
 	s0 = 1000.0,
 	newcell_delta = 68.8,
 	kappa = 1.0,
-	size_critical = 1100.0
-	age_critical = 6,
-	omega = 0.85,
-	eta = 0.8,
-	NCollect = 10000,
-	NCollect2 = 10000,
+	NCollect = 1000,
+	NCollect2 = 1000,
 	tc = 300,
 	NSize = 50
+/
+
+&MitosisPara
+	mp1 =  2 ,
+	mp2 =  1 ,
 /
 

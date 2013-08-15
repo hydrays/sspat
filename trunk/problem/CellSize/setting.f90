@@ -6,7 +6,7 @@ module setting
   real :: rho
   real :: lambda1, gamma1, lambda2, gamma2, kappa
   real :: s0, newcell_delta 
-  real :: age_critical, size_critical, omega, eta
+  real :: mp1, mp2
   real :: tc
   integer :: NCollect, NCollect2
   integer :: NSize
@@ -30,9 +30,10 @@ module setting
 
   namelist /xdata/ NPool, iseed, tpinc,	tminc, tend, timestep, &
        rho, lambda1, gamma1, lambda2, gamma2, &
-       s0, newcell_delta, kappa, size_critical, &
-       age_critical, omega, eta, NCollect, NCollect2, &
+       s0, newcell_delta, kappa, NCollect, NCollect2, &
        tc, NSize
+
+  namelist /MitosisPara/ mp1, mp2
 
   type cell
      real Csize
@@ -53,6 +54,7 @@ contains
     implicit none
     open(8, file="control.txt", status='OLD', recl=80, delim='APOSTROPHE')
     read(8, nml=xdata)
+    read(8, nml=MitosisPara)
 
     write(*, *), 'Control parameters...'
     write(*, '(a20, i10)'), 'NPool = ', NPool
@@ -69,14 +71,16 @@ contains
     write(*, '(a20, f10.2)'), 's0 = ', s0
     write(*, '(a20, f10.2)'), 'newcell_delta = ', newcell_delta
     write(*, '(a20, f10.2)'), 'kappa = ', kappa
-    write(*, '(a20, f10.2)'), 'age_critical = ', age_critical
-    write(*, '(a20, f10.2)'), 'size_critical = ', size_critical
-    write(*, '(a20, f10.2)'), 'omega = ', omega
-    write(*, '(a20, f10.2)'), 'eta = ', eta
     write(*, '(a20, I10)'), 'NCollect = ', NCollect
     write(*, '(a20, I10)'), 'NCollect2 = ', NCollect2
     write(*, '(a20, f10.2)'), 'tc ', tc
     write(*, '(a20, I10)'), 'NSize ', NSize
+
+    write(*, *)
+
+    write(*, *), 'Mitosis Parameters'
+    write(*, '(a20, f10.2)'), 'mp1', mp1
+    write(*, '(a20, f10.2)'), 'mp2', mp2
 
     open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
@@ -94,14 +98,12 @@ contains
     write(9, '(a20, f10.2)'), 's0,', s0
     write(9, '(a20, f10.2)'), 'newcell_delta,', newcell_delta
     write(9, '(a20, f10.2)'), 'kappa,', kappa
-    write(9, '(a20, f10.2)'), 'age_critical,', age_critical
-    write(9, '(a20, f10.2)'), 'size_critical,', size_critical
-    write(9, '(a20, f10.2)'), 'omega,', omega
-    write(9, '(a20, f10.2)'), 'eta,', eta
     write(9, '(a20, I10)'), 'NCollect,', NCollect
     write(9, '(a20, I10)'), 'NCollect2,', NCollect2
     write(9, '(a20, f10.2)'), 'tc,', tc
     write(9, '(a20, I10)'), 'NSize,', NSize
+    write(9, '(a20, f10.2)'), 'mp1,', mp1
+    write(9, '(a20, f10.2)'), 'mp2,', mp2
 
     close(8)
     close(9)
@@ -206,13 +208,14 @@ contains
     call normdev(0.0, newcell_delta, u)
     !call normdev(0.0, newcell_delta*CellPool(i)%Csize/500, u)
     !write(17, '(6(F16.2))'), u
-    u = min(u, .5*CellPool(i)%CSize)
-    u = max(u, -.5*CellPool(i)%CSize)
+    !u = min(u, .5*CellPool(i)%CSize)
+    !u = max(u, -.5*CellPool(i)%CSize)
     temp = CellPool(i)%Csize
     CellPool(i)%Csize = (temp + u)/2.0
     new_cell%Csize = temp - CellPool(i)%Csize
     if ( CellPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
        print *, 'Cell born to be negative size, abort ...'
+       print *, newcell_delta, u, CellPool(i)%Csize
     end if
     CellPool(i)%Csize_old1 = CellPool(i)%Csize
     new_cell%Csize_old1 = new_cell%Csize
@@ -245,8 +248,8 @@ contains
     type(cell) new_cell
     call normdev(0.0, newcell_delta, u)
     !call normdev(0.0, newcell_delta*NewbornPool(i)%Csize/500, u)
-    u = min(u, .25*NewbornPool(i)%CSize)
-    u = max(u, -.25*NewbornPool(i)%CSize)
+    !u = min(u, .25*NewbornPool(i)%CSize)
+    !u = max(u, -.25*NewbornPool(i)%CSize)
     temp = NewbornPool(i)%Csize
     NewbornPool(i)%Csize = (temp + u)/2.0
     new_cell%Csize = temp - NewbornPool(i)%Csize
@@ -285,76 +288,20 @@ contains
     m_flag = 0
     call ran2(u)
 
-    !p1 = omega*log(max(1.0, size - size_critical + 1.0))
-    !p2 = eta*log(max(1.0, age - age_critical + 1.0))
-    !p = p1 + p2
+    p1 = 0.0
+    p2 = 0.0
 
-    !p1 = omega*sqrt(max(0.0, size - size_critical))
-    !p2 = eta*max(0.0, age - age_critical)
-    !p = p1 + p2
-
-    !p1 = omega*max(0.0, (size - size_critical)/size_critical)
-    !p2 = eta*max(0.0, (age - age_critical)/age_critical)
-    !p = p1 + p2
-
-    !esize = min(size, 2000.0)
-    !eage = age
-    !esize = size
-    !if (size )
-    if (age > 6.0 ) then
-       p1 = omega*max(0.0, (size - size_critical)/size_critical)
-       !if ( size > 1800 ) then
-       !   p1 = 0.6
-       !end if
+    if ( age > mp1 ) then
+       p1 = mp2*max(0.0, (age - mp1)/mp1)
     else
        p1 = 0.0
     end if
-    if (size > 1000.0 ) then
-       p2 = eta*max(0.0, (age - age_critical)/age_critical)
-    else
-       p2 = 0.0
-    end if
-    if ( size*size/(1000.0*age) > 500 .and. age > 6.0 ) then
-       p1 = p1/2.0
-       p2 = p2/6.0
-    else if ( size*size/(1000.0*age) > 450 .and. age > 6.0 ) then
-       p1 = p1/1.2
-       p2 = p2/2.0
-       !p2 = 0
-    end if
-    !p2 = min(p2, eta*(12.0-age_critical)/age_critical)
-    ! p = max(p1, p2)
+    ! if (size > 1200.0 ) then
+    !    p2 = omega*max(0.0, (size - size_critical)/size_critical)
+    ! else
+    !    p2 = 0.0
+    ! end if
     p = p1**2.0 + p2**2.0
-    ! p = 0.0
-    ! if ( eage > age_critical ) then
-    !    p = max(p1, p2)
-    ! else
-    !    p = 0
-    ! end if
-    ! if ( esize > size_critical ) then    
-    !    p = max(p1, p2)
-    ! end if
-    ! else
-    !    p = 0.0
-    ! end if
-
-
-    !if (size > size_critical .and. age > age_critical) then
-    !   p = 1.0
-    !else
-    !   p = 0.0
-    !end if
-    
-    !if (size > size_critical) then
-    !   p = omega + &
-    !        (1-omega)*( max(0.0, (age - age_critical)/age_critical) )
-    !else 
-
-    !if (size > 1300.0) then
-    !   p =  (1-omega)*( max(0.0, (age - age_critical)/age_critical) )       
-    !else
-    !   p = 0.0
-    !end if
 
     p = p * timestep
     !print *, p

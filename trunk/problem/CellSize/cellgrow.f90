@@ -26,7 +26,6 @@ contains
     call init_cell_pool()
     open (unit = 17, file="randomnumber", action="write")
 
-
     t = 0.0
     tp = 0.0
     tm = 0.0
@@ -67,6 +66,9 @@ contains
              r(j) = poidev(a(j)*timestep)
              if (r(2) > lx(1) ) then
                 r(2) = lx(1)
+             end if
+             if (r(4) > lx(2) ) then
+                r(4) = lx(2)
              end if
              lx = lx + nu(:, j)*r(j)
              !print *, j, r(j), a(j)

@@ -14,7 +14,7 @@ MitoFun <- function(mpv){
 
   Content <- readLines('control.txt')
   Content[24] <- paste('\tmp1 = ', mp1, ',')
-  Content[25] <- paste('\tmp2 = ', mp2, ',')
+  Content[25] <- paste('\tmp2 = ', mp2)
   writeLines(Content, 'control.txt')
   
   cat('Invoking Fortran program\n')
@@ -46,9 +46,11 @@ MitoFun <- function(mpv){
   SimResultB$y <- SimResultB$y/(sum(SimResultB$y)*30)
   ExpResultB <- read.csv('newborn_dist.csv')
   ErrorB <- norm(as.matrix(ExpResultB$y-SimResultB$y))
-
-                                        # Total error
+  
+  ## Total error
   ErrorT <- ErrorA + ErrorB
 
+  ##cat('Para:', mp1, mp2, '-> Error:', ErrorT, '\n')
+  print(c(mp1, mp2, ErrorT), digits=16)
   return(ErrorT)
 }

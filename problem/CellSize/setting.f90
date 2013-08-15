@@ -178,7 +178,6 @@ contains
     end if
   end subroutine output_to_file
 
-
   subroutine output_to_file_syn(index)
     implicit none
     integer, intent(in) :: index
@@ -208,8 +207,8 @@ contains
     call normdev(0.0, newcell_delta, u)
     !call normdev(0.0, newcell_delta*CellPool(i)%Csize/500, u)
     !write(17, '(6(F16.2))'), u
-    !u = min(u, .5*CellPool(i)%CSize)
-    !u = max(u, -.5*CellPool(i)%CSize)
+    u = min(u, 0.9*CellPool(i)%CSize)
+    u = max(u, -0.9*CellPool(i)%CSize)
     temp = CellPool(i)%Csize
     CellPool(i)%Csize = (temp + u)/2.0
     new_cell%Csize = temp - CellPool(i)%Csize
@@ -248,8 +247,8 @@ contains
     type(cell) new_cell
     call normdev(0.0, newcell_delta, u)
     !call normdev(0.0, newcell_delta*NewbornPool(i)%Csize/500, u)
-    !u = min(u, .25*NewbornPool(i)%CSize)
-    !u = max(u, -.25*NewbornPool(i)%CSize)
+    u = min(u, 0.9*NewbornPool(i)%CSize)
+    u = max(u, -0.9*NewbornPool(i)%CSize)
     temp = NewbornPool(i)%Csize
     NewbornPool(i)%Csize = (temp + u)/2.0
     new_cell%Csize = temp - NewbornPool(i)%Csize
@@ -334,9 +333,12 @@ contains
     is_nag = 0
     if(any(x < 0.0) ) then
        is_nag = 1
-       print *, x, a, r
+       print *, x
+       print *, a
+       print *, r
        print *, 'nag!'
        read(*,*)
     end if
   end subroutine checkx
+
 end module setting

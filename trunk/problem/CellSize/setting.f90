@@ -231,7 +231,7 @@ contains
     np = ceiling(u*NPool)
     if (np .le. 0 .or. np > NPool) then
        print *, 'wrong np'
-       read(*,*)
+       !read(*,*)
     end if
     CellPool(np) = new_cell
     
@@ -270,7 +270,7 @@ contains
     np = ceiling(u*NCollect)
     if (np .le. 0 .or. np > NCollect) then
        print *, 'wrong np'
-       read(*,*)
+       !read(*,*)
     end if
     NewbornPool(np) = new_cell
   end subroutine cell_division_syn
@@ -290,16 +290,16 @@ contains
     p1 = 0.0
     p2 = 0.0
 
-    if ( age > mp1 ) then
-       p1 = mp2*max(0.0, (age - mp1)/mp1)
+    if ( age > 6.0 ) then
+       p1 = mp2*max(0.0, (age - 6.0)/6.0)
     else
        p1 = 0.0
     end if
-    ! if (size > 1200.0 ) then
-    !    p2 = omega*max(0.0, (size - size_critical)/size_critical)
-    ! else
-    !    p2 = 0.0
-    ! end if
+    if (size > 1200.0 ) then
+       p2 = mp1*max(0.0, (size - 1200.0)/1200.0)
+    else
+       p2 = 0.0
+    end if
     p = p1**2.0 + p2**2.0
 
     p = p * timestep
@@ -337,7 +337,7 @@ contains
        print *, a
        print *, r
        print *, 'nag!'
-       read(*,*)
+       !read(*,*)
     end if
   end subroutine checkx
 

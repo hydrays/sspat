@@ -8,7 +8,11 @@
 
 par(mfrow=c(2,1))
 
-i <- 5000
+parainfo <- read.csv("control.csv", strip.white=TRUE)
+NPool <- parainfo$VALUE[parainfo$PARAMETER=='NPool']
+L = 6
+
+i <- 490
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
             NPool, L, byrow=TRUE)

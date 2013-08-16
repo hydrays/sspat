@@ -4,6 +4,7 @@
 
 MitoFun <- function(mpv){
 
+  require(seewave)
   if (length(mpv) != 2 ) {
     cat('Number of parameters must equal to p\n')
   }

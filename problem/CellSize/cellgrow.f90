@@ -117,7 +117,7 @@ contains
     ! Output mitosis cell to file
     if ( n_mitosis < NCollect ) then
        print *, "Not enough mitosis cells are collected..."
-       read(*,*)
+       !read(*,*)
     else
        call output_to_file(-1)
     end if
@@ -125,7 +125,7 @@ contains
     ! Output newborn cell to file
     if ( n_newborn < NCollect ) then
        print *, "Not enough newborn cells are collected..."
-       read(*,*)
+       !read(*,*)
     else
        call output_to_file(-2)
     end if

@@ -13,10 +13,7 @@ contains
     integer output_index, i, j, r(lReac)
     integer is_nag, m_flag
     real a(lReac), lx(lSpec)
-    integer n_mitosis, n_newborn, n_newborn2
-    integer num_livecell, first_record
-    real prodiv(NSize)
-    real basediv1(NSize), basediv2(NSize)
+    integer n_newborn
     real ls, us, ds
     integer Cindex
     character(30) filename
@@ -28,32 +25,16 @@ contains
 
     t = 0.0
     tp = 0.0
-    tm = 0.0
     output_index = 0
-    n_mitosis = 0
     n_newborn = 0
-    n_newborn2 = 0
 
     do while (t < tend)
-       
-       !print *, t
-       
        if (t .ge. tp) then
           call output_to_file(output_index)
           call output_to_file_newborn(output_index)
           output_index = output_index + 1
           tp = tp + tpinc
           print *, t
-       end if
-
-       if (t .ge. tm) then
-          do i = 1, NPool
-             if ( CellPool(i)%Cage > tminc ) then
-                CellPool(i)%Csize_old1 = CellPool(i)%Csize_old2
-                CellPool(i)%Csize_old2 = CellPool(i)%Csize
-             end if
-          end do
-          tm = tm + tminc
        end if
 
        do i = 1, NPool
@@ -84,34 +65,14 @@ contains
           
           call check_mitosis(lsize, lage, m_flag)
           if ( m_flag .eq. 1 ) then
-             ! Collect the size of mitosis cell
-             if ( t > tc .and. n_mitosis < NCollect) then
-                n_mitosis = n_mitosis + 1
-                MitosisPool(n_mitosis) = CellPool(i)
-             end if
              call cell_division(i)
              ! Collect the newborn cells
-             if ( t > tc .and. n_newborn < NCollect) then
-                n_newborn = n_newborn + 1
-                NewbornPool(n_newborn) = CellPool(i)
-             end if
-
-             if ( t > tc .and. n_newborn2 < NCollect2) then
-                n_newborn2 = n_newborn2 + 1
-                NewbornPool2(n_newborn2) = CellPool(i)
-             end if
-
+             n_newborn = mod(n_newborn, NCollect) + 1
+             NewbornPool(n_newborn) = CellPool(i)
           end if
        end do
        t = t + timestep
 
-       !print *, t, CellPool(1)%Csize, CellPool(1)%Cage, & 
-       !     CellPool(1)%Crate, CellPool(1)%mRNA, CellPool(1)%nRibsome 
-       !if (CellPool(1)%Cage.eq.0.0) read(*,*)
-
-       ! Collect new born cell
-
-          
     end do
     close(unit=100)
 

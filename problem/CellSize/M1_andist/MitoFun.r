@@ -5,21 +5,17 @@
 MitoFun <- function(mpv){
 
   require(seewave)
-  if (length(mpv) != 4 ) {
+  if (length(mpv) != 2 ) {
     cat('Number of parameters must equal to p\n')
   }
 
   ## Prepare control file
   mp1 <- mpv[1]
   mp2 <- mpv[2]
-  mp3 <- mpv[3]
-  mp4 <- mpv[4]
 
   Content <- readLines('control.txt')
   Content[24] <- paste('\tmp1 = ', mp1, ',')
-  Content[25] <- paste('\tmp2 = ', mp2, ',')
-  Content[26] <- paste('\tmp3 = ', mp3, ',')
-  Content[27] <- paste('\tmp4 = ', mp4)
+  Content[25] <- paste('\tmp2 = ', mp2)
   writeLines(Content, 'control.txt')
   
   cat('Invoking Fortran program\n')
@@ -65,6 +61,6 @@ MitoFun <- function(mpv){
   ErrorT <- ErrorA + ErrorB
 
   ##cat('Para:', mp1, mp2, '-> Error:', ErrorT, '\n')
-  print(c(mp1, mp2, mp3, mp4, ErrorT), digits=16)
+  print(c(mp1, mp2, ErrorT), digits=16)
   return(ErrorT)
 }

@@ -27,13 +27,12 @@ NCollect <- parainfo$VALUE[parainfo$PARAMETER=='NCollect']
 ## ExpResultB$y <- pmax(0, ExpResultB$y)
 ## ExpResultB$y <- ExpResultB$y/(sum(ExpResultB$y)*30)
 
-#for (i in seq(10)) {
+#for (i in seq(100)) {
 
 i <- 10
-#outfile <- sprintf("%s%05d%s", "asynew", i, ".png")
-#png(outfile, width=600, height=800)
-#pdf(outfile, width=.pwidth, height=.pheight)
-#pdf("fasyn.pdf", width=7, height=5)
+outfile <- sprintf("%s%05d%s", "asynew", i, ".png")
+png(outfile, width=600, height=800)
+#pdf(outfile)
 
 par(mfrow=c(2,1))
 
@@ -73,5 +72,5 @@ tt2<-cbind(SimResultB$x, SimResultB$y)
 ErrorB <- kl.dist(tt1,tt2)$D1
 
 ErrorT <- ErrorA + ErrorB
-#dev.off()
+dev.off()
 #}

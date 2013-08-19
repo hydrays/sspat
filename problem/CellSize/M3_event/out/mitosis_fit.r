@@ -27,19 +27,19 @@ NCollect <- parainfo$VALUE[parainfo$PARAMETER=='NCollect']
 ## ExpResultB$y <- pmax(0, ExpResultB$y)
 ## ExpResultB$y <- ExpResultB$y/(sum(ExpResultB$y)*30)
 
-#for (i in seq(10)) {
+#for (i in seq(100)) {
 
 i <- 10
-#outfile <- sprintf("%s%05d%s", "asynew", i, ".png")
-#png(outfile, width=600, height=800)
+outfile <- sprintf("%s%05d%s", "asynew", i, ".png")
+png(outfile, width=600, height=800)
 #pdf(outfile, width=.pwidth, height=.pheight)
 #pdf("fasyn.pdf", width=7, height=5)
 
 par(mfrow=c(2,1))
 
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
-z <- matrix(scan(datafile, n=NPool*4, quiet=TRUE),
-            NPool, 4, byrow=TRUE)
+z <- matrix(scan(datafile, n=NPool*5, quiet=TRUE),
+            NPool, 5, byrow=TRUE)
 d1 <- density(z[,1])
 plot(d1, xlim=c(0,3000), ylim=c(0, 0.0015))
 
@@ -73,5 +73,5 @@ tt2<-cbind(SimResultB$x, SimResultB$y)
 ErrorB <- kl.dist(tt1,tt2)$D1
 
 ErrorT <- ErrorA + ErrorB
-#dev.off()
+dev.off()
 #}

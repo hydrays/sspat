@@ -6,7 +6,7 @@ module setting
   real :: rho
   real :: lambda1, gamma1, lambda2, gamma2, kappa
   real :: s0, newcell_delta 
-  real :: mp1, mp2, mp3, mp4
+  real :: mp1, mp2, mp3
   real :: tc
   integer :: NCollect, NCollect2
   integer :: NSize
@@ -33,13 +33,14 @@ module setting
        s0, newcell_delta, kappa, NCollect, NCollect2, &
        tc, NSize
 
-  namelist /MitosisPara/ mp1, mp2 , mp3, mp4
+  namelist /MitosisPara/ mp1, mp2 , mp3
 
   type cell
      real Csize
      real Cage
      real mRNA
      real nRibsome
+     real event
   end type cell
 
   type(cell), allocatable :: CellPool(:)
@@ -78,7 +79,6 @@ contains
     write(*, '(a20, f10.2)'), 'mp1', mp1
     write(*, '(a20, f10.2)'), 'mp2', mp2
     write(*, '(a20, f10.2)'), 'mp3', mp3
-    write(*, '(a20, f10.2)'), 'mp4', mp4
 
     open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
@@ -103,7 +103,6 @@ contains
     write(9, '(a20, f10.2)'), 'mp1,', mp1
     write(9, '(a20, f10.2)'), 'mp2,', mp2
     write(9, '(a20, f10.2)'), 'mp3,', mp3
-    write(9, '(a20, f10.2)'), 'mp4,', mp4
 
     close(8)
     close(9)
@@ -125,6 +124,7 @@ contains
        CellPool(i)%Cage = 0.0
        CellPool(i)%mRNA = 0.0
        CellPool(i)%nRibsome = s0*rho
+       CellPool(i)%event = 0.0
     end do
   end subroutine init_cell_pool
 
@@ -141,7 +141,7 @@ contains
        do i = 1, NPool
           write(11, '(4(F16.2))'), CellPool(i)%Csize, &
                CellPool(i)%Cage, CellPool(i)%mRNA, &
-               CellPool(i)%nRibsome
+               CellPool(i)%nRibsome, CellPool(i)%event
        end do
        close(11)
     end if
@@ -192,6 +192,8 @@ contains
     new_cell%mRNA = 0.0
     CellPool(i)%nRibsome = rho*CellPool(i)%Csize
     new_cell%nRibsome = rho*new_cell%Csize
+    CellPool(i)%event = 0.0
+    new_cell%event = 0.0
 
     call ran2(u)
     np = ceiling(u*NPool)
@@ -203,20 +205,18 @@ contains
     
   end subroutine cell_division
 
-  subroutine check_mitosis(size, age, m_flag)
+  subroutine check_mitosis(event, m_flag)
     use random
     implicit none
-    real, intent(in) :: size, age
+    real, intent(in) :: event
     integer, intent(out) :: m_flag
     integer j
-    real u, p, p1, p2
+    real u, p
 
     m_flag = 0
     call ran2(u)
 
-    p1 = mp1*(1.0+tanh(mp2*(age*mp3/9.0 - 1.0)))/2
-    p2 = mp1*(1.0+tanh(mp2*(size*mp4/1000.0 - 1.0)))/2
-    p = min(p1, p2)
+    p = mp1*(1.0+tanh(mp2*(event*mp3/8000.0 - 1.0)))/2
 
     p = p * timestep
     !print *, p

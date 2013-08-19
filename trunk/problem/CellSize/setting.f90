@@ -222,10 +222,10 @@ contains
     new_cell%Csize_old2 = new_cell%Csize
     CellPool(i)%Cage = 0.0
     new_cell%Cage = 0.0
-    CellPool(i)%mRNA = 0.0
-    new_cell%mRNA = 0.0
-    CellPool(i)%nRibsome = rho*CellPool(i)%Csize
-    new_cell%nRibsome = rho*new_cell%Csize
+    new_cell%mRNA = CellPool(i)%mRNA*(1.0-CellPool(i)%Csize/temp)
+    CellPool(i)%mRNA = CellPool(i)%mRNA*CellPool(i)%Csize/temp
+    new_cell%nRibsome = CellPool(i)%nRibsome*(1.0-CellPool(i)%Csize/temp)
+    CellPool(i)%nRibsome = CellPool(i)%nRibsome*CellPool(i)%Csize/temp
 
     call ran2(u)
     np = ceiling(u*NPool)
@@ -290,17 +290,18 @@ contains
     p1 = 0.0
     p2 = 0.0
 
-    if ( age > 6.0 ) then
-       p1 = mp2*max(0.0, (age - 6.0)/6.0)
+    if ( age > mp1 ) then
+       p1 = mp2*max(0.0, (age/mp1 - 1.0))
+       !p1 = 100.0
     else
        p1 = 0.0
     end if
-    if (size > 1200.0 ) then
-       p2 = mp1*max(0.0, (size - 1200.0)/1200.0)
+    if (size > 1000.0 ) then
+       p2 = 0.2*max(0.0, (size/1000.0 - 1.0))
     else
        p2 = 0.0
     end if
-    p = p1**2.0 + p2**2.0
+    p = p1 + p2
 
     p = p * timestep
     !print *, p
@@ -321,6 +322,7 @@ contains
     a(1) = lambda1*((kappa*age)**4)/(1.0+((kappa*age)**4))
     a(2) = gamma1*x(1)
     a(3) = lambda2*min(x(1), x(2))
+    !a(3) = lambda2*x(2)
     a(4) = gamma2*x(2)
   end subroutine getrate
 

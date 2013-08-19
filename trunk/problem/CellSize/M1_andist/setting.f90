@@ -6,7 +6,7 @@ module setting
   real :: rho
   real :: lambda1, gamma1, lambda2, gamma2, kappa
   real :: s0, newcell_delta 
-  real :: mp1, mp2, mp3, mp4
+  real :: mp1, mp2
   real :: tc
   integer :: NCollect, NCollect2
   integer :: NSize
@@ -33,7 +33,7 @@ module setting
        s0, newcell_delta, kappa, NCollect, NCollect2, &
        tc, NSize
 
-  namelist /MitosisPara/ mp1, mp2 , mp3, mp4
+  namelist /MitosisPara/ mp1, mp2
 
   type cell
      real Csize
@@ -77,8 +77,6 @@ contains
     write(*, *), 'Mitosis Parameters'
     write(*, '(a20, f10.2)'), 'mp1', mp1
     write(*, '(a20, f10.2)'), 'mp2', mp2
-    write(*, '(a20, f10.2)'), 'mp3', mp3
-    write(*, '(a20, f10.2)'), 'mp4', mp4
 
     open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
@@ -102,8 +100,6 @@ contains
     write(9, '(a20, I10)'), 'NSize,', NSize
     write(9, '(a20, f10.2)'), 'mp1,', mp1
     write(9, '(a20, f10.2)'), 'mp2,', mp2
-    write(9, '(a20, f10.2)'), 'mp3,', mp3
-    write(9, '(a20, f10.2)'), 'mp4,', mp4
 
     close(8)
     close(9)
@@ -214,9 +210,12 @@ contains
     m_flag = 0
     call ran2(u)
 
-    p1 = mp1*(1.0+tanh(mp2*(age*mp3/9.0 - 1.0)))/2
-    p2 = mp1*(1.0+tanh(mp2*(size*mp4/1000.0 - 1.0)))/2
-    p = min(p1, p2)
+    p1 = mp1*(1.0+tanh(20.0*(age*mp2/6.0 - 1.0)))/2
+    !p1 = 0.0
+    !p2 = mp1*(1.0+tanh(20.0*(size*mp2/1000.0 - 1.0)))/2
+
+    !p = min(p1, p2)
+    p = p1
 
     p = p * timestep
     !print *, p

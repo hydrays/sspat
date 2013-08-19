@@ -12,7 +12,7 @@ contains
     real lsize, lage
     integer output_index, i, j, r(lReac)
     integer is_nag, m_flag
-    real a(lReac), lx(lSpec)
+    real a(lReac), lx(lSpec), rr(lReac)
     integer n_mitosis, n_newborn, n_newborn2
     integer num_livecell, first_record
     real prodiv(NSize)
@@ -40,7 +40,6 @@ contains
        
        if (t .ge. tp) then
           call output_to_file(output_index)
-          call output_to_file_newborn(output_index)
           output_index = output_index + 1
           tp = tp + tpinc
           print *, t
@@ -64,18 +63,21 @@ contains
 
           call getrate(lx, lage, a)
           do j = 1, lReac
-             r(j) = poidev(a(j)*timestep)
-             if (r(2) > lx(1) ) then
-                r(2) = lx(1)
-             end if
-             if (r(4) > lx(2) ) then
-                r(4) = lx(2)
-             end if
-             lx = lx + nu(:, j)*r(j)
+             !r(j) = poidev(a(j)*timestep)
+             rr(j) = max(0.0, a(j))*timestep
+             ! if (r(2) > lx(1) ) then
+             !    r(2) = lx(1)
+             ! end if
+             ! if (r(4) > lx(2) ) then
+             !    r(4) = lx(2)
+             ! end if
+             lx = lx + nu(:, j)*rr(j)
              !print *, j, r(j), a(j)
           end do
           call checkx(lx, a, r, is_nag)          
-          lsize = max(lsize, lx(2)/rho)
+          !lsize = max(lsize, lx(2)/rho)
+          !lsize = lsize +  0.001*min(lx(1), lx(2))*timestep 
+          lsize = lx(2)
           lage = lage + timestep
           CellPool(i)%Csize = lsize
           CellPool(i)%Cage = lage

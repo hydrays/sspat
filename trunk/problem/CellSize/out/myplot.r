@@ -12,8 +12,8 @@ NCollect2 <- parainfo$VALUE[parainfo$PARAMETER=='NCollect2']
 .tpinc <- parainfo$VALUE[parainfo$PARAMETER=='tpinc']
 .tminc <- parainfo$VALUE[parainfo$PARAMETER=='tminc']
 
-lambda1 <- 4000
-gamma1 <- 2.0
+lambda1 <- 2000
+gamma1 <- 1.0
 lambda2 <- 0.25
 gamma2 <- 0.15
 k <- 1.0
@@ -21,10 +21,10 @@ k <- 1.0
 L = 6
 .pwidth = 800
 .pheight = 600
-i <- 490
+i <- 30
 
 # Generate the growth curve of mRNA and Ribosome
-y0 <- c(0, 1000)
+y0 <- c(1000, 1000)
 T <- 15.0
 N <- 1000
 dt <- T/N
@@ -32,10 +32,8 @@ y <- matrix(0, N, 2)
 y1 <- matrix(0, N, 2)
 y[1,] <- y0
 a <- seq(N)
-s <- seq(N)
 z <- seq(N)
 a[1] <- 0
-s[1] = y[1, 2]
 index1 <- 0
 index2 <- 0
 for ( j in seq(2, N) ) {
@@ -44,7 +42,6 @@ for ( j in seq(2, N) ) {
   y[j,1] <- y1[j,1] + dt * (lambda1*(k*a[j])^4/(1+(k*a[j])^4) - gamma1*y1[j,1])
   y[j,2] <- y1[j,2] + dt * (lambda2*min(y1[j,1], y1[j,2]) - gamma2*y1[j,2])
   z[j] <- min(y[j, 1], y[j, 2])
-  s[j] <- max(s[j-1], y[j,2])
   if ( y[j,1] > y[j,2] && index1 == 0) {
     index1 <- j-1
   }
@@ -65,13 +62,13 @@ p1 <- xyplot(z~a, xlim=c(0, 15),
              key = list(x = 0.1, y=0.95,
                border=TRUE,
                lines=list(
-                 col=c("black", "blue", 'red', 'green'),
-                 type=c("l","l","l","l"),
-                 lty=c(4,1,6,1),
-                 lwd=c(4,4,4,4)),
+                 col=c("black", "blue", 'red'),
+                 type=c("l","l","l"),
+                 lty=c(4,1,6),
+                 lwd=c(4,4,4)),
                cex = 1.4,
-               text = list(lab = c("mRNA","ribosome",
-                             "loaded ribosome", 'cell size')),
+               text = list(lab = c("mRNA","cell size",
+                             "loaded ribosome")),
                columns = 1,
                #space = ""
                title = NULL
@@ -79,15 +76,14 @@ p1 <- xyplot(z~a, xlim=c(0, 15),
              panel=function(...){
                panel.xyplot(...)
                auto.key = TRUE
-               panel.lines(a, s, lwd=4, type='l', lty=1, col='green')
                panel.lines(a, y[,1], lwd=4, type='l', lty = 4, col='black')
                panel.lines(a, y[,2], lwd=4, type='l', lty = 1, col='blue')
                panel.lines(c(a[index1], a[index1]),
                            c(0, s[index1]-125), lwd=4, type='l',
                            lty = 2, col='grey')
-               panel.lines(c(a[index2], a[index2]),
-                           c(0, s[index2]), lwd=4, type='l',
-                           lty = 2, col='grey')
+               ## panel.lines(c(a[index2], a[index2]),
+               ##             c(0, s[index2]), lwd=4, type='l',
+               ##             lty = 2, col='grey')
                grid.text('I',
                          just="left",
                          x = unit(0.03, "npc"),
@@ -160,45 +156,45 @@ print(p1)
 dev.off()
 s.save <- s
 
-#######################################
-## Asynchronized cell size distribution
-#######################################
-#outfile <- sprintf("%s%05d%s", "fa", i, ".png")
-#png(outfile, width=.pwidth, height=.pheight)
-#pdf(outfile, width=.pwidth, height=.pheight)
-pdf("fasyn.pdf", width=7, height=5)
-datafile <- sprintf("%s%05d%s", "m", i, ".dat")
-z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
-            NPool, L, byrow=TRUE)
+## #######################################
+## ## Asynchronized cell size distribution
+## #######################################
+## #outfile <- sprintf("%s%05d%s", "fa", i, ".png")
+## #png(outfile, width=.pwidth, height=.pheight)
+## #pdf(outfile, width=.pwidth, height=.pheight)
+## pdf("fasyn.pdf", width=7, height=5)
+## datafile <- sprintf("%s%05d%s", "m", i, ".dat")
+## z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
+##             NPool, L, byrow=TRUE)
 
-y.lim = c(c(0, 1.5e-3))
-y.at <- pretty(y.lim)
-y.labels <- formatC(1000*y.at, format = "g")
-#y.labels[length(y.at)] <- paste(y.labels[length(y.at)], 'x10-3')
+## y.lim = c(c(0, 1.5e-3))
+## y.at <- pretty(y.lim)
+## y.labels <- formatC(1000*y.at, format = "g")
+## #y.labels[length(y.at)] <- paste(y.labels[length(y.at)], 'x10-3')
 
-trellis.par.set(clip=list(panel = "off")) 
-p1 <- histogram(z[,1], nint=30, xlim=c(250, 3000),
-                ylim = y.lim,
-                type = c("density"),
-                xlab=list("s (cell size, fl)", cex = 1.5),
-                ylab=list("proportion of cells", cex=1.5),
-                scales=list(cex=1.5, y=list(at = y.at,
-                                       labels = y.labels)),
-                #mtext("10-3")
-                panel = function(x, ...){
-                  panel.histogram(x, ...)
-                  panel.densityplot(x, ...,
-                                    lwd = 4, col="red")
-                  panel.axis(side = c("top"),
-                             at = c(350),
-                             labels = c(expression(x10^{-3})),
-                             ticks=FALSE,
-                             outside=TRUE,
-                             rot=c(0,90),
-                             text.cex=1.4)
-                })
-print(p1)
-dev.off()
+## trellis.par.set(clip=list(panel = "off")) 
+## p1 <- histogram(z[,1], nint=30, xlim=c(250, 3000),
+##                 ylim = y.lim,
+##                 type = c("density"),
+##                 xlab=list("s (cell size, fl)", cex = 1.5),
+##                 ylab=list("proportion of cells", cex=1.5),
+##                 scales=list(cex=1.5, y=list(at = y.at,
+##                                        labels = y.labels)),
+##                 #mtext("10-3")
+##                 panel = function(x, ...){
+##                   panel.histogram(x, ...)
+##                   panel.densityplot(x, ...,
+##                                     lwd = 4, col="red")
+##                   panel.axis(side = c("top"),
+##                              at = c(350),
+##                              labels = c(expression(x10^{-3})),
+##                              ticks=FALSE,
+##                              outside=TRUE,
+##                              rot=c(0,90),
+##                              text.cex=1.4)
+##                 })
+## print(p1)
+## dev.off()
 
 
 ########################
@@ -208,6 +204,9 @@ dev.off()
 trellis.par.set(clip=list(panel = "on"))
 pdf("rate.pdf", width=7, height=6.3)
 g <- (z[,3]-z[,2])/.tminc
+g <- pmax(0, g)
+#g <- pmax(0, 0.25*pmin(z[,5], z[,6]) - 0.15*z[,6])
+#g <- 0.25*pmin(z[,5], z[,6]) - 0.15*z[,6]
 index <- 25
 Nbin <- 50
 lx <- 0
@@ -304,119 +303,119 @@ p1 <- xyplot(m~x, xlim=c(0, 15), grid=TRUE,
 print(p1)
 dev.off()
 
-trellis.par.set(clip=list(panel = "off")) 
-####################################
-## Plot histogram for mitosis cells.
-####################################
-pdf("mitosis.pdf", width=7, height=5.5)
-#png("mitosis.png", width=.pwidth, height=.pheight)
-datafile <- sprintf("CellMitosis.dat")
-z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
-            NPool, L, byrow=TRUE)
-y.lim = c(0, 1.4e-3)
-y.at <- pretty(y.lim)
-y.labels <- formatC(1000*y.at, format = "g")
-p1 <- histogram(z[,1], nint=30, xlim=c(300, 3000),
-                ylim=y.lim,
-                type = c("density"),
-                xlab=list("s (cell size, fl)", cex = 1.5),
-                ylab=list("proportion of cells", cex=1.5),
-                scales=list(cex=1.5, y=list(at = y.at,
-                                       labels = y.labels)),
-                panel = function(x, ...){
-                  panel.histogram(x, ...)
-                  panel.densityplot(x, ...,
-                                    lwd = 4, col="red")
-                  panel.axis(side = c("top"),
-                             at = c(400),
-                             labels = c(expression(x10^{-3})),
-                             ticks=FALSE,
-                             outside=TRUE,
-                             rot=c(0,90),
-                             text.cex=1.4)
-                })
-print(p1)
-dev.off()
+## trellis.par.set(clip=list(panel = "off")) 
+## ####################################
+## ## Plot histogram for mitosis cells.
+## ####################################
+## pdf("mitosis.pdf", width=7, height=5.5)
+## #png("mitosis.png", width=.pwidth, height=.pheight)
+## datafile <- sprintf("CellMitosis.dat")
+## z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
+##             NPool, L, byrow=TRUE)
+## y.lim = c(0, 1.4e-3)
+## y.at <- pretty(y.lim)
+## y.labels <- formatC(1000*y.at, format = "g")
+## p1 <- histogram(z[,1], nint=30, xlim=c(300, 3000),
+##                 ylim=y.lim,
+##                 type = c("density"),
+##                 xlab=list("s (cell size, fl)", cex = 1.5),
+##                 ylab=list("proportion of cells", cex=1.5),
+##                 scales=list(cex=1.5, y=list(at = y.at,
+##                                        labels = y.labels)),
+##                 panel = function(x, ...){
+##                   panel.histogram(x, ...)
+##                   panel.densityplot(x, ...,
+##                                     lwd = 4, col="red")
+##                   panel.axis(side = c("top"),
+##                              at = c(400),
+##                              labels = c(expression(x10^{-3})),
+##                              ticks=FALSE,
+##                              outside=TRUE,
+##                              rot=c(0,90),
+##                              text.cex=1.4)
+##                 })
+## print(p1)
+## dev.off()
 
-####################################
-## Plot histogram for newborn cells.
-####################################
-pdf("newborn.pdf", width=7, height=5)
-#png(outfile, width=.pwidth, height=.pheight)
-datafile <- sprintf("CellNewborn.dat")
-z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
-            NPool, L, byrow=TRUE)
-y.lim = c(0, 3e-3)
-y.at <- pretty(y.lim)
-y.labels <- formatC(1000*y.at, format = "g")
-p1 <- histogram(z[,1], nint=20, xlim=c(250, 3000),
-                ylim=y.lim,
-                type = c("density"),
-                xlab=list("s (cell size, fl)", cex = 1.5),
-                ylab=list("proportion of cells", cex=1.5),
-                scales=list(cex=1.5, y=list(at = y.at,
-                                       labels = y.labels)),
-                panel = function(x, ...){
-                  panel.histogram(x, ...)
-                  panel.densityplot(x, ...,
-                                    lwd = 4, col="red")
-                  panel.axis(side = c("top"),
-                             at = c(350),
-                             labels = c(expression(x10^{-3})),
-                             ticks=FALSE,
-                             outside=TRUE,
-                             rot=c(0,90),
-                             text.cex=1.4)
-                })
-print(p1)
-dev.off()
+## ####################################
+## ## Plot histogram for newborn cells.
+## ####################################
+## pdf("newborn.pdf", width=7, height=5)
+## #png(outfile, width=.pwidth, height=.pheight)
+## datafile <- sprintf("CellNewborn.dat")
+## z <- matrix(scan(datafile, n=NPool*L, quiet=TRUE),
+##             NPool, L, byrow=TRUE)
+## y.lim = c(0, 3e-3)
+## y.at <- pretty(y.lim)
+## y.labels <- formatC(1000*y.at, format = "g")
+## p1 <- histogram(z[,1], nint=20, xlim=c(250, 3000),
+##                 ylim=y.lim,
+##                 type = c("density"),
+##                 xlab=list("s (cell size, fl)", cex = 1.5),
+##                 ylab=list("proportion of cells", cex=1.5),
+##                 scales=list(cex=1.5, y=list(at = y.at,
+##                                        labels = y.labels)),
+##                 panel = function(x, ...){
+##                   panel.histogram(x, ...)
+##                   panel.densityplot(x, ...,
+##                                     lwd = 4, col="red")
+##                   panel.axis(side = c("top"),
+##                              at = c(350),
+##                              labels = c(expression(x10^{-3})),
+##                              ticks=FALSE,
+##                              outside=TRUE,
+##                              rot=c(0,90),
+##                              text.cex=1.4)
+##                 })
+## print(p1)
+## dev.off()
 
-####################################
-## Plot trajectory of the newborn cells syncronized.
-####################################
-outfile <- sprintf("syn.png")
-pdf("syn.pdf", width=7, height=5.5)
-#png(outfile, width=.pwidth, height=.pheight)
-ls <- 0
-us <- 5600
-T <- 24
-M <- 160
-ds <- (us-ls)/M
-data = matrix(0, T, M)
+## ####################################
+## ## Plot trajectory of the newborn cells syncronized.
+## ####################################
+## outfile <- sprintf("syn.png")
+## pdf("syn.pdf", width=7, height=5.5)
+## #png(outfile, width=.pwidth, height=.pheight)
+## ls <- 0
+## us <- 5600
+## T <- 24
+## M <- 160
+## ds <- (us-ls)/M
+## data = matrix(0, T, M)
 
-for (i in seq(T)) {
-  print(i)
-  datafile <- sprintf("%s%05d%s", "s", i, ".dat")
-  z <- matrix(scan(datafile, n=NCollect*L, quiet=TRUE),
-              NCollect, L, byrow=TRUE)
-  for (j in seq(NCollect)){
-    z[j,1] = min(us, z[j,1])
-    z[j,1] = max(ls, z[j,1])         
-    Mindex <- floor( (z[j,1]-ls)/ds ) + 1
-    data[i, Mindex] <- data[i, Mindex] + 1
-  }
-}
+## for (i in seq(T)) {
+##   print(i)
+##   datafile <- sprintf("%s%05d%s", "s", i, ".dat")
+##   z <- matrix(scan(datafile, n=NCollect*L, quiet=TRUE),
+##               NCollect, L, byrow=TRUE)
+##   for (j in seq(NCollect)){
+##     z[j,1] = min(us, z[j,1])
+##     z[j,1] = max(ls, z[j,1])         
+##     Mindex <- floor( (z[j,1]-ls)/ds ) + 1
+##     data[i, Mindex] <- data[i, Mindex] + 1
+##   }
+## }
 
-M <- floor((2800 - ls)/ds + 1)
-lM <- floor((400 - ls)/ds) 
-p1 <- levelplot(data[1:T, lM:M]/NCollect,
-                  col.regions=jet.colors(1000),
-                cuts=1000,
-                useRaster=TRUE,
-                region=FALSE,
-                colorkey=FALSE,
-                xlab=list("time (hours)", cex=1.5),
-                ylab=list("s (cell size, fl)", cex=1.5),
-                aspect="fill",
-                scales=list(cex=1.5,
-                  y = list(relation="sliced",
-                    at=list(c(M-60-lM, M-40-lM, M-20-lM)),
-                    label=list(c(700, 1400, 2100))),
-                x = list(relation="sliced",
-                  at=list(c(6, 12, 18))))
-                )
-print(p1)
-dev.off()
+## M <- floor((2800 - ls)/ds + 1)
+## lM <- floor((400 - ls)/ds) 
+## p1 <- levelplot(data[1:T, lM:M]/NCollect,
+##                   col.regions=jet.colors(1000),
+##                 cuts=1000,
+##                 useRaster=TRUE,
+##                 region=FALSE,
+##                 colorkey=FALSE,
+##                 xlab=list("time (hours)", cex=1.5),
+##                 ylab=list("s (cell size, fl)", cex=1.5),
+##                 aspect="fill",
+##                 scales=list(cex=1.5,
+##                   y = list(relation="sliced",
+##                     at=list(c(M-60-lM, M-40-lM, M-20-lM)),
+##                     label=list(c(700, 1400, 2100))),
+##                 x = list(relation="sliced",
+##                   at=list(c(6, 12, 18))))
+##                 )
+## print(p1)
+## dev.off()
 
 ## ## Make figure 4
 ## #png("fig4.png", width=.pwidth, height=.pheight)

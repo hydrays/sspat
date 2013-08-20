@@ -8,7 +8,6 @@ ExpResultB <- read.csv('newborn_dist.csv')
 
 parainfo <- read.csv("control.csv", strip.white=TRUE)
 NPool <- parainfo$VALUE[parainfo$PARAMETER=='NPool']
-NCollect <- parainfo$VALUE[parainfo$PARAMETER=='NCollect']
 
 ## ## Use stable distribution as a reference
 ## i <- 10
@@ -29,7 +28,7 @@ NCollect <- parainfo$VALUE[parainfo$PARAMETER=='NCollect']
 
 #for (i in seq(100)) {
 
-i <- 10
+i <- 5
 outfile <- sprintf("%s%05d%s", "asynew", i, ".png")
 png(outfile, width=600, height=800)
 #pdf(outfile, width=.pwidth, height=.pheight)
@@ -38,9 +37,9 @@ png(outfile, width=600, height=800)
 par(mfrow=c(2,1))
 
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
-z <- matrix(scan(datafile, n=NPool*5, quiet=TRUE),
-            NPool, 5, byrow=TRUE)
-d1 <- density(z[,1])
+z <- matrix(scan(datafile, n=NPool*6, quiet=TRUE),
+            NPool, 6, byrow=TRUE)
+d1 <- density(z[,1], from=0, to=3000)
 plot(d1, xlim=c(0,3000), ylim=c(0, 0.0015))
 
 SimResultA <- spline(d1, n=101, xmin=0, xmax=3000)
@@ -56,9 +55,9 @@ ErrorA <- kl.dist(tt1,tt2)$D1
 
 # Newborn part
 datafile <- sprintf("%s%05d%s", "n", i, ".dat")
-z <- matrix(scan(datafile, n=NCollect*1, quiet=TRUE),
-            NCollect, 1, byrow=TRUE)
-d2 <- density(z[,1])
+z <- matrix(scan(datafile, n=NPool*1, quiet=TRUE),
+            NPool, 1, byrow=TRUE)
+d2 <- density(z[,1], from=0, to=3000)
 plot(d2, xlim=c(0,3000), ylim=c(0, 0.003))
 
 SimResultB <- spline(d2, n=101, xmin=0, xmax=3000)

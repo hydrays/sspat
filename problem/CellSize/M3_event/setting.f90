@@ -6,7 +6,7 @@ module setting
   real :: rho
   real :: lambda1, gamma1, lambda2, gamma2, kappa
   real :: s0, newcell_delta 
-  real :: mp1, mp2, mp3
+  real :: mp1, mp2
   real :: tc
   integer :: NCollect, NCollect2
   integer :: NSize
@@ -19,10 +19,10 @@ module setting
   ! 3. 0 -> Ribsome, a = lambda2*ActiveRibsome
   ! 4. Ribsome -> 0, a = gamma2*Ribsome
   integer, parameter, dimension(lSpec,lReac) :: nu = reshape( &
-       ! 1   2
+                                ! 1   2
        source=(/ &
        (/01, 00/), & !1
-        (/-1, 00/), & !2
+       (/-1, 00/), & !2
        (/00, 01/), & !3
        (/00, -1/) & !4
        /), shape = (/lSpec, lReac/) &
@@ -33,18 +33,22 @@ module setting
        s0, newcell_delta, kappa, NCollect, NCollect2, &
        tc, NSize
 
-  namelist /MitosisPara/ mp1, mp2 , mp3
+  namelist /MitosisPara/ mp1, mp2
 
   type cell
      real Csize
+     real Csize_old1
+     real Csize_old2
      real Cage
      real mRNA
-     real nRibsome
+     real mitmet
      real event
   end type cell
 
   type(cell), allocatable :: CellPool(:)
+  type(cell), allocatable :: MitosisPool(:)
   type(cell), allocatable :: NewbornPool(:)
+  type(cell), allocatable :: NewbornPool2(:)
 
 contains
   subroutine read_xdata()
@@ -78,7 +82,6 @@ contains
     write(*, *), 'Mitosis Parameters'
     write(*, '(a20, f10.2)'), 'mp1', mp1
     write(*, '(a20, f10.2)'), 'mp2', mp2
-    write(*, '(a20, f10.2)'), 'mp3', mp3
 
     open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
@@ -102,7 +105,6 @@ contains
     write(9, '(a20, I10)'), 'NSize,', NSize
     write(9, '(a20, f10.2)'), 'mp1,', mp1
     write(9, '(a20, f10.2)'), 'mp2,', mp2
-    write(9, '(a20, f10.2)'), 'mp3,', mp3
 
     close(8)
     close(9)
@@ -115,16 +117,24 @@ contains
     use random
     implicit none
     integer i
+    real u
 
     allocate(CellPool(NPool))
-    allocate(NewbornPool(NCollect))
+
+    allocate(MitosisPool(NPool))
+    allocate(NewbornPool(NPool))
+    allocate(NewbornPool2(NPool))
 
     do i = 1, NPool
        CellPool(i)%Csize = s0
+       CellPool(i)%Csize_old1 = s0
+       CellPool(i)%Csize_old2 = s0
        CellPool(i)%Cage = 0.0
-       CellPool(i)%mRNA = 0.0
-       CellPool(i)%nRibsome = s0*rho
+       CellPool(i)%mRNA = s0
+       call ran2(u)
+       CellPool(i)%mitmet = log(u)
        CellPool(i)%event = 0.0
+       !print *, CellPool(i)%mitmet
     end do
   end subroutine init_cell_pool
 
@@ -137,15 +147,16 @@ contains
     if ( index .ge. 0 ) then
        WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
        open (unit = 11, file=filename, action="write")
-       
+
        do i = 1, NPool
-          write(11, '(4(F16.2))'), CellPool(i)%Csize, &
+          write(11, '(6(F16.2))'), CellPool(i)%Csize, &
+               CellPool(i)%Csize_old1, &
+               CellPool(i)%Csize_old2, &
                CellPool(i)%Cage, CellPool(i)%mRNA, &
-               CellPool(i)%nRibsome, CellPool(i)%event
+               CellPool(i)%event
        end do
        close(11)
     end if
-
   end subroutine output_to_file
 
   subroutine output_to_file_newborn(index)
@@ -154,18 +165,14 @@ contains
     character(30) filename
     integer i
 
-    if ( index .ge. 0 ) then
-       WRITE(filename,'(A7,I5.5,A4)') './out/n', index, '.dat'
-       open (unit = 111, file=filename, action="write")
-       
-       do i = 1, NCollect
-          write(111, '((F16.2))'), NewbornPool(i)%Csize
-       end do
-       close(111)
-    end if
-
+    WRITE(filename,'(A7,I5.5,A4)') './out/n', index, '.dat'
+    open (unit = 11, file=filename, action="write")
+    do i = 1, NPool
+       write(11, '((F16.2))'), NewbornPool(i)%Csize
+    end do
+    close(11)
   end subroutine output_to_file_newborn
-  
+
   subroutine cell_division(i)
     use random
     implicit none
@@ -186,12 +193,18 @@ contains
        print *, 'Cell born to be negative size, abort ...'
        print *, newcell_delta, u, CellPool(i)%Csize
     end if
+    CellPool(i)%Csize_old1 = CellPool(i)%Csize
+    new_cell%Csize_old1 = new_cell%Csize
+    CellPool(i)%Csize_old2 = CellPool(i)%Csize
+    new_cell%Csize_old2 = new_cell%Csize
     CellPool(i)%Cage = 0.0
     new_cell%Cage = 0.0
-    CellPool(i)%mRNA = 0.0
-    new_cell%mRNA = 0.0
-    CellPool(i)%nRibsome = rho*CellPool(i)%Csize
-    new_cell%nRibsome = rho*new_cell%Csize
+    new_cell%mRNA = 0.0*CellPool(i)%mRNA*(1.0-CellPool(i)%Csize/temp)
+    CellPool(i)%mRNA = 0.0*CellPool(i)%mRNA*CellPool(i)%Csize/temp
+    call ran2(u)
+    CellPool(i)%mitmet = log(u)
+    call ran2(u)
+    new_cell%mitmet = log(u)
     CellPool(i)%event = 0.0
     new_cell%event = 0.0
 
@@ -202,42 +215,105 @@ contains
        !read(*,*)
     end if
     CellPool(np) = new_cell
-    
+
   end subroutine cell_division
 
-  subroutine check_mitosis(event, m_flag)
+  ! subroutine cell_division_syn(i)
+  !   use random
+  !   implicit none
+  !   integer, intent(in) :: i
+  !   integer j
+  !   real u, temp
+  !   integer np
+  !   type(cell) new_cell
+  !   call normdev(0.0, newcell_delta, u)
+  !   !call normdev(0.0, newcell_delta*NewbornPool(i)%Csize/500, u)
+  !   u = min(u, 0.9*NewbornPool(i)%CSize)
+  !   u = max(u, -0.9*NewbornPool(i)%CSize)
+  !   temp = NewbornPool(i)%Csize
+  !   NewbornPool(i)%Csize = (temp + u)/2.0
+  !   new_cell%Csize = temp - NewbornPool(i)%Csize
+  !   if ( NewbornPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
+  !      print *, 'Cell born to be negative size, abort ...'
+  !   end if
+  !   NewbornPool(i)%Csize_old1 = NewbornPool(i)%Csize
+  !   new_cell%Csize_old1 = new_cell%Csize
+  !   NewbornPool(i)%Csize_old2 = NewbornPool(i)%Csize
+  !   new_cell%Csize_old2 = new_cell%Csize
+  !   NewbornPool(i)%Cage = 0.0
+  !   new_cell%Cage = 0.0
+  !   NewbornPool(i)%mRNA = 0.0
+  !   new_cell%mRNA = 0.0
+  !   NewbornPool(i)%nRibsome = rho*NewbornPool(i)%Csize
+  !   new_cell%nRibsome = rho*new_cell%Csize
+
+  !   call ran2(u)
+  !   np = ceiling(u*NCollect)
+  !   if (np .le. 0 .or. np > NCollect) then
+  !      print *, 'wrong np'
+  !      !read(*,*)
+  !   end if
+  !   NewbornPool(np) = new_cell
+  ! end subroutine cell_division_syn
+
+  subroutine check_mitosis(i, m_flag)
     use random
     implicit none
-    real, intent(in) :: event
+    integer, intent(in) :: i
     integer, intent(out) :: m_flag
-    integer j
-    real u, p
+    real event
+    real p, p1, p2
 
-    m_flag = 0
-    call ran2(u)
+    event = CellPool(i)%event
 
-    p = mp1*(1.0+tanh(mp2*(event*mp3/8000.0 - 1.0)))/2
+    p = mp2*(1.0+tanh(10.0*(event/(mp1*8000.0) - 1.0)))/2.0
+    ! if ( age > 6.5 ) then
+    !    p1 = 0.2*max(0.0, (age/6.5 - 1.0))
+    ! else
+    !    p1 = 0.0
+    ! end if
+    ! if (size > 1200.0 ) then
+    !    p2 = 0.6*max(0.0, (size/1200.0 - 1.0))
+    ! else
+    !    p2 = 0.0
+    ! end if
+    ! p = p1 + p2
 
-    p = p * timestep
-    !print *, p
-    if ( u < p ) then
+    !print *, CellPool(i)%mitmet, size, age
+    CellPool(i)%mitmet = CellPool(i)%mitmet + p*timestep
+    !print *, CellPool(i)%mitmet
+    !read(*,*)
+
+    if ( CellPool(i)%mitmet .ge. 0.0 ) then
        m_flag = 1
+       !print *, 'cell divide at', size, age
+       !read(*,*)
+    else
+       m_flag = 0
     end if
   end subroutine check_mitosis
-  
+
   subroutine getrate(x, age, a)
     implicit none
     real, intent(in) :: x(lSpec)
     real, intent(in) :: age
     real, intent(out) :: a(lReac)
     !integer, intent(in) :: i
-
-    a = 0.0
     a(1) = lambda1*((kappa*age)**4)/(1.0+((kappa*age)**4))
     a(2) = gamma1*x(1)
     a(3) = lambda2*min(x(1), x(2))
+    !a(3) = lambda2*x(2)
     a(4) = gamma2*x(2)
   end subroutine getrate
+
+  subroutine getderivative(t, x, yp)
+    implicit none
+    real, intent(in) :: t
+    real, intent(in) :: x(lSpec)
+    real, intent(out) :: yp(lSpec)
+    yp(1) = lambda1*((kappa*t)**4)/(1.0+((kappa*t)**4)) - gamma1*x(1)
+    yp(2) = max(0.0, lambda2*min(x(1), x(2)) - gamma2*x(2))
+  end subroutine getderivative
 
   subroutine checkx(x, a, r, is_nag)
     implicit none

@@ -1,14 +1,14 @@
 ! Control parameters
 &xdata
-	NPool = 5000,
-	iseed = 12341,
+	NPool = 20000,
+	iseed = 1234,
 	tpinc = 10.0,
 	tminc = 0.1,
 	tend = 700,
-	timestep = 0.05,
-	rho = 100.0,
-	lambda1 = 4000.0,
-	gamma1 = 2.0,
+	timestep = 0.05
+	rho = 1.0,
+	lambda1 = 2000.0,
+	gamma1 = 1.0,
 	lambda2 = 0.25,
 	gamma2 = 0.15,
 	s0 = 1000.0,
@@ -21,7 +21,7 @@
 /
 
 &MitosisPara
-	mp1 =  0.9761474609375 ,
-	mp2 =  0.654223632812501
+	mp1 =  6.5,
+	mp2 =  0.4
 /
 

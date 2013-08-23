@@ -261,29 +261,40 @@ contains
     implicit none
     integer, intent(in) :: i
     integer, intent(out) :: m_flag
-    real event
+    real event, size, age
     real p, p1, p2
 
+    ! Scheme event
     event = CellPool(i)%event
-
     p = mp2*(1.0+tanh(10.0*(event/(mp1*8000.0) - 1.0)))/2.0
-    ! if ( age > 6.5 ) then
-    !    p1 = 0.2*max(0.0, (age/6.5 - 1.0))
+
+    ! ! Scheme size + time
+    ! size = CellPool(i)%Csize
+    ! age = CellPool(i)%Cage
+    ! if ( age > 8.0 ) then
+    !    !p1 = 0.2*max(0.0, (age/6.5 - 1.0))
+    !    p1 = mp2
     ! else
     !    p1 = 0.0
     ! end if
-    ! if (size > 1200.0 ) then
-    !    p2 = 0.6*max(0.0, (size/1200.0 - 1.0))
+    ! if (size > mp1*1200.0 ) then
+    !    !p = mp2*(1.0+tanh(2.0*(size/(mp1*1200.0) - 1.0)))/2.0
+    !    !p = mp2*(max(0.0, (size/(mp1*1200.0) - 1.0)))**3.0
+    !    p2 = mp2
     ! else
     !    p2 = 0.0
     ! end if
     ! p = p1 + p2
 
-    !print *, CellPool(i)%mitmet, size, age
-    CellPool(i)%mitmet = CellPool(i)%mitmet + p*timestep
-    !print *, CellPool(i)%mitmet
-    !read(*,*)
+    ! ! Scheme time only
+    ! age = CellPool(i)%Cage
+    ! if ( age > mp1 ) then
+    !     p = mp2*max(0.0, (age/(mp1*8.0) - 1.0))
+    !  else
+    !     p = 0.0
+    ! end if
 
+    CellPool(i)%mitmet = CellPool(i)%mitmet + p*timestep
     if ( CellPool(i)%mitmet .ge. 0.0 ) then
        m_flag = 1
        !print *, 'cell divide at', size, age

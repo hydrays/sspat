@@ -28,7 +28,7 @@ NPool <- parainfo$VALUE[parainfo$PARAMETER=='NPool']
 
 #for (i in seq(100)) {
 
-i <- 5
+i <- 1
 outfile <- sprintf("%s%05d%s", "asynew", i, ".png")
 png(outfile, width=600, height=800)
 #pdf(outfile, width=.pwidth, height=.pheight)
@@ -48,10 +48,11 @@ SimResultA$y <- SimResultA$y/(sum(SimResultA$y)*30)
 lines(SimResultA$x, SimResultA$y, type='l', col='red')
 
 lines(ExpResultA$x, ExpResultA$y, type='l', col='blue')
-## ErrorA[i] <- norm(as.matrix(ExpResultA$y-SimResultA$y), type='O')
-tt1<-cbind(ExpResultA$x, ExpResultA$y)
-tt2<-cbind(SimResultA$x, SimResultA$y)
-ErrorA <- kl.dist(tt1,tt2)$D1
+#ErrorA[i] <- norm(as.matrix(ExpResultA$y-SimResultA$y), type='O')
+ErrorA <- norm(as.matrix(ExpResultA$y-SimResultA$y), type='O')
+## tt1<-cbind(ExpResultA$x, ExpResultA$y)
+## tt2<-cbind(SimResultA$x, SimResultA$y)
+## ErrorA[i] <- kl.dist(tt1,tt2)$D1
 
 # Newborn part
 datafile <- sprintf("%s%05d%s", "n", i, ".dat")
@@ -66,10 +67,11 @@ SimResultB$y <- SimResultB$y/(sum(SimResultB$y)*30)
 lines(SimResultB$x, SimResultB$y, type='l', col='red')
 
 lines(ExpResultB$x, ExpResultB$y, type='l', col='blue')
-## ErrorB[i] <- norm(as.matrix(ExpResultB$y-SimResultB$y), type='O')
-tt1<-cbind(ExpResultB$x, ExpResultB$y)
-tt2<-cbind(SimResultB$x, SimResultB$y)
-ErrorB <- kl.dist(tt1,tt2)$D1
+##ErrorB[i] <- norm(as.matrix(ExpResultB$y-SimResultB$y), type='O')
+ErrorB <- norm(as.matrix(ExpResultB$y-SimResultB$y), type='O')
+## tt1<-cbind(ExpResultB$x, ExpResultB$y)
+## tt2<-cbind(SimResultB$x, SimResultB$y)
+## ErrorB[i] <- kl.dist(tt1,tt2)$D1
 
 ErrorT <- ErrorA + ErrorB
 dev.off()

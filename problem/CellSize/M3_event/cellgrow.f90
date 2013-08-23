@@ -27,9 +27,9 @@ contains
     call init_cell_pool()
 
     t = 0.0
-    tp = 0.0
+    tp = tpinc
     tm = 0.0
-    output_index = 0
+    output_index = 1
     n_mitosis = 0
     n_newborn = 0
     n_newborn2 = 0

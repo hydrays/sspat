@@ -1,6 +1,6 @@
 ! Control parameters
 &xdata
-	NPool = 10000,
+	NPool = 20000,
 	iseed = 1234,
 	tpinc = 500.0,
 	tminc = 0.1,
@@ -21,7 +21,7 @@
 /
 
 &MitosisPara
-	mp1 =  0.3 ,
-	mp2 =  0.7
+	mp1 =  0.78,
+	mp2 =  0.5
 /
 

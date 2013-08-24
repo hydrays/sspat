@@ -43,25 +43,25 @@ MitoFun <- function(mpv){
   ## ErrorA <- kl.dist(tt1,tt2)$D1
   
   ## Newborn part
-  ## datafile <- sprintf("%s%05d%s", "out/n", i, ".dat")
-  ## z <- matrix(scan(datafile, n=NPool*1, quiet=TRUE),
-  ##             NPool, 1, byrow=TRUE)
-  ## d2 <- density(z[,1], from=0, to=3000)
-  ## SimResultB <- spline(d2, n=101, xmin=0, xmax=3000)
-  ## SimResultB$y <- pmax(0, SimResultB$y)
-  ## SimResultB$y <- SimResultB$y/(sum(SimResultB$y)*30)
-  ## ExpResultB <- read.csv('newborn_dist.csv')
-  ## ## L1 norm
-  ## ErrorB <- norm(as.matrix(ExpResultB$y-SimResultB$y))
-  ## ## ## KL divgence
-  ## ## tt1<-cbind(ExpResultB$x, ExpResultB$y)
-  ## ## tt2<-cbind(SimResultB$x, SimResultB$y)
-  ## ## ErrorB <- kl.dist(tt1,tt2)$D1
+  datafile <- sprintf("%s%05d%s", "out/n", i, ".dat")
+  z <- matrix(scan(datafile, n=NPool*1, quiet=TRUE),
+              NPool, 1, byrow=TRUE)
+  d2 <- density(z[,1], from=0, to=3000)
+  SimResultB <- spline(d2, n=101, xmin=0, xmax=3000)
+  SimResultB$y <- pmax(0, SimResultB$y)
+  SimResultB$y <- SimResultB$y/(sum(SimResultB$y)*30)
+  ExpResultB <- read.csv('newborn_dist.csv')
+  ## L1 norm
+  ErrorB <- norm(as.matrix(ExpResultB$y-SimResultB$y))
+  ## ## KL divgence
+  ## tt1<-cbind(ExpResultB$x, ExpResultB$y)
+  ## tt2<-cbind(SimResultB$x, SimResultB$y)
+  ## ErrorB <- kl.dist(tt1,tt2)$D1
   
   ## Total error
-  ## ErrorT <- ErrorA + ErrorB
+  ErrorT <- ErrorA + ErrorB
 
   ##cat('Para:', mp1, mp2, '-> Error:', ErrorT, '\n')
-  print(c(mp1, mp2, ErrorA), digits=16)
-  return(ErrorA)
+  print(c(mp1, mp2, ErrorT), digits=16)
+  return(ErrorT)
 }

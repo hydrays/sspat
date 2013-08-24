@@ -91,8 +91,11 @@ contains
                + ( 3855735.0 * f3 - 1371249.0*f4 ) ) &
                + ( 3953664.0 * f2 + 277020.0*f5 ) )
           
-          if ( lx(2) .le. lx(1) ) then
-             CellPool(i)%event = CellPool(i)%event + timestep*lx(2)
+          if ( CellPool(i)%event < 0.0 .and. lx(2) < lx(1) ) then
+             CellPool(i)%event = 0.0
+          end if
+          if ( CellPool(i)%event .ge. 0.0 ) then
+             CellPool(i)%event = CellPool(i)%event + timestep*min(lx(2), lx(1))
           end if
           
           ! Stochastic update

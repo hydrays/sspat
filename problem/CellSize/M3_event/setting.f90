@@ -133,7 +133,7 @@ contains
        CellPool(i)%mRNA = s0
        call ran2(u)
        CellPool(i)%mitmet = log(u)
-       CellPool(i)%event = 0.0
+       CellPool(i)%event = -1.0
        !print *, CellPool(i)%mitmet
     end do
   end subroutine init_cell_pool
@@ -205,8 +205,8 @@ contains
     CellPool(i)%mitmet = log(u)
     call ran2(u)
     new_cell%mitmet = log(u)
-    CellPool(i)%event = 0.0
-    new_cell%event = 0.0
+    CellPool(i)%event = -1.0
+    new_cell%event = -1.0
 
     call ran2(u)
     np = ceiling(u*NPool)
@@ -265,8 +265,16 @@ contains
     real p, p1, p2
 
     ! Scheme event
+    ! event = CellPool(i)%event
+    ! p = mp2*(1.0+tanh(10.0*(event/(mp1*8000.0) - 1.0)))/2.0
+
+    ! Scheme event 2
     event = CellPool(i)%event
-    p = mp2*(1.0+tanh(10.0*(event/(mp1*8000.0) - 1.0)))/2.0
+    if ( event > mp1*8000.0 ) then
+       p = mp2
+    else
+       p = 0.0
+    end if
 
     ! ! Scheme size + time
     ! size = CellPool(i)%Csize

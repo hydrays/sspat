@@ -1,27 +1,27 @@
 ! Control parameters
 &xdata
-	NPool = 20000,
+	NPool = 4000,
 	iseed = 1234,
-	tpinc = 100.0,
+	tpinc = 200.0,
 	tminc = 0.1,
 	tend = 1010,
-	timestep = 0.05,
-	rho = 100.0,
-	lambda1 = 4000.0,
-	gamma1 = 2.0,
+	timestep = 0.05
+	rho = 1.0,
+	lambda1 = 2000.0,
+	gamma1 = 1.0,
 	lambda2 = 0.25,
 	gamma2 = 0.15,
 	s0 = 1000.0,
 	newcell_delta = 68.8,
 	kappa = 1.0,
-	NCollect = 10000,
-	NCollect2 = 10000,
+	NCollect = 5000,
+	NCollect2 = 5000,
 	tc = 500,
 	NSize = 50
 /
 
 &MitosisPara
-	mp1 =  0.495068359375 ,
-	mp2 =  0.73916015625
+	mp1 =  0.9, 
+	mp2 =  0.3
 /
 

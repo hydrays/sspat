@@ -27,9 +27,9 @@ contains
     call init_cell_pool()
 
     t = 0.0
-    tp = 0.0
+    tp = tpinc
     tm = 0.0
-    output_index = 0
+    output_index = 1
     n_mitosis = 0
     n_newborn = 0
     n_newborn2 = 0
@@ -41,6 +41,16 @@ contains
           output_index = output_index + 1
           tp = tp + tpinc
           print *, t
+       end if
+
+       if (t .ge. tm) then
+          do i = 1, NPool
+             if ( CellPool(i)%Cage > tminc ) then
+                CellPool(i)%Csize_old1 = CellPool(i)%Csize_old2
+                CellPool(i)%Csize_old2 = CellPool(i)%Csize
+             end if
+          end do
+          tm = tm + tminc
        end if
 
        do i = 1, NPool
@@ -80,7 +90,14 @@ contains
           lx = lx + ch * ( ( 902880.0 * yp &
                + ( 3855735.0 * f3 - 1371249.0*f4 ) ) &
                + ( 3953664.0 * f2 + 277020.0*f5 ) )
-
+          
+          if ( CellPool(i)%event < 0.0 .and. lx(2) < lx(1) ) then
+             CellPool(i)%event = 0.0
+          end if
+          if ( CellPool(i)%event .ge. 0.0 ) then
+             CellPool(i)%event = CellPool(i)%event + timestep*min(lx(2), lx(1))
+          end if
+          
           ! Stochastic update
           ! do j = 1, lReac
           !    !r(j) = poidev(a(j)*timestep)
@@ -101,7 +118,7 @@ contains
           CellPool(i)%Csize = lx(2)
 
           call check_mitosis(i, m_flag)
-          if ( t > tc .and. m_flag .eq. 1 ) then
+          if ( m_flag .eq. 1 ) then
              ! Collect the size of mitosis cell
              call cell_division(i)
              ! Collect the newborn cells

@@ -59,37 +59,37 @@ contains
           lx(2) = CellPool(i)%Csize
 
           ! ODE update
-          call getrate(lx, lage, a)
-          lx(1) = lx(1) + (a(1) - a(2))*timestep
-          lx(2) = lx(2) + max(0.0, a(3) - a(4))*timestep
+          ! call getrate(lx, lage, a)
+          ! lx(1) = lx(1) + (a(1) - a(2))*timestep
+          ! lx(2) = lx(2) + max(0.0, a(3) - a(4))*timestep
 
           ! RK4 update
-          ! call getderivative(lage, lx, yp)
-          ! ch = timestep/4.0
-          ! f5 = lx + ch*yp
-          ! call getderivative(lage+ch, f5, f1 )
-          ! ch = 3.0*timestep/32.0
-          ! f5 = lx + ch*( yp + 3.0*f1 )
-          ! call getderivative(lage+3.0*timestep/8.0, f5, f2 )
-          ! ch = timestep/2197.0
-          ! f5 = lx + ch*( 1932.0*yp &
-          !      + ( 7296.0*f2 - 7200.0*f1 ) )
-          ! call getderivative (lage+12.0*timestep/13.0, f5, f3 )
-          ! ch = timestep/4104.0
-          ! f5 = lx + ch*( ( 8341.0*yp &
-          !      - 845.0*f3 ) + ( 29440.0*f2 &
-          !      - 32832.0*f1 ) )
-          ! call getderivative ( lage+timestep, f5, f4 )
-          ! ch = timestep/20520.0
-          ! f1 = lx + ch*( (-6080.0*yp &
-          !      + ( 9295.0*f3 - 5643.0*f4 ) ) &
-          !      + ( 41040.0*f1 - 28352.0*f2 ) )
-          ! call getderivative ( lage + timestep/2.0, f1, f5 )
-          ! !  Ready to compute the approximate solution at T+H.
-          ! ch = timestep / 7618050.0
-          ! lx = lx + ch * ( ( 902880.0 * yp &
-          !      + ( 3855735.0 * f3 - 1371249.0*f4 ) ) &
-          !      + ( 3953664.0 * f2 + 277020.0*f5 ) )
+          call getderivative(lage, lx, yp)
+          ch = timestep/4.0
+          f5 = lx + ch*yp
+          call getderivative(lage+ch, f5, f1 )
+          ch = 3.0*timestep/32.0
+          f5 = lx + ch*( yp + 3.0*f1 )
+          call getderivative(lage+3.0*timestep/8.0, f5, f2 )
+          ch = timestep/2197.0
+          f5 = lx + ch*( 1932.0*yp &
+               + ( 7296.0*f2 - 7200.0*f1 ) )
+          call getderivative (lage+12.0*timestep/13.0, f5, f3 )
+          ch = timestep/4104.0
+          f5 = lx + ch*( ( 8341.0*yp &
+               - 845.0*f3 ) + ( 29440.0*f2 &
+               - 32832.0*f1 ) )
+          call getderivative ( lage+timestep, f5, f4 )
+          ch = timestep/20520.0
+          f1 = lx + ch*( (-6080.0*yp &
+               + ( 9295.0*f3 - 5643.0*f4 ) ) &
+               + ( 41040.0*f1 - 28352.0*f2 ) )
+          call getderivative ( lage + timestep/2.0, f1, f5 )
+          !  Ready to compute the approximate solution at T+H.
+          ch = timestep / 7618050.0
+          lx = lx + ch * ( ( 902880.0 * yp &
+               + ( 3855735.0 * f3 - 1371249.0*f4 ) ) &
+               + ( 3953664.0 * f2 + 277020.0*f5 ) )
 
           ! Stochastic update
           ! do j = 1, lReac

@@ -11,11 +11,13 @@ H <- parainfo$VALUE[parainfo$PARAMETER=='H']
 ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
-N = 200
+N = 500
 pL = 400
 pH = 60
 .pwidth = 2048
 .pheight = 576
+
+H <- H + 2
 
 cat("processing file ...[",N,"]\n")
 i <- 0

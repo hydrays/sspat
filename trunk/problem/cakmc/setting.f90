@@ -118,12 +118,18 @@ contains
 
     npack = 0
     TDC = 0
+    SC = 0
+    TAC = 0
     do i = 1, L
        do j = 1, H
           if ( cmat(i,j)%type .ne. 0 ) then
              npack(i) = npack(i) + 1
           end if
-          if ( cmat(i,j)%type .eq. 3 ) then
+          if ( cmat(i,j)%type .eq. 1 ) then
+             SC(i) = SC(i) + 1
+          else if ( cmat(i,j)%type .eq. 2 ) then
+             TAC(i) = TAC(i) + 1
+          else if ( cmat(i,j)%type .eq. 3 ) then
              TDC(i) = TDC(i) + 1
           end if
        end do
@@ -132,6 +138,10 @@ contains
     npack(L+1) = npack(1)
     TDC(0) = TDC(L)
     TDC(L+1) = TDC(1)
+    SC(0) = SC(L)
+    SC(L+1) = SC(1)
+    TAC(0) = TAC(L)
+    TAC(L+1) = TAC(1)
 
     NP = 0.0
     NT = 0.0
@@ -160,6 +170,8 @@ contains
        do j = 1, H
           write(11, '(I5)', advance="no"), cmat(i,j)%type
        end do
+       write(11, '(I5)', advance="no"), SC(i)
+       write(11, '(I5)', advance="no"), TAC(i)
        write(11, *)
     end do
     do i = 1, L
@@ -234,7 +246,13 @@ contains
           cmat(m, j) = new_cell
        end if
        npack(m) = npack(m) + 1
-       if (new_cell%type .eq. 3) then
+       if (new_cell%type .eq. 1) then
+          SC(i) = SC(i) - 1
+          SC(m) = SC(m) + 1
+       else if (new_cell%type .eq. 2) then
+          TAC(i) = TAC(i) - 1
+          TAC(m) = TAC(m) + 1
+       else if (new_cell%type .eq. 3) then
           TDC(i) = TDC(i) - 1
           TDC(m) = TDC(m) + 1
        end if
@@ -271,7 +289,13 @@ contains
           cmat(m, j) = new_cell
        end if
        npack(m) = npack(m) + 1
-       if (new_cell%type .eq. 3) then
+       if (new_cell%type .eq. 1) then
+          SC(i) = SC(i) - 1
+          SC(m) = SC(m) + 1
+       else if (new_cell%type .eq. 2) then
+          TAC(i) = TAC(i) - 1
+          TAC(m) = TAC(m) + 1
+       else if (new_cell%type .eq. 3) then
           TDC(i) = TDC(i) - 1
           TDC(m) = TDC(m) + 1
        end if
@@ -304,10 +328,13 @@ contains
              if ( u1 < p0 ) then
                 ! SC -> 2SC
                 cmat(i,j+1) = cmat(i,j)
+                SC(i) = SC(i) + 1
              else
                 ! SC -> 2TAC
                 cmat(i,j)%type = 2
                 cmat(i,j+1) = cmat(i,j)
+                SC(i) = SC(i) - 1
+                TAC(i) = TAC(i) + 2
              end if
              npack(i) = npack(i) + 1
           else if ( cmat(i,j)%type .eq. 2 ) then
@@ -319,10 +346,12 @@ contains
              if ( u1 < p1 ) then
                 ! TAC -> 2TAC
                 cmat(i, j+1) = cmat(i,j)
+                TAC(i) = TAC(i) + 1
              else
                 ! TAC -> 2TDC
                 cmat(i, j)%type = 3
                 cmat(i, j+1) = cmat(i,j)
+                TAC(i) = TAC(i) - 1
                 TDC(i) = TDC(i) + 2
              end if
              npack(i) = npack(i) + 1
@@ -433,6 +462,10 @@ contains
        cmat(L+1, :) = cmat(1, :)
        npack(L) = npack(0)
        npack(L+1) = npack(1)
+       SC(L) = SC(0)
+       SC(L+1) = SC(1)
+       TAC(L) = TAC(0)
+       TAC(L+1) = TAC(1)
        TDC(L) = TDC(0)
        TDC(L+1) = TDC(1)
     end if
@@ -440,18 +473,26 @@ contains
        cmat(L+1, :) = cmat(1, :)
        npack(L+1) = npack(1)
        TDC(L+1) = TDC(1)
+       SC(L+1) = SC(1)
+       TAC(L+1) = TAC(1)
     end if
     if ( k .eq. L ) then
        cmat(1, :) = cmat(L+1, :)
        cmat(0, :) = cmat(L, :)
        npack(1) = npack(L+1)
        npack(0) = npack(L)
+       SC(1) = SC(L+1)
+       SC(0) = SC(L)
+       TAC(1) = TAC(L+1)
+       TAC(0) = TAC(L)
        TDC(1) = TDC(L+1)
        TDC(0) = TDC(L)
     end if
     if ( k .eq. L-1 ) then
        cmat(0, :) = cmat(L, :)
        npack(0) = npack(L)
+       SC(0) = SC(L)
+       TAC(0) = TAC(L)
        TDC(0) = TDC(L)
     end if
   end subroutine Perodic_BC

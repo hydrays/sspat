@@ -184,7 +184,7 @@ contains
     integer np
     type(cell) new_cell
     call normdev(0.0, newcell_delta, u)
-    !call normdev(0.0, newcell_delta*CellPool(i)%Csize/500, u)
+    !call normdev(0.0, newcell_delta*CellPool(i)%Csize/400.0, u)
     !write(17, '(6(F16.2))'), u
     u = min(u, 0.9*CellPool(i)%CSize)
     u = max(u, -0.9*CellPool(i)%CSize)

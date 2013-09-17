@@ -97,7 +97,7 @@ contains
     real(kind=8), intent(out) :: a(NReac)
     real(kind=8) TGFbeta, g1
 
-    d = 0.3
+    d = 0.2
     
     TGFbeta = x(3) + x(5)
     !TGFbeta = x(3)

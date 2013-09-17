@@ -14,14 +14,14 @@
 	s0 = 1000.0,
 	newcell_delta = 68.8,
 	kappa = 0.5,
-	NCollect = 5000,
-	NCollect2 = 5000,
-	tc = 500,
+	NCollect = 100000,
+	NCollect2 = 100000,
+	tc = 400,
 	NSize = 50
 /
 
 &MitosisPara
-	mp1 =  0.8 ,
-	mp2 =  0.5
+	mp1 =  0.90859375 ,
+	mp2 =  1.140625
 /
 

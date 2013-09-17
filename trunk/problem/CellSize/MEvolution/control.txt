@@ -9,14 +9,14 @@
 	rho = 1.0,
 	lambda1 = 2000.0,
 	gamma1 = 1.0,
-	lambda2 = 0.25,
-	gamma2 = 0.15,
+	lambda2 = 0.09,
+	gamma2 = 0.0,
 	s0 = 1000.0,
 	newcell_delta = 68.8,
 	kappa = 0.5,
 	NCollect = 5000,
 	NCollect2 = 5000,
-	tc = 500,
+	tc = 0,
 	NSize = 50
 /
 

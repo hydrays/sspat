@@ -45,18 +45,18 @@ contains
 
        if (t .ge. tm) then
           do i = 1, NPool
-             if ( CellPool(i)%Cage > tminc ) then
-                CellPool(i)%Csize_old1 = CellPool(i)%Csize_old2
-                CellPool(i)%Csize_old2 = CellPool(i)%Csize
+             if ( CellPool(i)%State(2) > tminc ) then
+                CellPool(i)%AuxVariable(1) = CellPool(i)%AuxVariable(2)
+                CellPool(i)%AuxVariable(2) = CellPool(i)%State(1)
              end if
           end do
           tm = tm + tminc
        end if
 
        do i = 1, NPool
-          lage = CellPool(i)%Cage
-          lx(1) = CellPool(i)%mRNA
-          lx(2) = CellPool(i)%Csize
+          lage = CellPool(i)%State(2)
+          lx(1) = CellPool(i)%State(3)
+          lx(2) = CellPool(i)%State(1)
 
           ! ODE update
           ! call getrate(lx, lage, a)
@@ -64,39 +64,34 @@ contains
           ! lx(2) = lx(2) + max(0.0, a(3) - a(4))*timestep
 
           ! RK4 update
-          call getderivative(lage, lx, yp)
+          call getderivative(i, lage, lx, yp)
           ch = timestep/4.0
           f5 = lx + ch*yp
-          call getderivative(lage+ch, f5, f1 )
+          call getderivative(i, lage+ch, f5, f1 )
           ch = 3.0*timestep/32.0
           f5 = lx + ch*( yp + 3.0*f1 )
-          call getderivative(lage+3.0*timestep/8.0, f5, f2 )
+          call getderivative(i, lage+3.0*timestep/8.0, f5, f2 )
           ch = timestep/2197.0
           f5 = lx + ch*( 1932.0*yp &
                + ( 7296.0*f2 - 7200.0*f1 ) )
-          call getderivative (lage+12.0*timestep/13.0, f5, f3 )
+          call getderivative (i, lage+12.0*timestep/13.0, f5, f3 )
           ch = timestep/4104.0
           f5 = lx + ch*( ( 8341.0*yp &
                - 845.0*f3 ) + ( 29440.0*f2 &
                - 32832.0*f1 ) )
-          call getderivative ( lage+timestep, f5, f4 )
+          call getderivative (i, lage+timestep, f5, f4 )
           ch = timestep/20520.0
           f1 = lx + ch*( (-6080.0*yp &
                + ( 9295.0*f3 - 5643.0*f4 ) ) &
                + ( 41040.0*f1 - 28352.0*f2 ) )
-          call getderivative ( lage + timestep/2.0, f1, f5 )
+          call getderivative (i, lage + timestep/2.0, f1, f5 )
           !  Ready to compute the approximate solution at T+H.
           ch = timestep / 7618050.0
           lx = lx + ch * ( ( 902880.0 * yp &
                + ( 3855735.0 * f3 - 1371249.0*f4 ) ) &
                + ( 3953664.0 * f2 + 277020.0*f5 ) )
           
-          if ( CellPool(i)%event < 0.0 .and. lx(2) < lx(1) ) then
-             CellPool(i)%event = 0.0
-          end if
-          if ( CellPool(i)%event .ge. 0.0 ) then
-             CellPool(i)%event = CellPool(i)%event + timestep*min(lx(2), lx(1))
-          end if
+          CellPool(i)%State(4) = CellPool(i)%State(4) + timestep*lx(2)
           
           ! Stochastic update
           ! do j = 1, lReac
@@ -113,9 +108,9 @@ contains
           ! end do
           ! call checkx(lx, a, r, is_nag)          
           lage = lage + timestep
-          CellPool(i)%Cage = lage
-          CellPool(i)%mRNA = lx(1)
-          CellPool(i)%Csize = lx(2)
+          CellPool(i)%State(2) = lage
+          CellPool(i)%State(3) = lx(1)
+          CellPool(i)%State(1) = lx(2)
 
           call check_mitosis(i, m_flag)
           if ( m_flag .eq. 1 ) then
@@ -128,9 +123,9 @@ contains
        end do
        t = t + timestep
 
-       !print *, t, CellPool(1)%Csize, CellPool(1)%Cage, & 
-       !     CellPool(1)%Crate, CellPool(1)%mRNA, CellPool(1)%nRibsome 
-       !if (CellPool(1)%Cage.eq.0.0) read(*,*)
+       !print *, t, CellPool(1)%State(1), CellPool(1)%State(2), & 
+       !     CellPool(1)%Crate, CellPool(1)%State(3), CellPool(1)%nRibsome 
+       !if (CellPool(1)%State(2).eq.0.0) read(*,*)
 
        ! Collect new born cell
     end do

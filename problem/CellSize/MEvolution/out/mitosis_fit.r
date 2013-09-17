@@ -34,7 +34,7 @@ png(outfile, width=600, height=800)
 #pdf(outfile, width=.pwidth, height=.pheight)
 #pdf("fasyn.pdf", width=7, height=5)
 
-par(mfrow=c(2,1))
+par(mfrow=c(2,2))
 
 datafile <- sprintf("%s%05d%s", "m", i, ".dat")
 z <- matrix(scan(datafile, n=NPool*6, quiet=TRUE),
@@ -54,6 +54,10 @@ ErrorA <- norm(as.matrix(ExpResultA$y-SimResultA$y), type='O')
 ## tt2<-cbind(SimResultA$x, SimResultA$y)
 ## ErrorA[i] <- kl.dist(tt1,tt2)$D1
 
+hist(z[,5])
+
+hist(z[,4])
+
 # Newborn part
 datafile <- sprintf("%s%05d%s", "n", i, ".dat")
 z <- matrix(scan(datafile, n=NPool*1, quiet=TRUE),
@@ -72,6 +76,7 @@ ErrorB <- norm(as.matrix(ExpResultB$y-SimResultB$y), type='O')
 ## tt1<-cbind(ExpResultB$x, ExpResultB$y)
 ## tt2<-cbind(SimResultB$x, SimResultB$y)
 ## ErrorB[i] <- kl.dist(tt1,tt2)$D1
+
 
 ErrorT <- ErrorA + ErrorB
 dev.off()

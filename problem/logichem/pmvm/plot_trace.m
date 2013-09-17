@@ -22,8 +22,8 @@
 % ===========
 % test
 % ===========
-load pmvm_wtime50
-data = pmvm_wtime50;
+load pmvm_s1000_50
+data = pmvm_s1000_50;
 vm = 0.1:.06:3.009;
 pm = 0.5:0.01:1.0001;
 [X,Y] = meshgrid(pm, vm);

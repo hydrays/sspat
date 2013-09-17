@@ -8,14 +8,14 @@
                 rho,      1.00
             lambda1,   2000.00
              gamma1,      1.00
-            lambda2,      0.25
-             gamma2,      0.15
+            lambda2,      0.09
+             gamma2,      0.00
                  s0,   1000.00
       newcell_delta,     68.80
               kappa,      0.50
            NCollect,      5000
           NCollect2,      5000
-                 tc,    500.00
+                 tc,      0.00
               NSize,        50
                 mp1,      0.80
                 mp2,      0.50

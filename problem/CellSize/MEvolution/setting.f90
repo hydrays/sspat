@@ -11,6 +11,7 @@ module setting
   integer :: NCollect, NCollect2
   integer :: NSize
 
+  real, parameter :: ctime = 14.0
   integer, parameter :: lReac = 4
   integer, parameter :: lSpec = 2
   ! Reactions within one cell
@@ -19,7 +20,7 @@ module setting
   ! 3. 0 -> Ribsome, a = lambda2*ActiveRibsome
   ! 4. Ribsome -> 0, a = gamma2*Ribsome
   integer, parameter, dimension(lSpec,lReac) :: nu = reshape( &
-                                ! 1   2
+       ! 1   2
        source=(/ &
        (/01, 00/), & !1
        (/-1, 00/), & !2
@@ -36,13 +37,13 @@ module setting
   namelist /MitosisPara/ mp1, mp2!, mp3
 
   type cell
-     real Csize
-     real Csize_old1
-     real Csize_old2
-     real Cage
-     real mRNA
+     ! size, age, mRNA, event
+     real State(4)
+     ! cellsize_old1, cellsize_old2
+     real AuxVariable(2)
+     ! growth rate
+     real Pheno(8)
      real mitmet
-     real event
   end type cell
 
   type(cell), allocatable :: CellPool(:)
@@ -128,15 +129,32 @@ contains
     allocate(NewbornPool2(NPool))
 
     do i = 1, NPool
-       CellPool(i)%Csize = s0
-       CellPool(i)%Csize_old1 = s0
-       CellPool(i)%Csize_old2 = s0
-       CellPool(i)%Cage = 0.0
-       CellPool(i)%mRNA = s0
+       call ran2(u)
+       CellPool(i)%Pheno(1) = lambda1
+       CellPool(i)%Pheno(2) = gamma1
+       CellPool(i)%Pheno(3) = lambda2 + 0.5*lambda2*(2.0*u - 1.0)
+       ! if ( u < 0.5 ) then
+       !    CellPool(i)%Pheno(3) = 0.12
+       ! else
+       !    CellPool(i)%Pheno(3) = 0.08
+       ! end if       
+       !CellPool(i)%Pheno(4) = ctime - log(2.0)/CellPool(i)%Pheno(3)
+       !print *, CellPool(i)%mitmet
+
+       s0 = 500.0/(0.35+CellPool(i)%Pheno(3))
+       CellPool(i)%State(1) = s0
+       CellPool(i)%AuxVariable(1) = s0
+       CellPool(i)%AuxVariable(2) = s0
+       CellPool(i)%State(2) = 0.0
+       CellPool(i)%State(3) = s0
        call ran2(u)
        CellPool(i)%mitmet = log(u)
-       CellPool(i)%event = -1.0
-       !print *, CellPool(i)%mitmet
+       CellPool(i)%State(4) = -1.0       
+       
+       CellPool(i)%Pheno(4) = max(0.0, ctime - log(2.0)/CellPool(i)%Pheno(3))
+       !CellPool(i)%Pheno(4) = max(0.0, ctime - (1.0/CellPool(i)%Pheno(3))*&
+       !     log(1000.0/(CellPool(i)%State(1)*(CellPool(i)%Pheno(3)+0.35))))
+
     end do
   end subroutine init_cell_pool
 
@@ -151,11 +169,13 @@ contains
        open (unit = 11, file=filename, action="write")
 
        do i = 1, NPool
-          write(11, '(6(F16.2))'), CellPool(i)%Csize, &
-               CellPool(i)%Csize_old1, &
-               CellPool(i)%Csize_old2, &
-               CellPool(i)%Cage, CellPool(i)%mRNA, &
-               CellPool(i)%event
+          write(11, '(6(F16.2))'), &
+               CellPool(i)%State(1), &
+               CellPool(i)%AuxVariable(1), &
+               CellPool(i)%AuxVariable(2), &
+               CellPool(i)%State(2), &
+               CellPool(i)%Pheno(3), &
+               CellPool(i)%State(4)
        end do
        close(11)
     end if
@@ -170,7 +190,7 @@ contains
     WRITE(filename,'(A7,I5.5,A4)') './out/n', index, '.dat'
     open (unit = 11, file=filename, action="write")
     do i = 1, NPool
-       write(11, '((F16.2))'), NewbornPool(i)%Csize
+       write(11, '((F16.2))'), NewbornPool(i)%State(1)
     end do
     close(11)
   end subroutine output_to_file_newborn
@@ -184,31 +204,37 @@ contains
     integer np
     type(cell) new_cell
     call normdev(0.0, newcell_delta, u)
-    !call normdev(0.0, newcell_delta*CellPool(i)%Csize/500, u)
+    !call normdev(0.0, newcell_delta*CellPool(i)%State(1)/500, u)
     !write(17, '(6(F16.2))'), u
-    u = min(u, 0.9*CellPool(i)%CSize)
-    u = max(u, -0.9*CellPool(i)%CSize)
-    temp = CellPool(i)%Csize
-    CellPool(i)%Csize = (temp + u)/2.0
-    new_cell%Csize = temp - CellPool(i)%Csize
-    if ( CellPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
+    u = min(u, 0.9*CellPool(i)%State(1))
+    u = max(u, -0.9*CellPool(i)%State(1))
+    temp = CellPool(i)%State(1)
+    CellPool(i)%State(1) = (temp + u)/2.0
+    new_cell%State(1) = temp - CellPool(i)%State(1)
+    if ( CellPool(i)%State(1) * new_cell%State(1) .le. 0.0 ) then
        print *, 'Cell born to be negative size, abort ...'
-       print *, newcell_delta, u, CellPool(i)%Csize
+       print *, newcell_delta, u, CellPool(i)%State(1)
     end if
-    CellPool(i)%Csize_old1 = CellPool(i)%Csize
-    new_cell%Csize_old1 = new_cell%Csize
-    CellPool(i)%Csize_old2 = CellPool(i)%Csize
-    new_cell%Csize_old2 = new_cell%Csize
-    CellPool(i)%Cage = 0.0
-    new_cell%Cage = 0.0
-    new_cell%mRNA = 0.0*CellPool(i)%mRNA*(1.0-CellPool(i)%Csize/temp)
-    CellPool(i)%mRNA = 0.0*CellPool(i)%mRNA*CellPool(i)%Csize/temp
+    CellPool(i)%AuxVariable(1) = CellPool(i)%State(1)
+    new_cell%AuxVariable(1) = new_cell%State(1)
+    CellPool(i)%AuxVariable(2) = CellPool(i)%State(1)
+    new_cell%AuxVariable(2) = new_cell%State(1)
+    CellPool(i)%State(2) = 0.0
+    new_cell%State(2) = 0.0
+    new_cell%State(3) = 0.0*CellPool(i)%State(3)*(1.0-CellPool(i)%State(1)/temp)
+    CellPool(i)%State(3) = 0.0*CellPool(i)%State(3)*CellPool(i)%State(1)/temp
     call ran2(u)
     CellPool(i)%mitmet = log(u)
     call ran2(u)
     new_cell%mitmet = log(u)
-    CellPool(i)%event = -1.0
-    new_cell%event = -1.0
+    CellPool(i)%State(4) = -1.0
+    new_cell%State(4) = -1.0
+
+    new_cell%Pheno = CellPool(i)%Pheno
+    !CellPool(i)%Pheno(4) = max(0.0, ctime - (1.0/CellPool(i)%Pheno(3))*&
+    !     log(1000.0/(CellPool(i)%State(1)*(CellPool(i)%Pheno(3)+0.35))))
+    !new_cell%Pheno(4) = max(0.0, ctime - (1.0/new_cell%Pheno(3))*&
+    !     log(1000.0/(new_cell%State(1)*(new_cell%Pheno(3)+0.35))))
 
     call ran2(u)
     np = ceiling(u*NPool)
@@ -229,25 +255,25 @@ contains
   !   integer np
   !   type(cell) new_cell
   !   call normdev(0.0, newcell_delta, u)
-  !   !call normdev(0.0, newcell_delta*NewbornPool(i)%Csize/500, u)
-  !   u = min(u, 0.9*NewbornPool(i)%CSize)
-  !   u = max(u, -0.9*NewbornPool(i)%CSize)
-  !   temp = NewbornPool(i)%Csize
-  !   NewbornPool(i)%Csize = (temp + u)/2.0
-  !   new_cell%Csize = temp - NewbornPool(i)%Csize
-  !   if ( NewbornPool(i)%Csize * new_cell%Csize .le. 0.0 ) then
+  !   !call normdev(0.0, newcell_delta*NewbornPool(i)%State(1)/500, u)
+  !   u = min(u, 0.9*NewbornPool(i)%State(1))
+  !   u = max(u, -0.9*NewbornPool(i)%State(1))
+  !   temp = NewbornPool(i)%State(1)
+  !   NewbornPool(i)%State(1) = (temp + u)/2.0
+  !   new_cell%State(1) = temp - NewbornPool(i)%State(1)
+  !   if ( NewbornPool(i)%State(1) * new_cell%State(1) .le. 0.0 ) then
   !      print *, 'Cell born to be negative size, abort ...'
   !   end if
-  !   NewbornPool(i)%Csize_old1 = NewbornPool(i)%Csize
-  !   new_cell%Csize_old1 = new_cell%Csize
-  !   NewbornPool(i)%Csize_old2 = NewbornPool(i)%Csize
-  !   new_cell%Csize_old2 = new_cell%Csize
-  !   NewbornPool(i)%Cage = 0.0
-  !   new_cell%Cage = 0.0
-  !   NewbornPool(i)%mRNA = 0.0
-  !   new_cell%mRNA = 0.0
-  !   NewbornPool(i)%nRibsome = rho*NewbornPool(i)%Csize
-  !   new_cell%nRibsome = rho*new_cell%Csize
+  !   NewbornPool(i)%AuxVariable(1) = NewbornPool(i)%State(1)
+  !   new_cell%AuxVariable(1) = new_cell%State(1)
+  !   NewbornPool(i)%AuxVariable(2) = NewbornPool(i)%State(1)
+  !   new_cell%AuxVariable(2) = new_cell%State(1)
+  !   NewbornPool(i)%State(2) = 0.0
+  !   new_cell%State(2) = 0.0
+  !   NewbornPool(i)%State(3) = 0.0
+  !   new_cell%State(3) = 0.0
+  !   NewbornPool(i)%nRibsome = rho*NewbornPool(i)%State(1)
+  !   new_cell%nRibsome = rho*new_cell%State(1)
 
   !   call ran2(u)
   !   np = ceiling(u*NCollect)
@@ -265,22 +291,23 @@ contains
     integer, intent(out) :: m_flag
     real event, size, age
     real p, p1, p2
+    real lambda
 
     ! Scheme event
-    ! event = CellPool(i)%event
+    ! event = CellPool(i)%State(4)
     ! p = mp2*(1.0+tanh(10.0*(event/(mp1*8000.0) - 1.0)))/2.0
 
-    ! Scheme event 2
-    event = CellPool(i)%event
-    if ( event > mp1*8000.0 ) then
-       p = mp2
-    else
-       p = 0.0
-    end if
+    ! ! Scheme event 2
+    ! event = CellPool(i)%State(4)
+    ! if ( event > mp1*8000.0 ) then
+    !    p = mp2
+    ! else
+    !    p = 0.0
+    ! end if
 
     ! ! Scheme size + time
-    ! size = CellPool(i)%Csize
-    ! age = CellPool(i)%Cage
+    ! size = CellPool(i)%State(1)
+    ! age = CellPool(i)%State(2)
     ! if ( age > mp3*8.0 ) then
     !    !p1 = 0.2*max(0.0, (age/6.5 - 1.0))
     !    p1 = mp2
@@ -297,12 +324,21 @@ contains
     ! p = p1 + p2
 
     ! ! Scheme time only
-    ! age = CellPool(i)%Cage
+    ! age = CellPool(i)%State(2)
     ! if ( age > mp1 ) then
     !     p = mp2*max(0.0, (age/(mp1*8.0) - 1.0))
     !  else
     !     p = 0.0
     ! end if
+
+    ! Scheme time only
+    size = CellPool(i)%State(1)
+    lambda = 0.35+CellPool(i)%Pheno(3)
+    if ( size*lambda > 1000.0 ) then
+        p = 5.0
+     else
+        p = 0.0
+    end if
 
     CellPool(i)%mitmet = CellPool(i)%mitmet + p*timestep
     if ( CellPool(i)%mitmet .ge. 0.0 ) then
@@ -314,26 +350,33 @@ contains
     end if
   end subroutine check_mitosis
 
-  subroutine getrate(x, age, a)
+  subroutine getrate(i, x, age, a)
     implicit none
     real, intent(in) :: x(lSpec)
     real, intent(in) :: age
     real, intent(out) :: a(lReac)
-    !integer, intent(in) :: i
+    integer, intent(in) :: i
     a(1) = lambda1*((kappa*age)**4)/(1.0+((kappa*age)**4))
     a(2) = gamma1*x(1)
-    a(3) = lambda2*min(x(1), x(2))
+    !a(3) = lambda2*min(x(1), x(2))
     !a(3) = lambda2*x(2)
+    a(3) = CellPool(i)%Pheno(3)*x(1)
     a(4) = gamma2*x(2)
   end subroutine getrate
 
-  subroutine getderivative(t, x, yp)
+  subroutine getderivative(i, t, x, yp)
     implicit none
     real, intent(in) :: t
     real, intent(in) :: x(lSpec)
     real, intent(out) :: yp(lSpec)
+    integer, intent(in) :: i
     yp(1) = lambda1*((kappa*t)**4)/(1.0+((kappa*t)**4)) - gamma1*x(1)
-    yp(2) = max(0.0, lambda2*min(x(1), x(2)) - gamma2*x(2))
+    !yp(2) = max(0.0, lambda2*min(x(1), x(2)) - gamma2*x(2))
+    if ( CellPool(i)%State(2) > CellPool(i)%Pheno(4) ) then
+       yp(2) = CellPool(i)%Pheno(3)*x(1)
+    else
+       yp(2) = 0.0
+    end if
   end subroutine getderivative
 
   subroutine checkx(x, a, r, is_nag)

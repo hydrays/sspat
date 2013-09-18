@@ -97,9 +97,9 @@ for (i in seq(N)) {
                   draw=FALSE,
             panel=function(...){
               panel.levelplot(...)
-              #panel.lines(seq(pL), nutri, lwd=4, type='l', col=colors()[100])
-              #panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
-              #panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
+              panel.lines(seq(pL), nutri, lwd=4, type='l', col=colors()[100])
+              panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
+              panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
               #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
               grid.text(my.label.time,
                          x = unit(0.85, "npc"),

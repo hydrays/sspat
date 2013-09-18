@@ -249,11 +249,10 @@ contains
     close(12)
   end subroutine output_to_file
 
-  subroutine cell_event(i, t)
+  subroutine cell_event(i)
     use random
     implicit none
     integer, intent(in) :: i
-    real, intent(in) :: t
     integer j, k, m, shift_i
     real u, p0, TGFbeta, Pa, ENutri
     real vr, vl
@@ -274,13 +273,7 @@ contains
     ! Pa controls the division rate of SC and MC.
     !Pa = 2.0*ENutri/(1.0+ENutri)
     Pa = ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
-    
-    ! if ( Nutri(i) .eq. 0.0 ) then
-    !    Pa = 1.0
-    ! else
-    !    Pa = 0.0
-    ! end if
-    
+
     call ran2(u)
     u = u*a(i)
     !if (npack(i).ne.0) then
@@ -409,12 +402,8 @@ contains
                    TGFbeta = TGFbeta + &
                         bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
                 end do
-                !if ( t < 105.0 ) then
-                   p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
-                        / (1.0 + cmat(i,j)%gene3*TGFbeta)
-                !else
-                !   p0 = 0.99
-                !end if
+                p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
+                     / (1.0 + cmat(i,j)%gene3*TGFbeta)
                 !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
                 !p0 = p0*(1.0-real(j)/40.0)
                 !print *, 'p0', p0
@@ -442,15 +431,14 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                !if ( Nutri(i) < 0.05*0.04 ) then
-                !if ( Nutri(i) > 30 ) then
+                if ( Nutri(i) < 0.05*0.04 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
                    end do
                    SC(i) = SC(i) - 1
                    npack(i) = npack(i) - 1
-                !end if
+                end if
              end if
           else if ( cmat(i,j)%type .eq. 2 ) then
              ! division
@@ -494,15 +482,14 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                !if ( Nutri(i) < 0.05*0.04 ) then
-                !if ( Nutri(i) > 30 ) then
+                if ( Nutri(i) < 0.05*0.04 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
                    end do
                    MC(i) = MC(i) - 1
                    npack(i) = npack(i) - 1
-                !end if
+                end if
              end if
           else
              ! do nothing
@@ -905,27 +892,27 @@ contains
   subroutine update_nutri(dt)
     implicit none
     real, intent(in) :: dt
-    integer i, b1, k, shift_i
-    real nutri_flag, Pa
-    !b1 = brange
+    integer i
+    real nutri_flag
     Nutri_old(0:L+1) = Nutri(0:L+1)
-    !Nutri_old(0:L+1) = npack(0:L+1)
-    !Nutri(0:L+1) = max(npack(0:L+1) - 30.0, 0.0)
-    !Nutri(0:L+1) = Nutri(200)
     do i = 1, L
-       ! do k = -b1, b1
-       !    shift_i = k + i
-       !    if ( shift_i .le. 0 ) then
-       !       shift_i = shift_i + L
-       !    else if ( shift_i > L ) then
-       !       shift_i = shift_i - L
-       !    end if
-       !    Nutri(i) = Nutri(i) + Nutri_old(shift_i)
-       ! end do
-       !Nutri(i) = Nutri(i) / (2*b1 + 1)
-       !Nutri(i) = max(0.0, Nutri(i) / (2*b1 + 1) - 10.0)
-       !Nutri(i) = min(1.0, 100.0/Nutri(i))
-
+       if ( TDC(i) < 0 ) then
+          print *, i, TDC(i), SC(i), TAC(i), MC(i), npack(i)
+          read(*,*)
+          nutri_flag = 0.0
+       else
+          !nutri_flag = 1.0
+          nutri_flag = TDC(i)
+       end if
+       !nutri_flag = 1.0
+       !nutri_flag = TDC(i)
+       Nutri(i) = Nutri_old(i) + &
+            (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
+            + NutriGrowthRate*nutri_flag*dt &
+            - NutriConsumeRate*(SC(i)+MC(i))*dt &
+            - NutriDecayRate*Nutri(i)*dt
+       Nutri(i) = max(0.0, Nutri(i))
+       !Nutri(i) = min(10.0, Nutri(i))
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)

@@ -273,13 +273,13 @@ contains
     ! supply from the basal layer, Nutri.
     ! Pa controls the division rate of SC and MC.
     !Pa = 2.0*ENutri/(1.0+ENutri)
-    !Pa = ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
+    Pa = ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
     
-    if ( Nutri(i) .eq. 0.0 ) then
-       Pa = 1.0
-    else
-       Pa = 0.0
-    end if
+    ! if ( Nutri(i) .eq. 0.0 ) then
+    !    Pa = 1.0
+    ! else
+    !    Pa = 0.0
+    ! end if
     
     call ran2(u)
     u = u*a(i)
@@ -409,12 +409,12 @@ contains
                    TGFbeta = TGFbeta + &
                         bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
                 end do
-                if ( t < 105.0 ) then
+                !if ( t < 105.0 ) then
                    p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
                         / (1.0 + cmat(i,j)%gene3*TGFbeta)
-                else
-                   p0 = 0.99
-                end if
+                !else
+                !   p0 = 0.99
+                !end if
                 !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
                 !p0 = p0*(1.0-real(j)/40.0)
                 !print *, 'p0', p0
@@ -907,28 +907,30 @@ contains
     real, intent(in) :: dt
     integer i, b1, k, shift_i
     real nutri_flag, Pa
-    b1 = brange
-    Nutri_old(0:L+1) = npack(0:L+1)
-    Nutri(0:L+1) = max(npack(0:L+1) - 30.0, 0.0)
+    !b1 = brange
+    Nutri_old(0:L+1) = Nutri(0:L+1)
+    !Nutri_old(0:L+1) = npack(0:L+1)
+    !Nutri(0:L+1) = max(npack(0:L+1) - 30.0, 0.0)
     !Nutri(0:L+1) = Nutri(200)
-    ! do i = 1, L
-    !    do k = -b1, b1
-    !       shift_i = k + i
-    !       if ( shift_i .le. 0 ) then
-    !          shift_i = shift_i + L
-    !       else if ( shift_i > L ) then
-    !          shift_i = shift_i - L
-    !       end if
-    !       Nutri(i) = Nutri(i) + Nutri_old(shift_i)
-    !    end do
-    !    Nutri(i) = Nutri(i) / (2*b1 + 1)
-    !    Nutri(i) = max(0.0, Nutri(i) / (2*b1 + 1) - 10.0)
-    !    Nutri(i) = min(1.0, 100.0/Nutri(i))
-    ! end do
-    !Nutri(L+1) = Nutri(1)
-    !Nutri(0) = Nutri(L)
-    !Nutri(1) = 0.5
-    !Nutri(400) = 0.5
+    do i = 1, L
+       ! do k = -b1, b1
+       !    shift_i = k + i
+       !    if ( shift_i .le. 0 ) then
+       !       shift_i = shift_i + L
+       !    else if ( shift_i > L ) then
+       !       shift_i = shift_i - L
+       !    end if
+       !    Nutri(i) = Nutri(i) + Nutri_old(shift_i)
+       ! end do
+       !Nutri(i) = Nutri(i) / (2*b1 + 1)
+       !Nutri(i) = max(0.0, Nutri(i) / (2*b1 + 1) - 10.0)
+       !Nutri(i) = min(1.0, 100.0/Nutri(i))
+
+    end do
+    Nutri(L+1) = Nutri(1)
+    Nutri(0) = Nutri(L)
+    Nutri(1) = 0.5
+    Nutri(400) = 0.5
     !Nutri(100) = 15.0
     !Nutri(500) = 15.0
     !print *, Nutri(1:3), SC(1:3)

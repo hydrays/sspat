@@ -11,7 +11,7 @@
 	fdgain1 = 0.01,
 	scstick = 0.96,
 	prelax = 0.2,
-	iseed = 1234,
+	iseed = 12351,
 	tpinc = 1.0,
 	tm = 100
 /

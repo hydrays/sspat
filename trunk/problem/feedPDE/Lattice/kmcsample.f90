@@ -36,7 +36,7 @@ contains
        end if
 
        if (t .ge. tm) then
-          kill_number = 200 
+          kill_number = 250 
           if ( cmat(kill_number, 1)%type .eq. 1 ) then
              SC(kill_number) = SC(kill_number) - 1
           else if ( cmat(kill_number, 1)%type .eq. 2 ) then
@@ -54,7 +54,7 @@ contains
 
        call Next_Reaction(k, tau)
 
-       call cell_event(k, t)
+       call cell_event(k)
        if ( (k .le. 2).or.(k .ge. L-1) ) then
           call Perodic_BC(k)
        end if

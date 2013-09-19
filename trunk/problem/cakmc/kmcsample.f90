@@ -8,15 +8,16 @@ contains
     use setting
     implicit none
 
-    real t, tau, tp, u
+    real t, tau, tp, u, tn
     integer output_index, i, j, active_index
-    integer k, shift_i
+    integer k, shift_i, kill_number
     open (unit = 100, file='./out/logfile', action="write")
     call ran_seed(sequence=iseed)
     call init_cell_pool()
 
     t = 0.0
     tp = 0.0
+    tn = 0.0
     output_index = 0
 
     do while (t < tend)
@@ -25,6 +26,28 @@ contains
           call cell_stat(t)
           output_index = output_index + 1
           tp = tp + tpinc
+       end if
+
+       if (t > tn) then
+          call mark_dead()
+          tn = tn + timestep
+       end if
+
+       if (t .ge. tm) then
+          kill_number = 200 
+          if ( cmat(kill_number, 1)%type .eq. 1 ) then
+             SC(kill_number) = SC(kill_number) - 1
+          else if ( cmat(kill_number, 1)%type .eq. 2 ) then
+             TAC(kill_number) = TAC(kill_number) - 1
+          else if ( cmat(kill_number, 1)%type .eq. 3 ) then
+             TDC(kill_number) = TDC(kill_number) - 1
+          else
+             print *, "do not suppose to find a mutantion cell now...error"
+             read(*, *)
+          end if
+          cmat(kill_number, 1)%type = 4
+          MC(kill_number) = MC(kill_number) + 1
+          tm = tm + 10000.0
        end if
 
        call Next_Reaction(k, tau)
@@ -105,7 +128,7 @@ contains
           i = 500
           j = 1
           cmat(i,j)%type = 4
-          cmat(i,j)%gene1 = 0.0
+          cmat(i,j)%gene(1) = 0.0
           call Update_Rate(i)
           call Update_Rate(i+1)
           call Update_Rate(i-1)
@@ -211,7 +234,7 @@ contains
           i = 500
           j = 1
           cmat(i,j)%type = 4
-          cmat(i,j)%gene1 = 0.0
+          cmat(i,j)%gene(1) = 0.0
           call Update_Rate(i)
           call Update_Rate(i+1)
           call Update_Rate(i-1)

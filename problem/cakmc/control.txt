@@ -12,13 +12,15 @@
 	scstick = 0.96,
 	prelax = 0.2,
 	iseed = 1234,
-	tpinc = 10.0,
-	tm = 100
+	tpinc = 1.0,
+	tm = 100,
+	HP0 = 10.0,
+	HP1 = 200.0
 /
 
 &xdataomp
 	useomp = 0,
 	is64bit = 0,
-	timestep = 0.01,
+	timestep = 0.1,
 	npar = 4
 /

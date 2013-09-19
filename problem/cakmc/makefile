@@ -53,5 +53,5 @@ main: $(OBJS) $(USER_OBJS)
 
 # Other Targets
 clean:
-	-$(RM) $(OBJS) $(OBJS3D) $(OUTPUT_FILE) $(OUTPUT_FILE3D) *.mod *~
+	-$(RM) $(OBJS) $(OBJS3D) $(OUTPUT_FILE) $(OUTPUT_FILE3D) *.mod *~ out/*.dat
 	-@echo ' '

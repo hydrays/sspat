@@ -1,6 +1,6 @@
 library("lattice")
 library("grid")
-jet.colors <- colorRampPalette(c("white", "red", "blue", "green"))
+jet.colors <- colorRampPalette(c("white","red","blue","green","black","grey"))
 
 parainfo <- read.csv("control.csv", strip.white=TRUE)
 L <- parainfo$VALUE[parainfo$PARAMETER=='L']
@@ -11,11 +11,11 @@ H <- parainfo$VALUE[parainfo$PARAMETER=='H']
 ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
-N = 500
+N = 1000
 pL = 400
-pH = 60
-.pwidth = 2048
-.pheight = 576
+pH = 200
+.pwidth = 1024
+.pheight = 560
 
 H <- H + 2
 
@@ -27,6 +27,7 @@ png(outfile, width=.pwidth, height=.pheight)
 z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
             L, H, byrow=TRUE)
 z <- z[1:pL, 1:pH]
+z[1, 1:5] = seq(5) # for coloring
 my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
 p1 <- levelplot(z, col.regions=jet.colors,
                 colorkey=FALSE, xlab="",
@@ -75,7 +76,7 @@ for (i in seq(N)) {
   z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
               L, H, byrow=TRUE)
   z <- z[1:pL, 1:pH]
-
+  z[1, 1:5] = seq(5) # for coloring
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
   p1 <- levelplot(z, col.regions=jet.colors,
             colorkey=FALSE, xlab="",
@@ -83,7 +84,9 @@ for (i in seq(N)) {
             panel=function(...){
               panel.levelplot(...)
               grid.text(my.label.time,
-                        y = unit(0.9, "npc"), gp=gpar(fontsize=30))
+                        y = unit(0.9, "npc"),
+                        x = unit(0.9, "npc"),
+                        gp=gpar(fontsize=30))
             },
             scales=list(cex=2))
 

@@ -225,7 +225,7 @@ contains
     ! else
     !    Pa = 1.0
     ! end if
-    Pa = min(1.0, (25.0/pressure)**4)
+    Pa = min(1.0, exp(-20.0*(pressure-35.0)))
     call ran2(u)
     u = u*a(i)
     !print *, u, a(i)

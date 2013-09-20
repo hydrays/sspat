@@ -8,6 +8,9 @@ module setting
   integer :: useomp, is64bit
   real :: timestep
   integer :: npar
+  integer, parameter :: brange1 = 50
+  real, parameter :: pressure_critical = 30
+
 
   namelist /xdata/ L, H, brange, tend, p1, v, difv, mutv, &
        fdgain1, scstick, prelax, iseed, tpinc, tm, HP0, HP1
@@ -168,8 +171,9 @@ contains
 
     integer, intent(in) :: index
     character(30) filename, filename2
-    integer i, j
-
+    integer i, j, k, shift_i
+    real TGFbeta, p0, Pa, pressure
+    
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
     WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
@@ -181,7 +185,38 @@ contains
        end do
        write(11, '(I5)', advance="no"), SC(i)
        write(11, '(I5)', advance="no"), TAC(i)
+
+       pressure = 0.0
+       do k = -brange1, brange1
+          shift_i = k + i
+          if ( shift_i .le. 0 ) then
+             shift_i = shift_i + L
+          else if ( shift_i > L ) then
+             shift_i = shift_i - L
+          end if
+          pressure = pressure + npack(shift_i)
+       end do
+       pressure = pressure/(2*brange1 + 1)
+       Pa = min(1.0, exp(-(pressure-pressure_critical)))
+
+       TGFbeta = 0.0
+       do k = -brange, brange
+          shift_i = k + i
+          if ( shift_i .le. 0 ) then
+             shift_i = shift_i + L
+          else if ( shift_i > L ) then
+             shift_i = shift_i - L
+          end if
+          TGFbeta = TGFbeta + &
+               bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
+       end do
+       p0 = prelax + (1.0-2.0*prelax) / (1.0 + 0.01*TGFbeta)
+
+       !p0 = max(p0, 1-Pa)
+       write(11, '(f10.2)', advance="no"), p0
+       write(11, '(f10.2)', advance="no"), Pa
        write(11, *)
+
     end do
     do i = 1, L
        do j = 1, H
@@ -204,11 +239,9 @@ contains
     real u, p0, TGFbeta
     real vr, vl
     type(cell) new_cell
-    real u1, Pa
+    real u1, u2, Pa
     real pressure
-    integer brange1
 
-    brange1 = 50
     pressure = 0.0
     do k = -brange1, brange1
        shift_i = k + i
@@ -225,7 +258,7 @@ contains
     ! else
     !    Pa = 1.0
     ! end if
-    Pa = min(1.0, exp(-20.0*(pressure-35.0)))
+    Pa = min(1.0, exp(-(pressure-pressure_critical)))
     call ran2(u)
     u = u*a(i)
     !print *, u, a(i)
@@ -361,6 +394,7 @@ contains
                 end do
                 p0 = cmat(i,j)%gene(2) + (1.0 - 2.0*cmat(i,j)%gene(2)) &
                      / (1.0 + cmat(i,j)%gene(3)*TGFbeta)
+                !p0 = max(p0, 1-Pa)
                 !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
                 !p0 = p0*(1.0-real(j)/40.0)
                 !print *, 'p0', p0
@@ -383,6 +417,14 @@ contains
                    TAC(i) = TAC(i) + 2
                 end if
                 npack(i) = npack(i) + 1
+             else
+                ! death
+                if ( Pa < 0.01 ) then
+                   cmat(i,j)%type = 5
+                   call ran2(u2)
+                   cmat(i,j)%HP = -HP1*log(u2)
+                   SC(i) = SC(i) - 1
+                end if
              end if
           else if ( cmat(i,j)%type .eq. 2 ) then
              ! division
@@ -422,6 +464,14 @@ contains
                 cmat(i,j+1) = cmat(i,j)
                 MC(i) = MC(i) + 1
                 npack(i) = npack(i) + 1
+             else
+                ! death
+                if ( Pa < 0.01 ) then
+                   cmat(i,j)%type = 5
+                   call ran2(u2)
+                   cmat(i,j)%HP = -HP1*log(u2)
+                   MC(i) = MC(i) - 1
+                end if
              end if
           else
              ! do nothing
@@ -526,25 +576,26 @@ contains
     real u
     do i = 1, L
        do j = 1, H
-          if (cmat(i,j)%type.eq.1) then
-             cmat(i,j)%HP = cmat(i,j)%HP - timestep
-             if (cmat(i,j)%HP < 0.0) then
-                ! it become a dead cell
-                cmat(i,j)%type = 5
-                call ran2(u)
-                cmat(i,j)%HP = -HP1*log(u)
-                SC(i) = SC(i) - 1
-             end if
-          else if (cmat(i,j)%type.eq.4) then
-             cmat(i,j)%HP = cmat(i,j)%HP - timestep
-             if (cmat(i,j)%HP < 0.0) then
-                ! it become a dead cell
-                cmat(i,j)%type = 5
-                call ran2(u)
-                cmat(i,j)%HP = -HP1*log(u)
-                MC(i) = MC(i) - 1
-             end if
-          else if (cmat(i,j)%type.eq.5) then
+          ! if (cmat(i,j)%type.eq.1) then
+          !    cmat(i,j)%HP = cmat(i,j)%HP - timestep
+          !    if (cmat(i,j)%HP < 0.0) then
+          !       ! it become a dead cell
+          !       cmat(i,j)%type = 5
+          !       call ran2(u)
+          !       cmat(i,j)%HP = -HP1*log(u)
+          !       SC(i) = SC(i) - 1
+          !    end if
+          ! else if (cmat(i,j)%type.eq.4) then
+          !    cmat(i,j)%HP = cmat(i,j)%HP - timestep
+          !    if (cmat(i,j)%HP < 0.0) then
+          !       ! it become a dead cell
+          !       cmat(i,j)%type = 5
+          !       call ran2(u)
+          !       cmat(i,j)%HP = -HP1*log(u)
+          !       MC(i) = MC(i) - 1
+          !    end if
+          ! else if (cmat(i,j)%type.eq.5) then
+          if (cmat(i,j)%type.eq.5) then
              cmat(i,j)%HP = cmat(i,j)%HP - timestep
              if (cmat(i,j)%HP < 0.0) then
                 ! remove the dead cell

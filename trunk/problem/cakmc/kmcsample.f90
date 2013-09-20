@@ -41,6 +41,7 @@ contains
              TAC(kill_number) = TAC(kill_number) - 1
           else if ( cmat(kill_number, 1)%type .eq. 3 ) then
              TDC(kill_number) = TDC(kill_number) - 1
+          else if ( cmat(kill_number, 1)%type .eq. 5 ) then
           else
              print *, "do not suppose to find a mutantion cell now...error"
              read(*, *)

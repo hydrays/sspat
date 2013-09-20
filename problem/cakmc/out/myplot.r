@@ -17,7 +17,7 @@ pH = 200
 .pwidth = 1024
 .pheight = 560
 
-H <- H + 2
+H <- H + 4
 
 cat("processing file ...[",N,"]\n")
 i <- 0
@@ -75,6 +75,8 @@ for (i in seq(N)) {
   png(outfile, width=.pwidth, height=.pheight)
   z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
               L, H, byrow=TRUE)
+  p0 <- 50*z[,H-1]
+  Pa <- 50*z[,H]
   z <- z[1:pL, 1:pH]
   z[1, 1:5] = seq(5) # for coloring
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
@@ -83,6 +85,8 @@ for (i in seq(N)) {
             ylab="",
             panel=function(...){
               panel.levelplot(...)
+              panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
+              panel.lines(seq(pL), Pa, lwd=4, type='l', col='blue')
               grid.text(my.label.time,
                         y = unit(0.9, "npc"),
                         x = unit(0.9, "npc"),

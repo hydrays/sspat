@@ -186,18 +186,19 @@ contains
        write(11, '(I5)', advance="no"), SC(i)
        write(11, '(I5)', advance="no"), TAC(i)
 
-       pressure = 0.0
-       do k = -brange1, brange1
-          shift_i = k + i
-          if ( shift_i .le. 0 ) then
-             shift_i = shift_i + L
-          else if ( shift_i > L ) then
-             shift_i = shift_i - L
-          end if
-          pressure = pressure + npack(shift_i)
-       end do
-       pressure = pressure/(2*brange1 + 1)
-       Pa = min(1.0, exp(-(pressure-pressure_critical)))
+       ! pressure = 0.0
+       ! do k = -brange1, brange1
+       !    shift_i = k + i
+       !    if ( shift_i .le. 0 ) then
+       !       shift_i = shift_i + L
+       !    else if ( shift_i > L ) then
+       !       shift_i = shift_i - L
+       !    end if
+       !    pressure = pressure + npack(shift_i)*exp(-real(abs(k))/brange)
+       ! end do
+       ! pressure = pressure/(2*brange1 + 1)
+       pressure = npack(i)
+       Pa = min(1.0, exp(-0.1*(pressure-pressure_critical)))
 
        TGFbeta = 0.0
        do k = -brange, brange
@@ -210,7 +211,7 @@ contains
           TGFbeta = TGFbeta + &
                bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
        end do
-       p0 = prelax + (1.0-2.0*prelax) / (1.0 + 0.01*TGFbeta)
+       p0 = prelax + (1.0-2.0*prelax) / (1.0 + (0.01*TGFbeta)**2)
 
        !p0 = max(p0, 1-Pa)
        write(11, '(f10.2)', advance="no"), p0
@@ -242,23 +243,24 @@ contains
     real u1, u2, Pa
     real pressure
 
-    pressure = 0.0
-    do k = -brange1, brange1
-       shift_i = k + i
-       if ( shift_i .le. 0 ) then
-          shift_i = shift_i + L
-       else if ( shift_i > L ) then
-          shift_i = shift_i - L
-       end if
-       pressure = pressure + npack(shift_i)
-    end do
-    pressure = pressure/(2*brange1 + 1)
+    ! pressure = 0.0
+    ! do k = -brange1, brange1
+    !    shift_i = k + i
+    !    if ( shift_i .le. 0 ) then
+    !       shift_i = shift_i + L
+    !    else if ( shift_i > L ) then
+    !       shift_i = shift_i - L
+    !    end if
+    !    pressure = pressure + npack(shift_i)*exp(-real(abs(k))/brange)
+    ! end do
+    !pressure = pressure/(2*brange1 + 1)
     ! if (pressure > 30) then
     !    Pa = 0.0
     ! else
     !    Pa = 1.0
     ! end if
-    Pa = min(1.0, exp(-(pressure-pressure_critical)))
+    pressure = npack(i)
+    Pa = min(1.0, exp(-0.1*(pressure-pressure_critical)))
     call ran2(u)
     u = u*a(i)
     !print *, u, a(i)
@@ -392,8 +394,7 @@ contains
                    end if
                    TGFbeta = TGFbeta + bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
                 end do
-                p0 = cmat(i,j)%gene(2) + (1.0 - 2.0*cmat(i,j)%gene(2)) &
-                     / (1.0 + cmat(i,j)%gene(3)*TGFbeta)
+                p0 = prelax + (1.0-2.0*prelax) / (1.0 + (0.01*TGFbeta)**2)
                 !p0 = max(p0, 1-Pa)
                 !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
                 !p0 = p0*(1.0-real(j)/40.0)
@@ -419,7 +420,7 @@ contains
                 npack(i) = npack(i) + 1
              else
                 ! death
-                if ( Pa < 0.1 ) then
+                if ( Pa < 0.01 ) then
                    cmat(i,j)%type = 5
                    call ran2(u2)
                    cmat(i,j)%HP = -HP1*log(u2)
@@ -466,7 +467,7 @@ contains
                 npack(i) = npack(i) + 1
              else
                 ! death
-                if ( Pa < 0.1 ) then
+                if ( Pa < 0.01 ) then
                    cmat(i,j)%type = 5
                    call ran2(u2)
                    cmat(i,j)%HP = -HP1*log(u2)

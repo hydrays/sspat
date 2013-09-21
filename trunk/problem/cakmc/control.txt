@@ -10,12 +10,12 @@
 	mutv = 0.0,
 	fdgain1 = 0.01,
 	scstick = 0.96,
-	prelax = 0.0,
+	prelax = 0.2,
 	iseed = 1234,
 	tpinc = 1.0,
 	tm = 60,
 	HP0 = 12.0,
-	HP1 = 100.0
+	HP1 = 200.0
 /
 
 &xdataomp

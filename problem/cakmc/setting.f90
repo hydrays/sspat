@@ -10,6 +10,7 @@ module setting
   integer :: npar
   integer, parameter :: brange1 = 25
   real, parameter :: pressure_critical = 35
+  real, parameter :: pressure_critical2 = 50
 
 
   namelist /xdata/ L, H, brange, tend, p1, v, difv, mutv, &
@@ -420,11 +421,13 @@ contains
                 npack(i) = npack(i) + 1
              else
                 ! death
-                if ( Pa < 0.01 ) then
-                   cmat(i,j)%type = 5
+                if ( pressure > pressure_critical2 ) then
                    call ran2(u2)
-                   cmat(i,j)%HP = -HP1*log(u2)
-                   SC(i) = SC(i) - 1
+                   if ( u2 < 1.0/HP0 ) then
+                      cmat(i,j)%type = 5
+                      cmat(i,j)%HP = HP1
+                      SC(i) = SC(i) - 1
+                   end if
                 end if
              end if
           else if ( cmat(i,j)%type .eq. 2 ) then
@@ -467,11 +470,13 @@ contains
                 npack(i) = npack(i) + 1
              else
                 ! death
-                if ( Pa < 0.01 ) then
-                   cmat(i,j)%type = 5
+                if ( pressure > pressure_critical2 ) then
                    call ran2(u2)
-                   cmat(i,j)%HP = -HP1*log(u2)
-                   MC(i) = MC(i) - 1
+                   if ( u2 < 1.0/HP0 ) then
+                      cmat(i,j)%type = 5
+                      cmat(i,j)%HP = HP1
+                      MC(i) = MC(i) - 1
+                   end if
                 end if
              end if
           else

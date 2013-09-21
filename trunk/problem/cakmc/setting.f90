@@ -8,8 +8,8 @@ module setting
   integer :: useomp, is64bit
   real :: timestep
   integer :: npar
-  integer, parameter :: brange1 = 50
-  real, parameter :: pressure_critical = 30
+  integer, parameter :: brange1 = 25
+  real, parameter :: pressure_critical = 35
 
 
   namelist /xdata/ L, H, brange, tend, p1, v, difv, mutv, &
@@ -419,7 +419,7 @@ contains
                 npack(i) = npack(i) + 1
              else
                 ! death
-                if ( Pa < 0.01 ) then
+                if ( Pa < 0.1 ) then
                    cmat(i,j)%type = 5
                    call ran2(u2)
                    cmat(i,j)%HP = -HP1*log(u2)
@@ -466,7 +466,7 @@ contains
                 npack(i) = npack(i) + 1
              else
                 ! death
-                if ( Pa < 0.01 ) then
+                if ( Pa < 0.1 ) then
                    cmat(i,j)%type = 5
                    call ran2(u2)
                    cmat(i,j)%HP = -HP1*log(u2)

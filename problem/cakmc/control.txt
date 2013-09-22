@@ -14,8 +14,8 @@
 	iseed = 1234,
 	tpinc = 1.0,
 	tm = 60,
-	HP0 = 50.0,
-	HP1 = 50.0
+	HP0 = 10.0,
+	HP1 = 200.0
 /
 
 &xdataomp

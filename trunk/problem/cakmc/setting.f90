@@ -173,7 +173,7 @@ contains
     integer, intent(in) :: index
     character(30) filename, filename2
     integer i, j, k, shift_i
-    real TGFbeta, p0, Pa, pressure
+    real TGFbeta, p0, Pa, pressure, Ta
     
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
     WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
@@ -214,7 +214,18 @@ contains
        end do
        p0 = prelax + (1.0-2.0*prelax) / (1.0 + (0.01*TGFbeta)**2)
 
+    if ( pressure > pressure_critical2 ) then
+       !Ta = (exp(0.1*(pressure-pressure_critical2))-1.0)/HP0
+       !Ta = (pressure-pressure_critical2)/HP0
+       !Ta = min(1.0-Pa, Ta)
+       !Ta = 1.0/HP0
+       Ta = 0.0
+    else
+       Ta = 0.0
+    end if
+
        !p0 = max(p0, 1-Pa)
+       write(11, '(f10.2)', advance="no"), Ta
        write(11, '(f10.2)', advance="no"), p0
        write(11, '(f10.2)', advance="no"), Pa
        write(11, *)
@@ -241,7 +252,7 @@ contains
     real u, p0, TGFbeta
     real vr, vl
     type(cell) new_cell
-    real u1, u2, Pa
+    real u1, u2, Pa, Ta
     real pressure
 
     ! pressure = 0.0
@@ -262,6 +273,19 @@ contains
     ! end if
     pressure = npack(i)
     Pa = min(1.0, exp(-0.1*(pressure-pressure_critical)))
+    if ( pressure > pressure_critical2 ) then
+       !Ta = (exp(0.1*(pressure-pressure_critical2))-1.0)/HP0
+       !Ta = (pressure-pressure_critical2)/HP0
+       !Ta = min(1.0-Pa, Ta)
+       !Ta = 1.0/HP0
+       Ta = 0.0
+    else
+       Ta = 0.0
+    end if
+    if (Ta + Pa > 1) then
+       print *, 'stop here'
+       read(*,*)
+    end if
     call ran2(u)
     u = u*a(i)
     !print *, u, a(i)
@@ -378,9 +402,9 @@ contains
        return
     end if
     do j = 1, npack(i)
-       if (cmat(i,j)%type .ne. 5) then
-          u = u - v
-       end if
+       !if (cmat(i,j)%type .ne. 5) then
+       u = u - v
+       !end if
        if ( u < 0 ) then
           if ( cmat(i,j)%type .eq. 1 ) then
              call ran2(u1)
@@ -419,16 +443,9 @@ contains
                    TAC(i) = TAC(i) + 2
                 end if
                 npack(i) = npack(i) + 1
-             else
-                ! death
-                if ( pressure > pressure_critical2 ) then
-                   call ran2(u2)
-                   if ( u2 < 1.0/HP0 ) then
-                      cmat(i,j)%type = 5
-                      cmat(i,j)%HP = HP1
-                      SC(i) = SC(i) - 1
-                   end if
-                end if
+             else if ( u1 < Pa + Ta ) then
+                cmat(i,j)%type = 5
+                SC(i) = SC(i) - 1
              end if
           else if ( cmat(i,j)%type .eq. 2 ) then
              ! division
@@ -468,16 +485,19 @@ contains
                 cmat(i,j+1) = cmat(i,j)
                 MC(i) = MC(i) + 1
                 npack(i) = npack(i) + 1
-             else
+             else if ( u1 < Pa + Ta ) then
+                ! transform
+                cmat(i,j)%type = 5
+                MC(i) = MC(i) - 1
+             end if
+          else if ( cmat(i,j)%type .eq. 5 ) then
+             call ran2(u1)
+             if ( u1 < 1.0/HP1) then
                 ! death
-                if ( pressure > pressure_critical2 ) then
-                   call ran2(u2)
-                   if ( u2 < 1.0/HP0 ) then
-                      cmat(i,j)%type = 5
-                      cmat(i,j)%HP = HP1
-                      MC(i) = MC(i) - 1
-                   end if
-                end if
+                do k=j, H-1
+                   cmat(i, k) = cmat(i, k+1)
+                end do
+                npack(i) = npack(i) - 1
              end if
           else
              ! do nothing
@@ -713,7 +733,8 @@ contains
     if (npack(i).eq.0) then
        !       print *, vr, vl
     end if
-    a(i) = vr + vl + (SC(i)+TAC(i)+TDC(i)+MC(i))*(v+mutv)
+    !a(i) = vr + vl + (SC(i)+TAC(i)+TDC(i)+MC(i))*(v+mutv)
+    a(i) = vr + vl + npack(i)*(v+mutv)
   end subroutine Update_Rate
 
 !!$ ----------------------

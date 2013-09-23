@@ -9,8 +9,8 @@ module setting
   real :: timestep
   integer :: npar
   integer, parameter :: brange1 = 25
-  real, parameter :: pressure_critical = 35
-  real, parameter :: pressure_critical2 = 50
+  real, parameter :: pressure_critical = 25
+  real, parameter :: pressure_critical2 = 55
 
 
   namelist /xdata/ L, H, brange, tend, p1, v, difv, mutv, &
@@ -199,7 +199,7 @@ contains
        ! end do
        ! pressure = pressure/(2*brange1 + 1)
        pressure = npack(i)
-       Pa = min(1.0, exp(-0.1*(pressure-pressure_critical)))
+       Pa = min(1.0, exp(-0.2*(pressure-pressure_critical)))
 
        TGFbeta = 0.0
        do k = -brange, brange
@@ -218,7 +218,6 @@ contains
        !Ta = (exp(0.1*(pressure-pressure_critical2))-1.0)/HP0
        !Ta = (pressure-pressure_critical2)/HP0
        !Ta = min(1.0-Pa, Ta)
-       !Ta = 1.0/HP0
        Ta = 0.0
     else
        Ta = 0.0
@@ -255,54 +254,22 @@ contains
     real u1, u2, Pa, Ta
     real pressure
 
-    ! pressure = 0.0
-    ! do k = -brange1, brange1
-    !    shift_i = k + i
-    !    if ( shift_i .le. 0 ) then
-    !       shift_i = shift_i + L
-    !    else if ( shift_i > L ) then
-    !       shift_i = shift_i - L
-    !    end if
-    !    pressure = pressure + npack(shift_i)*exp(-real(abs(k))/brange)
-    ! end do
-    !pressure = pressure/(2*brange1 + 1)
-    ! if (pressure > 30) then
-    !    Pa = 0.0
-    ! else
-    !    Pa = 1.0
-    ! end if
     pressure = npack(i)
-    Pa = min(1.0, exp(-0.1*(pressure-pressure_critical)))
+
     if ( pressure > pressure_critical2 ) then
        !Ta = (exp(0.1*(pressure-pressure_critical2))-1.0)/HP0
        !Ta = (pressure-pressure_critical2)/HP0
        !Ta = min(1.0-Pa, Ta)
-       !Ta = 1.0/HP0
        Ta = 0.0
     else
        Ta = 0.0
     end if
-    if (Ta + Pa > 1) then
-       print *, 'stop here'
-       read(*,*)
-    end if
+
+    Pa = min(1.0, exp(-0.2*(pressure-pressure_critical)))
     call ran2(u)
     u = u*a(i)
-    !print *, u, a(i)
-    !if (npack(i).ne.0) then
     vr = max(0.0, difv*real(npack(i)-npack(i+1)))
     vl = max(0.0, difv*real(npack(i)-npack(i-1)))
-    !vr = difv*real(npack(i))
-    !vl = difv*real(npack(i))
-    !else
-    !   vr = 0.0
-    !   vl = 0.0
-    !end if
-!!$    print *, 'event happen at ', i
-!!$    print *, 'u', u
-!!$    print *, 'a(i)', a(i)
-!!$    print *, 'npack(i)', npack(i-1:i+1)
-!!$    print *, 'vr, vl', vr, vl
 
     u = u - vr
     if ( u < 0 ) then
@@ -408,7 +375,7 @@ contains
        if ( u < 0 ) then
           if ( cmat(i,j)%type .eq. 1 ) then
              call ran2(u1)
-             if (u1<Pa) then
+             if ( u1 < Pa ) then
                 TGFbeta = 0.0
                 do k = -brange, brange
                    shift_i = k + i
@@ -428,10 +395,10 @@ contains
                 do k=H, j+2, -1
                    cmat(i, k) = cmat(i, k-1)
                 end do
-                call ran2(u1)
-                if ( u1 < p0 ) then
+                call ran2(u2)
+                if ( u2 < p0 ) then
                    ! SC -> 2SC
-                   call ran2(u1)
+                   call ran2(u2)
                    cmat(i,j)%HP = HP0
                    cmat(i,j+1) = cmat(i,j)
                    SC(i) = SC(i) + 1
@@ -444,16 +411,16 @@ contains
                 end if
                 npack(i) = npack(i) + 1
              else if ( u1 < Pa + Ta ) then
-                cmat(i,j)%type = 5
-                SC(i) = SC(i) - 1
+                 cmat(i,j)%type = 5
+                 SC(i) = SC(i) - 1
              end if
           else if ( cmat(i,j)%type .eq. 2 ) then
              ! division
              do k=H, j+2, -1
                 cmat(i, k) = cmat(i, k-1)
              end do
-             call ran2(u1)
-             if ( u1 < p1 ) then
+             call ran2(u2)
+             if ( u2 < p1 ) then
                 ! TAC -> 2TAC
                 cmat(i, j+1) = cmat(i,j)
                 TAC(i) = TAC(i) + 1
@@ -474,19 +441,23 @@ contains
              npack(i) = npack(i) - 1
           else if ( cmat(i,j)%type .eq. 4 ) then
              call ran2(u1)
-             if (u1<Pa) then
+             !if (npack(i) > 50) then
+             !   print *, u1, Pa, pressure, pressure_critical2, Ta
+             !end if
+             if ( u1 < Pa ) then
                 ! division
                 do k=H, j+2, -1
                    cmat(i, k) = cmat(i, k-1)
                 end do
                 ! MC -> 2MC
-                call ran2(u1)
                 cmat(i,j)%HP = HP0
                 cmat(i,j+1) = cmat(i,j)
                 MC(i) = MC(i) + 1
                 npack(i) = npack(i) + 1
              else if ( u1 < Pa + Ta ) then
-                ! transform
+                !print *, 'come here'
+                !read(*,*)
+                 ! transform
                 cmat(i,j)%type = 5
                 MC(i) = MC(i) - 1
              end if
@@ -602,37 +573,53 @@ contains
     real u
     do i = 1, L
        do j = 1, H
-          ! if (cmat(i,j)%type.eq.1) then
-          !    cmat(i,j)%HP = cmat(i,j)%HP - timestep
-          !    if (cmat(i,j)%HP < 0.0) then
-          !       ! it become a dead cell
-          !       cmat(i,j)%type = 5
-          !       call ran2(u)
-          !       cmat(i,j)%HP = -HP1*log(u)
-          !       SC(i) = SC(i) - 1
-          !    end if
-          ! else if (cmat(i,j)%type.eq.4) then
-          !    cmat(i,j)%HP = cmat(i,j)%HP - timestep
-          !    if (cmat(i,j)%HP < 0.0) then
-          !       ! it become a dead cell
-          !       cmat(i,j)%type = 5
-          !       call ran2(u)
-          !       cmat(i,j)%HP = -HP1*log(u)
-          !       MC(i) = MC(i) - 1
-          !    end if
-          ! else if (cmat(i,j)%type.eq.5) then
-          if (cmat(i,j)%type.eq.5) then
+          if (cmat(i,j)%type.eq.1) then
              cmat(i,j)%HP = cmat(i,j)%HP - timestep
              if (cmat(i,j)%HP < 0.0) then
-                ! remove the dead cell
-                do k=j, H-1
-                   cmat(i, k) = cmat(i, k+1)
-                end do
-                npack(i) = npack(i) - 1
+                ! it become a dead cell
+                cmat(i,j)%type = 5
+                call ran2(u)
+                cmat(i,j)%HP = -HP1*log(u)
+                SC(i) = SC(i) - 1
+             end if
+          else if (cmat(i,j)%type.eq.4) then
+             cmat(i,j)%HP = cmat(i,j)%HP - timestep
+             if (cmat(i,j)%HP < 0.0) then
+                ! it become a dead cell
+                cmat(i,j)%type = 5
+                call ran2(u)
+                cmat(i,j)%HP = -HP1*log(u)
+                MC(i) = MC(i) - 1
              end if
           end if
        end do
     end do
+
+    ! do i = 1, L
+    !    do j = 1, H
+    !       if (cmat(i,j)%type.eq.4) then
+    !          cmat(i,j)%type = 5
+    !          call ran2(u)
+    !          cmat(i,j)%HP = -HP1*log(u)
+    !          MC(i) = MC(i) - 1
+    !       end if
+    !    end do
+    ! end do
+
+
+
+          !else if (cmat(i,j)%type.eq.5) then
+          ! if (cmat(i,j)%type.eq.5) then
+          !    cmat(i,j)%HP = cmat(i,j)%HP - timestep
+          !    if (cmat(i,j)%HP < 0.0) then
+          !       ! remove the dead cell
+          !       do k=j, H-1
+          !          cmat(i, k) = cmat(i, k+1)
+          !       end do
+          !       npack(i) = npack(i) - 1
+          !    end if
+
+
     do i = 1, L
        call Update_Rate(i)
     end do

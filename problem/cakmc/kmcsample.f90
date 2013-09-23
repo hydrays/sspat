@@ -28,10 +28,10 @@ contains
           tp = tp + tpinc
        end if
 
-       ! if (t > tn) then
-       !    call mark_dead()
-       !    tn = tn + timestep
-       ! end if
+       if (t > tn) then
+          call mark_dead()
+          tn = tn + timestep
+       end if
 
        if (t .ge. tm) then
           kill_number = 200 

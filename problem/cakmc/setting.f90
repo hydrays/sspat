@@ -255,17 +255,13 @@ contains
     real pressure
 
     pressure = npack(i)
-
     if ( pressure > pressure_critical2 ) then
-       !Ta = (exp(0.1*(pressure-pressure_critical2))-1.0)/HP0
-       !Ta = (pressure-pressure_critical2)/HP0
-       !Ta = min(1.0-Pa, Ta)
-       Ta = 0.0
+       Ta = 0.1
     else
        Ta = 0.0
     end if
-
     Pa = min(1.0, exp(-0.2*(pressure-pressure_critical)))
+
     call ran2(u)
     u = u*a(i)
     vr = max(0.0, difv*real(npack(i)-npack(i+1)))

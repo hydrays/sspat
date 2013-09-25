@@ -10,7 +10,7 @@ module setting
   integer :: npar
   integer, parameter :: brange1 = 25
   real, parameter :: pressure_critical = 25
-  real, parameter :: pressure_critical2 = 55
+  real, parameter :: Tpressure_critical = 30
 
 
   namelist /xdata/ L, H, brange, tend, p1, v, difv, mutv, &
@@ -173,12 +173,18 @@ contains
     integer, intent(in) :: index
     character(30) filename, filename2
     integer i, j, k, shift_i
-    real TGFbeta, p0, Pa, pressure, Ta
+    real TGFbeta, p0, Pa, pressure, Ta, Tpressure
     
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
     WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
     open (unit = 11, file=filename, action="write")
     open (unit = 12, file=filename2, action="write")
+
+    Tpressure = 0.0
+    do i = 1, L
+       Tpressure = Tpressure + npack(i)
+    end do
+    Tpressure = Tpressure/L
 
     do i = 1, L
        do j = 1, H
@@ -198,7 +204,13 @@ contains
        !    pressure = pressure + npack(shift_i)*exp(-real(abs(k))/brange)
        ! end do
        ! pressure = pressure/(2*brange1 + 1)
+
        pressure = npack(i)
+       if ( Tpressure > Tpressure_critical ) then
+          Ta = 0.1*(Tpressure - Tpressure_critical)
+       else
+          Ta = 0.0
+       end if
        Pa = min(1.0, exp(-0.2*(pressure-pressure_critical)))
 
        TGFbeta = 0.0
@@ -213,15 +225,6 @@ contains
                bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
        end do
        p0 = prelax + (1.0-2.0*prelax) / (1.0 + (0.01*TGFbeta)**2)
-
-    if ( pressure > pressure_critical2 ) then
-       !Ta = (exp(0.1*(pressure-pressure_critical2))-1.0)/HP0
-       !Ta = (pressure-pressure_critical2)/HP0
-       !Ta = min(1.0-Pa, Ta)
-       Ta = 0.0
-    else
-       Ta = 0.0
-    end if
 
        !p0 = max(p0, 1-Pa)
        write(11, '(f10.2)', advance="no"), Ta
@@ -252,11 +255,17 @@ contains
     real vr, vl
     type(cell) new_cell
     real u1, u2, Pa, Ta
-    real pressure
+    real pressure, Tpressure
 
+    Tpressure = 0.0
+    do j = 1, L
+       Tpressure = Tpressure + npack(j)
+    end do
+    Tpressure = Tpressure/L
     pressure = npack(i)
-    if ( pressure > pressure_critical2 ) then
-       Ta = 0.1
+
+    if ( Tpressure > Tpressure_critical ) then
+       Ta = 0.1*(Tpressure - Tpressure_critical)
     else
        Ta = 0.0
     end if
@@ -407,8 +416,13 @@ contains
                 end if
                 npack(i) = npack(i) + 1
              else if ( u1 < Pa + Ta ) then
-                 cmat(i,j)%type = 5
-                 SC(i) = SC(i) - 1
+                ! do k=j, H-1
+                !    cmat(i, k) = cmat(i, k+1)
+                ! end do
+                ! SC(i) = SC(i) - 1
+                ! npack(i) = npack(i) - 1
+                cmat(i,j)%type = 5
+                SC(i) = SC(i) - 1
              end if
           else if ( cmat(i,j)%type .eq. 2 ) then
              ! division
@@ -451,13 +465,18 @@ contains
                 MC(i) = MC(i) + 1
                 npack(i) = npack(i) + 1
              else if ( u1 < Pa + Ta ) then
-                !print *, 'come here'
-                !read(*,*)
+                ! do k=j, H-1
+                !    cmat(i, k) = cmat(i, k+1)
+                ! end do
+                ! MC(i) = MC(i) - 1
+                ! npack(i) = npack(i) - 1
                  ! transform
                 cmat(i,j)%type = 5
                 MC(i) = MC(i) - 1
              end if
           else if ( cmat(i,j)%type .eq. 5 ) then
+             !print *, 'what here?'
+             !read(*,*)
              call ran2(u1)
              if ( u1 < 1.0/HP1) then
                 ! death

@@ -1,0 +1,26 @@
+! Control parameters
+&xdata
+	L = 400,
+	H = 400,
+	brange = 50,
+	tend = 1001.0,
+  	p1 = 0.3,
+	v = 1.0,
+	difv = 100.0,
+	mutv = 0.0,
+	fdgain1 = 0.01,
+	scstick = 0.96,
+	prelax = 0.2,
+	iseed = 1234,
+	tpinc = 1.0,
+	tm = 60,
+	HP0 = 10.0,
+	HP1 = 100.0
+/
+
+&xdataomp
+	useomp = 0,
+	is64bit = 0,
+	timestep = 0.1,
+	npar = 4
+/

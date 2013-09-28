@@ -403,7 +403,7 @@ contains
                         bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
                 end do
                 p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
-                     / (1.0 + cmat(i,j)%gene3*TGFbeta)
+                     / (1.0 + (cmat(i,j)%gene3*TGFbeta))
                 !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
                 !p0 = p0*(1.0-real(j)/40.0)
                 !print *, 'p0', p0

@@ -5,6 +5,7 @@ jet.colors <- colorRampPalette(c("white","red","blue","green","black","grey"))
 parainfo <- read.csv("control.csv", strip.white=TRUE)
 L <- parainfo$VALUE[parainfo$PARAMETER=='L']
 H <- parainfo$VALUE[parainfo$PARAMETER=='H']
+pc <- parainfo$VALUE[parainfo$PARAMETER=='pressure_critical']
 .tend <- parainfo$VALUE[parainfo$PARAMETER=='tend']
 .tpinc <- parainfo$VALUE[parainfo$PARAMETER=='tpinc']
 .divide <- which(parainfo$PARAMETER=='useomp')
@@ -12,7 +13,7 @@ ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
 N = 1000
-pL = 400
+pL = L
 pH = 200
 .pwidth = 1024
 .pheight = 560
@@ -89,6 +90,7 @@ for (i in seq(N)) {
               panel.lines(seq(pL), Ta, lwd=4, type='l', col='yellow')
               panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
               panel.lines(seq(pL), Pa, lwd=4, type='l', col='blue')
+              panel.lines(seq(pL), pc, lwd=4, type='l', lty = 2, col='grey')
               grid.text(my.label.time,
                         y = unit(0.9, "npc"),
                         x = unit(0.9, "npc"),

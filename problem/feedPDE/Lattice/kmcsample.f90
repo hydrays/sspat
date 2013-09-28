@@ -36,7 +36,7 @@ contains
        end if
 
        if (t .ge. tm) then
-          kill_number = 250 
+          kill_number = 200 
           if ( cmat(kill_number, 1)%type .eq. 1 ) then
              SC(kill_number) = SC(kill_number) - 1
           else if ( cmat(kill_number, 1)%type .eq. 2 ) then
@@ -59,15 +59,15 @@ contains
           call Perodic_BC(k)
        end if
        ! Check
-       if ( MC(k) .ne. 0 .and. k < 100) then
-          print *, "error at", k
-          print *, TDC(k-3:k+3)
-          print *, SC(k-3:k+3)
-          print *, TAC(k-3:k+3)
-          print *, MC(k-3:k+3)
-          print *, npack(k-3:k+3)
-          read(*,*)
-       end if
+       ! if ( MC(k) .ne. 0 .and. k < 100) then
+       !    print *, "error at", k
+       !    print *, TDC(k-3:k+3)
+       !    print *, SC(k-3:k+3)
+       !    print *, TAC(k-3:k+3)
+       !    print *, MC(k-3:k+3)
+       !    print *, npack(k-3:k+3)
+       !    read(*,*)
+       ! end if
 
 
        do i = 1, L

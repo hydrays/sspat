@@ -896,32 +896,16 @@ contains
     real nutri_flag
     Nutri_old(0:L+1) = Nutri(0:L+1)
     do i = 1, L
-       if ( TDC(i) < 0 ) then
-          print *, i, TDC(i), SC(i), TAC(i), MC(i), npack(i)
-          read(*,*)
-          nutri_flag = 0.0
-       else
-          !nutri_flag = 1.0
-          nutri_flag = TDC(i)
-       end if
-       !nutri_flag = 1.0
-       !nutri_flag = TDC(i)
        Nutri(i) = Nutri_old(i) + &
             (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
-            + NutriGrowthRate*nutri_flag*dt &
-            - NutriConsumeRate*(SC(i)+MC(i))*dt &
+            + NutriGrowthRate*(TAC(i))*dt &
+            - NutriConsumeRate*(0.1*SC(i)+MC(i))*dt &
             - NutriDecayRate*Nutri(i)*dt
        Nutri(i) = max(0.0, Nutri(i))
        !Nutri(i) = min(10.0, Nutri(i))
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
-    Nutri(1) = 0.5
-    Nutri(400) = 0.5
-    !Nutri(100) = 15.0
-    !Nutri(500) = 15.0
-    !print *, Nutri(1:3), SC(1:3)
-    !read(*,*)
   end subroutine update_nutri
 
 end module setting

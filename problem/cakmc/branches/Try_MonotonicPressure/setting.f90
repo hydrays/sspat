@@ -1,4 +1,4 @@
-module setting
+Module setting
   integer :: L
   integer :: H
   integer :: brange, iseed
@@ -9,13 +9,12 @@ module setting
   real :: timestep
   integer :: npar
   integer, parameter :: brange1 = 25
-  real, parameter :: pressure_critical = 30.0
-  real, parameter :: pressure_critical2 = 0.6
+  real, parameter :: pressure_critical2 = 0.62
   real, parameter :: coeff = 0.01
 
 
   namelist /xdata/ L, H, brange, tend, p1, v, difv, mutv, &
-       fdgain1, scstick, prelax, iseed, tpinc, tm, HP0, HP1
+       fdgain1, scstick, prelax, iseed, tpinc, tm, HP0, HP1, pressure_critical
 
   namelist /xdataomp/ useomp, is64bit, timestep, npar
 
@@ -62,6 +61,7 @@ contains
     write(*, '(a20, f10.2)'), 'tm = ', tm
     write(*, '(a20, f10.2)'), 'HP0 = ', HP0
     write(*, '(a20, f10.2)'), 'HP1 = ', HP1
+    write(*, '(a20, f10.2)'), 'pressure_critical = ', pressure_critical
 
     if (useomp.eq.1) then
        write(*, '(a)'), 'OpenMP parallel in use!'
@@ -92,6 +92,7 @@ contains
     write(9, '(a20, I10)'), 'npar,', npar
     write(9, '(a20, f10.2)'), 'HP0,', HP0
     write(9, '(a20, f10.2)'), 'HP1,', HP1
+    write(9, '(a20, f10.2)'), 'pressure_critical,', pressure_critical
     close(8)
     close(9)
 
@@ -226,7 +227,7 @@ contains
 
        !p0 = max(p0, 1-Pa)
        write(11, '(f10.2)', advance="no"), coeff*pressure(i)
-       write(11, '(f10.2)', advance="no"), Ta
+       write(11, '(f10.2)', advance="no"), p0
        write(11, '(f10.2)', advance="no"), Pa
        write(11, *)
 
@@ -255,7 +256,7 @@ contains
     real u1, u2, Pa, Ta
 
     Pa = min(1.0, exp(-20.0*(coeff*pressure(i)-pressure_critical2)))
-    if ( Pa < 0.001 ) then
+    if ( pressure(i) > 95.0 ) then
        Ta = 0.1
     else
        Ta = 0.0
@@ -579,22 +580,23 @@ contains
     implicit none
     integer i, j
     real coeff
-    
+    real p1, p2
+
     pressure = 0.0
-    do i = 1, L/2
+    do i = 1, L
+       p1 = 0.0
        do j = 1, i
           if ( npack(j) > pressure_critical ) then
-             pressure(i) = pressure(i) + (npack(j) - pressure_critical)
+             p1 = p1 + (npack(j) - pressure_critical)
           end if
        end do
-    end do
-       
-    do i = L/2+1, L
+       p2 = 0.0
        do j = i, L
           if ( npack(j) > pressure_critical ) then
-             pressure(i) = pressure(i) + (npack(j) - pressure_critical)
+             p2 = p2 + (npack(j) - pressure_critical)
           end if
        end do
+       pressure(i) = min(p1, p2)
     end do
     
   end subroutine update_pressure

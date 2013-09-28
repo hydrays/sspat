@@ -22,6 +22,8 @@ module setting
      integer type
      real HP
      real gene(3)
+     real rate
+     integer nevent
   end type cell
   type(cell), allocatable :: cmat(:,:)
   real, allocatable :: a(:)
@@ -114,6 +116,9 @@ contains
     cmat(1:L, 1)%type = 1
     cmat(1:L, 2:3)%type = 2
     cmat(1:L, 3:4)%type = 3
+    cmat(1:L, 1)%nevent = 1
+    cmat(1:L, 2:3)%nevent = 1
+    cmat(1:L, 3:4)%nevent = 1
     do i = 1, L
        call ran2(u)
        cmat(i, 1)%gene(1) = scstick
@@ -221,126 +226,10 @@ contains
     real u1, u2, Pa, Ta
     real pressure, Tpressure
 
-    Tpressure = 0.0
-    do j = 1, L
-       Tpressure = Tpressure + npack(j)
-    end do
-    Tpressure = Tpressure/L
-    pressure = npack(i)
-
-    if ( Tpressure > Tpressure_critical ) then
-       Ta = 0.1*(Tpressure - Tpressure_critical)
-    else
-       Ta = 0.0
-    end if
-    Pa = min(1.0, exp(-0.2*(pressure-pressure_critical)))
-
     call ran2(u)
     u = u*a(i)
-    vr = max(0.0, difv*real(npack(i)-npack(i+1)))
-    vl = max(0.0, difv*real(npack(i)-npack(i-1)))
-
-    u = u - vr
-    if ( u < 0 ) then
-       call ran2(u1)
-       j = ceiling(u1*npack(i))
-       if (j < 1 .or. j>npack(i)) then
-          print *, 'error 4', j, u1
-          read(*,*)
-       end if
-
-       if ( (cmat(i,j)%type .eq. 1) &
-            .or. (cmat(i,j)%type .eq. 4) &
-            .or. (cmat(i,j)%type .eq. 5)) then
-          call ran2(u1)
-          if ( u1 < cmat(i,j)%gene(1) ) then
-             return
-          end if
-       end if
-
-       new_cell = cmat(i, j)
-       do k=j, H-1
-          cmat(i, k) = cmat(i, k+1)
-       end do
-       npack(i) = npack(i) - 1
-
-       m = i + 1
-       if ( cmat(m, j)%type .eq. 0 ) then
-          cmat(m, npack(m)+1) = new_cell
-       else
-          do k=npack(m)+1, j+1, -1
-             cmat(m, k) = cmat(m, k-1)
-          end do
-          cmat(m, j) = new_cell
-       end if
-       npack(m) = npack(m) + 1
-       if (new_cell%type .eq. 1) then
-          SC(i) = SC(i) - 1
-          SC(m) = SC(m) + 1
-       else if (new_cell%type .eq. 2) then
-          TAC(i) = TAC(i) - 1
-          TAC(m) = TAC(m) + 1
-       else if (new_cell%type .eq. 3) then
-          TDC(i) = TDC(i) - 1
-          TDC(m) = TDC(m) + 1
-       else if (new_cell%type .eq. 4) then
-          MC(i) = MC(i) - 1
-          MC(m) = MC(m) + 1
-       end if
-       return
-    end if
-    u = u - vl
-    if ( u < 0 ) then
-       call ran2(u1)
-       j = ceiling(u1*npack(i))
-       if (j < 1 .or. j>npack(i)) then
-          print *, 'error 5', j, u1, npack(i)
-          read(*,*)
-       end if
-       !print *, 'move left at height j', i, j
-       if ( (cmat(i,j)%type .eq. 1) &
-            .or. (cmat(i,j)%type .eq. 4) &
-            .or. (cmat(i,j)%type .eq. 5)) then
-          call ran2(u1)
-          if ( u1 < cmat(i,j)%gene(1) ) then
-             return
-          end if
-       end if
-       new_cell = cmat(i, j)
-       do k=j, H-1
-          cmat(i, k) = cmat(i, k+1)
-       end do
-       npack(i) = npack(i) - 1
-
-       m = i - 1
-       if ( cmat(m, j)%type .eq. 0 ) then
-          cmat(m, npack(m)+1) = new_cell
-       else
-          do k=npack(m)+1, j+1, -1
-             cmat(m, k) = cmat(m, k-1)
-          end do
-          cmat(m, j) = new_cell
-       end if
-       npack(m) = npack(m) + 1
-       if (new_cell%type .eq. 1) then
-          SC(i) = SC(i) - 1
-          SC(m) = SC(m) + 1
-       else if (new_cell%type .eq. 2) then
-          TAC(i) = TAC(i) - 1
-          TAC(m) = TAC(m) + 1
-       else if (new_cell%type .eq. 3) then
-          TDC(i) = TDC(i) - 1
-          TDC(m) = TDC(m) + 1
-       else if (new_cell%type .eq. 4) then
-          MC(i) = MC(i) - 1
-          MC(m) = MC(m) + 1
-       end if
-       return
-    end if
     do j = 1, npack(i)
-       !if (cmat(i,j)%type .ne. 5) then
        u = u - v
-       !end if
        if ( u < 0 ) then
           if ( cmat(i,j)%type .eq. 1 ) then
              call ran2(u1)
@@ -356,11 +245,6 @@ contains
                    TGFbeta = TGFbeta + bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
                 end do
                 p0 = prelax + (1.0-2.0*prelax) / (1.0 + (0.01*TGFbeta)**2)
-                !p0 = max(p0, 1-Pa)
-                !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
-                !p0 = p0*(1.0-real(j)/40.0)
-                !print *, 'p0', p0
-                ! division
                 do k=H, j+2, -1
                    cmat(i, k) = cmat(i, k-1)
                 end do
@@ -455,38 +339,6 @@ contains
           return
        end if
     end do
-    if ( mutv .ne. 0.0 ) then
-       do j = 1, npack(i)
-          u = u - mutv
-          if ( u < 0 ) then
-             if ( cmat(i,j)%type .eq. 1 ) then
-                ! mutation
-                call ran2(u1)
-                cmat(i,j)%gene(1) = cmat(i,j)%gene(1) + (u1-0.5)*0.1
-                if ( cmat(i,j)%gene(1) > 0.995) then
-                   cmat(i,j)%gene(1) = 0.995
-                else if ( cmat(i,j)%gene(1) < 0.0) then
-                   cmat(i,j)%gene(1) = 0.0
-                end if
-!!$                u1 = par_uni(kpar)
-!!$                cmat(i,j)%gene(2) = cmat(i,j)%gene(2) + (u1-0.5)*0.01
-!!$                if ( cmat(i,j)%gene(2) > 0.5) then
-!!$                   cmat(i,j)%gene(2) = 1.0
-!!$                else if ( cmat(i,j)%gene(2) < 0.0) then
-!!$                   cmat(i,j)%gene(2) = 0.0
-!!$                end if
-!!$                u1 = par_uni(kpar)
-!!$                cmat(i,j)%gene(3) = cmat(i,j)%gene(3) + (u1-0.5)*0.0001
-!!$                if ( cmat(i,j)%gene(2) > 0.5) then
-!!$                   cmat(i,j)%gene(2) = 1.0
-!!$                else if ( cmat(i,j)%gene(2) < 0.0) then
-!!$                   cmat(i,j)%gene(2) = 0.0
-!!$                end if
-             end if
-             return
-          end if
-       end do
-    end if
     print *, "not suppose to be here!"
     print *, u, a(i), i
     print *, npack(i), SC(i), TAC(i), TDC(i), MC(i)
@@ -672,10 +524,8 @@ contains
   subroutine Update_Rate(i)
     implicit none
     integer, intent(in) :: i
-    real vr, vl
-    if (npack(i).eq.0) then
-       !       print *, vr, vl
-    end if
+    do j = 1, H
+       
     a(i) = npack(i)*(v+mutv)
   end subroutine Update_Rate
 end module setting

@@ -1,7 +1,7 @@
 ! Control parameters
 &xdata
 	L = 400,
-	H = 400,
+	H = 200,
 	brange = 50,
 	tend = 1001.0,
   	p1 = 0.3,
@@ -15,7 +15,8 @@
 	tpinc = 1.0,
 	tm = 60,
 	HP0 = 10.0,
-	HP1 = 100.0
+	HP1 = 100.0,
+	pressure_critical = 30.0
 /
 
 &xdataomp

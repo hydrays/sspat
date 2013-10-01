@@ -13,7 +13,7 @@
 	prelax = 0.2,
 	iseed = 1234,
 	tpinc = 1.0,
-	tm = 60
+	tm = 100
 /
 
 &xdataomp
@@ -24,8 +24,8 @@
 /
 
 &ndata
-	NutriGrowthRate = 0.01,
-	NutriConsumeRate = 0.01,
+	NutriGrowthRate = 0.05,
+	NutriConsumeRate = 0.05,
 	NutriDecayRate = 0.5,
 	NutriMobility = 50.0,
 	NutriTimestep = 0.001,

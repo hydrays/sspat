@@ -233,7 +233,7 @@ contains
        p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
 
        write(11, '(f10.2)', advance="no"), p0
-       write(11, '(f10.2)', advance="no"), ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
+       write(11, '(f10.2)', advance="no"), ((5.0*Nutri(i))**2)/(1.0+((5.0*Nutri(i))**2))
        write(11, *)
     end do
     do i = 1, L
@@ -272,7 +272,7 @@ contains
     ! supply from the basal layer, Nutri.
     ! Pa controls the division rate of SC and MC.
     !Pa = 2.0*ENutri/(1.0+ENutri)
-    Pa = ((25*Nutri(i))**2)/(1.0+((25*Nutri(i))**2))
+    Pa = ((5.0*Nutri(i))**2)/(1.0+((5.0*Nutri(i))**2))
 
     call ran2(u)
     u = u*a(i)
@@ -431,7 +431,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( Nutri(i) < 0.05*0.04 ) then
+                if ( Nutri(i) < 0.01 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -482,7 +482,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( Nutri(i) < 0.05*0.04 ) then
+                if ( Nutri(i) < 0.01 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -898,8 +898,8 @@ contains
     do i = 1, L
        Nutri(i) = Nutri_old(i) + &
             (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
-            + NutriGrowthRate*(TAC(i))*dt &
-            - NutriConsumeRate*(0.1*SC(i)+MC(i))*dt &
+            + NutriGrowthRate*(2.0*TAC(i))*dt &
+            - NutriConsumeRate*(0.8*SC(i)+0.8*MC(i))*dt &
             - NutriDecayRate*Nutri(i)*dt
        Nutri(i) = max(0.0, Nutri(i))
        !Nutri(i) = min(10.0, Nutri(i))

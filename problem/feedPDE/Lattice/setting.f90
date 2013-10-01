@@ -20,6 +20,7 @@ module setting
   real, allocatable :: a(:)
   real, allocatable :: NT(:)
   real, allocatable :: NP(:)
+  real, allocatable :: Va(:)
 
   ! Nutrition that effect division rate
   real, allocatable :: Nutri(:), Nutri_old(:)
@@ -132,6 +133,7 @@ contains
     allocate(TAC(0:L+1))
     allocate(Nutri(0:L+1))
     allocate(Nutri_old(0:L+1))
+    allocate(Va(1:L))
 
 !    cmat(200, 1)%type = 1
     cmat(1:L, 1)%type = 1
@@ -893,9 +895,11 @@ contains
     implicit none
     real, intent(in) :: dt
     integer i
-    real nutri_flag
+    real nutri_flag, growth_rate
+
     Nutri_old(0:L+1) = Nutri(0:L+1)
     do i = 1, L
+       !growth_rate = ((5.0*Nutri_old(i))**2)/(1.0+((5.0*Nutri_old(i))**2))
        Nutri(i) = Nutri_old(i) + &
             (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
             + NutriGrowthRate*(2.0*TAC(i))*dt &

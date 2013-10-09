@@ -902,8 +902,8 @@ contains
        !growth_rate = ((5.0*Nutri_old(i))**2)/(1.0+((5.0*Nutri_old(i))**2))
        Nutri(i) = Nutri_old(i) + &
             (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
-            + NutriGrowthRate*(2.0*TAC(i))*dt &
-            - NutriConsumeRate*(0.8*SC(i)+0.8*MC(i))*dt &
+            + NutriGrowthRate*(TAC(i))*dt &
+            - NutriConsumeRate*(SC(i)+MC(i))*dt &
             - NutriDecayRate*Nutri(i)*dt
        Nutri(i) = max(0.0, Nutri(i))
        !Nutri(i) = min(10.0, Nutri(i))

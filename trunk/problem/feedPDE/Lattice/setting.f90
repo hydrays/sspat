@@ -20,7 +20,6 @@ module setting
   real, allocatable :: a(:)
   real, allocatable :: NT(:)
   real, allocatable :: NP(:)
-  real, allocatable :: Va(:)
 
   ! Nutrition that effect division rate
   real, allocatable :: Nutri(:), Nutri_old(:)
@@ -133,9 +132,7 @@ contains
     allocate(TAC(0:L+1))
     allocate(Nutri(0:L+1))
     allocate(Nutri_old(0:L+1))
-    allocate(Va(1:L))
 
-!    cmat(200, 1)%type = 1
     cmat(1:L, 1)%type = 1
     cmat(1:L, 2:3)%type = 2
     cmat(1:L, 3:10)%type = 3
@@ -191,7 +188,7 @@ contains
     end do
 
     ! Nutrition inital is high
-    Nutri(0:L+1) = 1.0
+    Nutri(0:L+1) = 10.0
 
   end subroutine init_cell_pool
 
@@ -201,9 +198,6 @@ contains
     integer, intent(in) :: index
     character(30) filename, filename2
     integer i, j
-    
-    integer k, shift_i
-    real TGFbeta, p0
 
     WRITE(filename,'(A7,I5.5,A4)') './out/m', index, '.dat'
     WRITE(filename2,'(A7,I5.5,A4)') './out/g', index, '.dat'
@@ -220,22 +214,6 @@ contains
        write(11, '(I5)', advance="no"), TDC(i)
        write(11, '(I5)', advance="no"), MC(i)
        write(11, '(I5)', advance="no"), npack(i)
-
-       TGFbeta = 0.0
-       do k = -brange, brange
-          shift_i = k + i
-          if ( shift_i .le. 0 ) then
-             shift_i = shift_i + L
-          else if ( shift_i > L ) then
-             shift_i = shift_i - L
-          end if
-          TGFbeta = TGFbeta + &
-               bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
-       end do
-       p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
-
-       write(11, '(f10.2)', advance="no"), p0
-       write(11, '(f10.2)', advance="no"), ((5.0*Nutri(i))**2)/(1.0+((5.0*Nutri(i))**2))
        write(11, *)
     end do
     do i = 1, L
@@ -263,18 +241,17 @@ contains
 
     !Effective Nutrition
     !if ( Nutri(i) > 1.0 ) then
-    !ENutri = min(5.0, Nutri(i))
+    ENutri = min(5.0, Nutri(i))
     !end if
-    !if ( Nutri(i) < 1.0 ) then
-    !   ENutri = 0.0
-    !end if
-    !ENutri = ENutri / 5.0
+    if ( Nutri(i) < 1.0 ) then
+       ENutri = 0.0
+    end if
+    ENutri = ENutri / 5.0
     ! Pa is the probability of accepting the division of 
     ! stem cell and mutation cell effected by the nutrition
     ! supply from the basal layer, Nutri.
     ! Pa controls the division rate of SC and MC.
-    !Pa = 2.0*ENutri/(1.0+ENutri)
-    Pa = ((5.0*Nutri(i))**2)/(1.0+((5.0*Nutri(i))**2))
+    Pa = 2.0*ENutri/(1.0+ENutri)
 
     call ran2(u)
     u = u*a(i)
@@ -405,7 +382,7 @@ contains
                         bd10*TDC(shift_i)*exp(-real(abs(k))/brange)
                 end do
                 p0 = cmat(i,j)%gene2 + (1.0 - 2.0*cmat(i,j)%gene2) &
-                     / (1.0 + (cmat(i,j)%gene3*TGFbeta))
+                     / (1.0 + cmat(i,j)%gene3*TGFbeta)
                 !p0 = 0.2 + 0.6 / (1.0 + 0.01*TGFbeta)
                 !p0 = p0*(1.0-real(j)/40.0)
                 !print *, 'p0', p0
@@ -433,7 +410,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( Nutri(i) < 0.01 ) then
+                if ( Nutri(i) < 0.05 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -484,7 +461,7 @@ contains
                 !end if
                 !if ( ud < NutriKillrate ) then
                 !if ( Pa .eq. 0.0 ) then
-                if ( Nutri(i) < 0.01 ) then
+                if ( Nutri(i) < 0.05 ) then
                    ! death
                    do k=j, H-1
                       cmat(i, k) = cmat(i, k+1)
@@ -895,14 +872,22 @@ contains
     implicit none
     real, intent(in) :: dt
     integer i
-    real nutri_flag, growth_rate
-
+    real nutri_flag
     Nutri_old(0:L+1) = Nutri(0:L+1)
     do i = 1, L
-       !growth_rate = ((5.0*Nutri_old(i))**2)/(1.0+((5.0*Nutri_old(i))**2))
+       if ( TDC(i) < 0 ) then
+          print *, i, TDC(i), SC(i), TAC(i), MC(i), npack(i)
+          read(*,*)
+          nutri_flag = 0.0
+       else
+          !nutri_flag = 1.0
+          nutri_flag = TDC(i)
+       end if
+       !nutri_flag = 1.0
+       !nutri_flag = TDC(i)
        Nutri(i) = Nutri_old(i) + &
             (Nutri_old(i+1)+Nutri_old(i-1)-2.0*Nutri_old(i))*NutriMobility*dt &
-            + NutriGrowthRate*(TAC(i))*dt &
+            + NutriGrowthRate*nutri_flag*dt &
             - NutriConsumeRate*(SC(i)+MC(i))*dt &
             - NutriDecayRate*Nutri(i)*dt
        Nutri(i) = max(0.0, Nutri(i))
@@ -910,6 +895,10 @@ contains
     end do
     Nutri(L+1) = Nutri(1)
     Nutri(0) = Nutri(L)
+    !Nutri(400) = 15.0
+    !Nutri(600) = 15.0
+    !print *, Nutri(1:3), SC(1:3)
+    !read(*,*)
   end subroutine update_nutri
 
 end module setting

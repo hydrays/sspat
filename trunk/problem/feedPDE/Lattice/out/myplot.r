@@ -12,14 +12,14 @@ ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
 N = 2000
-pL = 400
-pH = 80
-#.pwidth = 2048/2
-#.pheight = 288
-.pwidth = 1028
-.pheight = 256
+pL = 1000
+pH = 200
+.pwidth = 2048
+.pheight = 576
+#.pwidth = 1028
+#.pheight = 256
 
-dataH <- H + 8
+dataH <- H + 6
 
 cat("processing file ...[",N,"]\n")
 i <- 0
@@ -74,15 +74,10 @@ for (i in seq(N)) {
   datafile <- sprintf("%s%05d%s", "m", i, ".dat")
   outfile <- sprintf("%s%05d%s", "slice", i, ".png")
   png(outfile, width=.pwidth, height=.pheight)
-  #outfile <- sprintf("%s%05d%s", "slice", i, ".pdf")
-  #pdf(outfile, width=.pwidth/60, height=.pheight/60)
-  
   z <- matrix(scan(datafile, n=L*dataH, quiet=TRUE),
               L, dataH, byrow=TRUE)
-  nutri <- 50*z[, H+1]
-  p0 <- 50*z[,H+7]
-  v0 <- 50*z[,H+8]  
-                                        #z <- z[200:pL-200, 1:pH]
+  nutri <- z[, H+1]
+  #z <- z[200:pL-200, 1:pH]
   z <- z[1:pL, 1:pH]
   if(max(z)<4){
     z[200, pH] <- 4
@@ -91,45 +86,20 @@ for (i in seq(N)) {
 
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
   p1 <- levelplot(z, col.regions=jet.colors,
-                  colorkey=FALSE, xlab="",
-                  ylab="",
-                  ylim = c(0,60),
-                  draw=FALSE,
+            colorkey=FALSE, xlab="",
+            ylab="",
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), nutri, lwd=4, type='l', col=colors()[100])
-              panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
-              panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
-              #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
+              panel.lines(seq(pL), nutri*2.0 + .5*pH, lwd=4, type='l', col='black')
+              panel.lines(seq(pL), 1 + .5*pH, lwd=1, type='l', col='grey')
               grid.text(my.label.time,
-                         x = unit(0.85, "npc"),
-                         y = unit(0.85, "npc"), gp=gpar(fontsize=30))
+                        y = unit(0.85, "npc"), gp=gpar(fontsize=30))
             },
-            scales=list(cex=4, y=list(relation="free",
-                                 at=list(c(0, 25, 50)),
-                                 labels=list(c(0, 0.5, 1)))))
+            scales=list(cex=2))
 
+  #p2 <- xyplot(nutri~seq(pL))
   print(p1)
 
-  ## p2 <- xyplot(c(0,0)~c(400, 60),
-  ##                 ylab="",
-  ##                 ylim = c(0,60),
-  ##              xlim = c(0,400),
-  ##                 draw=FALSE,
-  ##           panel=function(...){
-  ##             panel.lines(seq(pL), nutri, lwd=4, type='l', col=colors()[100])
-  ##             panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
-  ##             panel.lines(seq(pL), v0, lwd=4, type='l', col=colors()[68])    
-  ##             #panel.lines(seq(pL), 5, lwd=2, lty=2, col='yellow')
-  ##             #grid.text(my.label.time,
-  ##             #          x = unit(0.85, "npc"),
-  ##             #          y = unit(0.85, "npc"), gp=gpar(fontsize=30))
-  ##           },
-  ##           scales=list(cex=2, y=list(relation="free",
-  ##                                at=list(c(0, 25, 50)),
-  ##                                labels=list(c(0, 0.5, 1)))))
-
-  
   ## print(p2)
   #print(p1, position=c(0, 0.5, 1, 1), more=TRUE)
   #print(p2, position=c(0, 0, 1, 0.5))

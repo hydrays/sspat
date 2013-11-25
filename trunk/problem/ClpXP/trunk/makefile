@@ -8,12 +8,8 @@ FC = gfortran -fopenmp -fdefault-real-8
 OBJS += \
 ./random.o \
 ./setting.o \
+./motor.o \
 ./main.o
-
-OBJS3D += \
-./random.o \
-./setting3d.o \
-./main3d.o
 
 # Each subdirectory must supply rules for building sources it contributes
 %.o: ./%.f90
@@ -35,15 +31,6 @@ main: $(OBJS) $(USER_OBJS)
 	@echo $(OUTPUT_FILE)
 	@echo 'Invoking Fortran Linker'
 	$(FC) -o $(OUTPUT_FILE) $(OBJS)
-	@echo 'Finished building target: $@'
-	@echo ' '
-
-3d: $(OBJS3D)
-	@echo 'Building target: $@'
-	@echo 'Output file name:'
-	@echo $(OUTPUT_FILE3D)
-	@echo 'Invoking Fortran Linker'
-	$(FC) -o $(OUTPUT_FILE3D) $(OBJS3D)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

@@ -1,11 +1,11 @@
 ! Control parameters
 &xdata
 	k1 = 1.0,
-	k2 = 0.0,
-	r = 1.0,
+	k2 = 0.5,
+	r = 0.2,
 	jp_base = 0.001,
-	jp_incre = 0.5,
+	jp_incre = 0.8,
 	tr_flag = 0,
 	iseed = 1234,
-	nsample = 10000
+	nsample = 100000
 /

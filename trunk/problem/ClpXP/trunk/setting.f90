@@ -49,13 +49,13 @@ contains
        a(2) = 0.0
     else if ( nATP .eq. 2 ) then
        a(1) = k2
-       a(2) = r
+       a(2) = 1.0/r
     else if ( nATP .eq. 3 ) then
        a(1) = k2
-       a(2) = r
+       a(2) = 1.0/r
     else if ( nATP .eq. 4 ) then
        a(1) = 0
-       a(2) = r
+       a(2) = 1.0/r
     else
        print *, 'nATP error'
        read(*,*)

@@ -12,12 +12,8 @@ ompinfo <- parainfo[.divide:nrow(parainfo),]
 parainfo <- parainfo[1:(.divide-1),]
 
 N = 1000
-pL = 400
-pH = 200
 .pwidth = 1024
-.pheight = 560
-
-H <- H + 5
+.pheight = 1024
 
 cat("processing file ...[",N,"]\n")
 i <- 0
@@ -26,8 +22,6 @@ outfile <- sprintf("%s%05d%s", "slice", i, ".png")
 png(outfile, width=.pwidth, height=.pheight)
 z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
             L, H, byrow=TRUE)
-z <- z[1:pL, 1:pH]
-z[1, 1:5] = seq(5) # for coloring
 my.label.time <- sprintf("%s%d%s", "t = ", i, " (day)")
 p1 <- levelplot(z, col.regions=jet.colors,
                 colorkey=FALSE, xlab="",
@@ -75,20 +69,12 @@ for (i in seq(N)) {
   png(outfile, width=.pwidth, height=.pheight)
   z <- matrix(scan(datafile, n=L*H, quiet=TRUE),
               L, H, byrow=TRUE)
-  p0 <- 50*z[,H-1]
-  Pa <- 50*z[,H]
-  Ta <- 50*z[,H-2]
-  z <- z[1:pL, 1:pH]
-  z[1, 1:5] = seq(5) # for coloring
   my.label.time <- sprintf("%s%d%s", "t = ", as.integer(i*.tpinc), " (day)")
   p1 <- levelplot(z, col.regions=jet.colors,
             colorkey=FALSE, xlab="",
             ylab="",
             panel=function(...){
               panel.levelplot(...)
-              panel.lines(seq(pL), Ta, lwd=4, type='l', col='yellow')
-              panel.lines(seq(pL), p0, lwd=4, type='l', col=colors()[450])
-              panel.lines(seq(pL), Pa, lwd=4, type='l', col='blue')
               grid.text(my.label.time,
                         y = unit(0.9, "npc"),
                         x = unit(0.9, "npc"),

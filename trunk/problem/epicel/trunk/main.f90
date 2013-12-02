@@ -6,10 +6,11 @@ program main
   call read_xdata()
 
   if (useomp.eq.1) then
+     print *, 'not implement'
      if (is64bit.eq.1) then
-        call kmc_sample_omp64()
+        !call kmc_sample_omp64()
      else
-        call kmc_sample_omp32()
+        !call kmc_sample_omp32()
      end if
   else
      call kmc_sample_serial()

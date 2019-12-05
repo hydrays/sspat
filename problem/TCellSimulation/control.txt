@@ -1,0 +1,19 @@
+! Control parameters
+&xdata
+	Lbox = 64,
+	tend = 400.0,
+	dt = 0.1,	
+	a0 = 0.001,
+	difv = 0.5,
+	iseed = 1234,  
+	tpinc = 1.0,
+	p0 = 0.1,
+	R1 = 2,
+	R2 = 2,	
+	beta = 0.0,
+	k0 = 5.0,
+	phi0 = 0.5,
+	lambda = 1.0,
+	gamma = 0.5,
+	nc = 6
+/

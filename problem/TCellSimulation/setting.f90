@@ -80,7 +80,8 @@ contains
     implicit none
     real u
     integer i, j
-
+    integer curb
+    
     write(*, *), 'Initialize...'
     allocate(cmat(1:Lbox,1:Lbox))
     allocate(phi(1:Lbox, 1:Lbox))
@@ -97,9 +98,10 @@ contains
        end do
     end do
 
+    curb = 20
     ! randomly distribute M cells
-    do i = 1, Lbox
-       do j = 1, Lbox
+    do i = curb, Lbox-curb
+       do j = curb, Lbox-curb
           call random_number(u)
           if ( u < p0 ) then
              cmat(i,j)%type = 1

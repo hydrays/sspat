@@ -1,5 +1,5 @@
 require(lattice)
-L  <- 64
+L  <- 128
 colors <- c("#A7A7A7",
             "dodgerblue",
             "firebrick",

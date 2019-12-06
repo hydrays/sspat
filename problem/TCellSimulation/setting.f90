@@ -4,13 +4,15 @@ module setting
   real :: tend, dt
   real :: a0
   real :: p0
-  real :: beta
+  real :: beta, moblty
   integer :: R1, R2
   integer :: nc
   real :: k0, phi0
   real :: lambda, difv, gamma
   
-  namelist /xdata/ Lbox, tend, dt, a0, difv, iseed, tpinc, p0, R1, R2, beta, nc, k0, phi0, lambda, gamma
+  namelist /xdata/ Lbox, tend, dt, a0, difv, &
+       iseed, tpinc, p0, R1, R2, beta, nc, k0, &
+       phi0, lambda, gamma, moblty
 
   type cell
      integer type
@@ -43,6 +45,7 @@ contains
     write(*, '(a20, i10)'), 'R2 = ', R2
     write(*, '(a20, f10.2)'), 'p0 = ', p0
     write(*, '(a20, f10.2)'), 'beta = ', beta
+    write(*, '(a20, f10.2)'), 'moblty = ', moblty
     write(*, '(a20, f10.2)'), 'k0 = ', k0
     write(*, '(a20, f10.2)'), 'phi0 = ', phi0
     write(*, '(a20, f10.2)'), 'lambda = ', lambda
@@ -62,6 +65,7 @@ contains
     write(9, '(a20, i10)'), 'R2,', R2
     write(9, '(a20, f10.2)'), 'p0,', p0
     write(9, '(a20, f10.2)'), 'beta,', beta
+    write(9, '(a20, f10.2)'), 'moblty,', moblty
     write(9, '(a20, f10.2)'), 'k0,', k0
     write(9, '(a20, f10.2)'), 'phi0,', phi0
     write(9, '(a20, f10.2)'), 'lambda,', lambda

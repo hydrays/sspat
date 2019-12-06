@@ -98,14 +98,14 @@ contains
        end do
     end do
 
-    curb = 20
+    curb = 10
     ! randomly distribute M cells
-    do i = curb, Lbox-curb
-       do j = curb, Lbox-curb
+    do i = curb, Lbox-curb, 4
+       do j = curb, Lbox-curb, 4
           call random_number(u)
-          if ( u < p0 ) then
+          !if ( u < p0 ) then
              cmat(i,j)%type = 1
-          end if
+          !end if
        end do
     end do
   end subroutine init_cell_pool

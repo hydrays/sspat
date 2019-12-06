@@ -15,7 +15,7 @@ for( i in seq(0, 2000) )
     A <- matrix(unlist(read.csv(paste('c', padded_i, '.dat', sep=''), header=F)), nrow=L)
     p1  <- levelplot(A, at=myAt, col.regions = c('white', 'red', 'yellow', 'green'))
 
-    B <- matrix(unlist(read.csv(paste('p', padded_i, '.dat', sep=''), header=F)), nrow=L)
+    B <- matrix(unlist(read.csv(paste('phi', padded_i, '.dat', sep=''), header=F)), nrow=L)
     ##B  <- B
     ##p2  <- levelplot(B, seq(0, 1, length.out=100))
     p2  <- levelplot(B)

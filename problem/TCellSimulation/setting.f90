@@ -208,8 +208,8 @@ contains
     A = 0.0
     do i = 1, Lbox
        do j = 1, Lbox
-          !p(i, j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0)))
-          p(i, j) = exp(k0*phi(i, j))
+          p(i, j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0)))
+          !p(i, j) = exp(k0*phi(i, j))
           A = A + p(i, j)
        end do
     end do

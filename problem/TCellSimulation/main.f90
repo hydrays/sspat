@@ -143,7 +143,8 @@ program main
               if ( u < beta*dt ) then
                  cmat(i,j)%type = 0
               end if
-           else if ( cmat(i,j)%type == 2 ) then
+              else if ( cmat(i,j)%type == 2 ) then
+              !else if ( cmat(i,j)%type == 2 .or. cmat(i,j)%type == 3) then
               ! T cell
               call random_number(u)
               if ( u < beta*dt ) then

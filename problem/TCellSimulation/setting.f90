@@ -3,15 +3,14 @@ module setting
   integer :: iseed
   real :: tend, dt
   real :: a0
-  real :: p0
   real :: beta, moblty
-  integer :: R1, R2
+  integer :: R1
   integer :: nc
   real :: k0, phi0
   real :: lambda, difv, gamma
   
   namelist /xdata/ Lbox, tend, dt, a0, difv, &
-       iseed, tpinc, p0, R1, R2, beta, nc, k0, &
+       iseed, tpinc, R1, beta, nc, k0, &
        phi0, lambda, gamma, moblty
 
   type cell
@@ -42,8 +41,6 @@ contains
     write(*, '(a20, f10.2)'), 'difv = ', difv
     write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
     write(*, '(a20, i10)'), 'R1 = ', R1
-    write(*, '(a20, i10)'), 'R2 = ', R2
-    write(*, '(a20, f10.2)'), 'p0 = ', p0
     write(*, '(a20, f10.2)'), 'beta = ', beta
     write(*, '(a20, f10.2)'), 'moblty = ', moblty
     write(*, '(a20, f10.2)'), 'k0 = ', k0
@@ -62,8 +59,6 @@ contains
     write(9, '(a20, f10.2)'), 'difv,', difv
     write(9, '(a20, f10.2)'), 'tpinc,', tpinc
     write(9, '(a20, i10)'), 'R1,', R1
-    write(9, '(a20, i10)'), 'R2,', R2
-    write(9, '(a20, f10.2)'), 'p0,', p0
     write(9, '(a20, f10.2)'), 'beta,', beta
     write(9, '(a20, f10.2)'), 'moblty,', moblty
     write(9, '(a20, f10.2)'), 'k0,', k0
@@ -103,9 +98,7 @@ contains
     do i = curb, Lbox-curb, 4
        do j = curb, Lbox-curb, 4
           call random_number(u)
-          !if ( u < p0 ) then
              cmat(i,j)%type = 1
-          !end if
        end do
     end do
   end subroutine init_cell_pool

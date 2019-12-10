@@ -2,14 +2,12 @@ module setting
   integer Lbox
   integer :: iseed
   real :: tend, dt
-  real :: a0
-  real :: beta, moblty
-  integer :: R1
-  integer :: nc
-  real :: k0, phi0
-  real :: lambda, difv, gamma
+  real :: alpha, beta
+  real :: moblty, k0, phi0
+  integer :: R1, nc
+  real :: diff, lambda, gamma
   
-  namelist /xdata/ Lbox, tend, dt, a0, difv, &
+  namelist /xdata/ Lbox, tend, dt, alpha, diff, &
        iseed, tpinc, R1, beta, nc, k0, &
        phi0, lambda, gamma, moblty
 
@@ -37,8 +35,8 @@ contains
     write(*, '(a20, i10)'), 'iseed = ', iseed
     write(*, '(a20, f10.2)'), 'tend = ', tend
     write(*, '(a20, f10.2)'), 'dt = ', dt
-    write(*, '(a20, f10.2)'), 'a0 = ', a0
-    write(*, '(a20, f10.2)'), 'difv = ', difv
+    write(*, '(a20, f10.2)'), 'alpha = ', alpha
+    write(*, '(a20, f10.2)'), 'diff = ', diff
     write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
     write(*, '(a20, i10)'), 'R1 = ', R1
     write(*, '(a20, f10.2)'), 'beta = ', beta
@@ -55,8 +53,8 @@ contains
     write(9, '(a20, i10)'), 'iseed,', iseed
     write(9, '(a20, f10.2)'), 'tend,', tend
     write(9, '(a20, f10.2)'), 'dt,', dt
-    write(9, '(a20, f10.2)'), 'a0,', a0
-    write(9, '(a20, f10.2)'), 'difv,', difv
+    write(9, '(a20, f10.2)'), 'alpha,', alpha
+    write(9, '(a20, f10.2)'), 'diff,', diff
     write(9, '(a20, f10.2)'), 'tpinc,', tpinc
     write(9, '(a20, i10)'), 'R1,', R1
     write(9, '(a20, f10.2)'), 'beta,', beta
@@ -147,7 +145,7 @@ contains
     integer i, j
     do i = 1, Lbox
        do j = 1, Lbox
-          a(i,j) = a0*p(i, j)
+          a(i,j) = alpha*p(i, j)
        end do
     end do    
   end subroutine update_rate
@@ -187,7 +185,7 @@ contains
     do i = 2, Lbox-1
        do j = 2, Lbox-1
           phi(i, j) = phi_old(i,j) &
-               + dt*difv*(phi_old(i-1,j)+phi_old(i+1,j)+phi_old(i,j-1)+phi_old(i,j+1)-4.0*phi_old(i,j))
+               + dt*diff*(phi_old(i-1,j)+phi_old(i+1,j)+phi_old(i,j-1)+phi_old(i,j+1)-4.0*phi_old(i,j))
        end do
     end do
 

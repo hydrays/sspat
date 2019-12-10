@@ -83,7 +83,7 @@ program main
                  cmat(i,j)%type = 0
               end if
            else if ( cmat(i,j)%type == 2 ) then
-              ! else if ( cmat(i,j)%type == 2 .or. cmat(i,j)%type == 3) then
+              !else if ( cmat(i,j)%type == 2 .or. cmat(i,j)%type == 3) then
               ! T cell
               call random_number(u)
               if ( u < beta*dt ) then
@@ -203,12 +203,12 @@ program main
            end if
         end do
      end do
-     
+
      call update_phi()
      call update_rate()
      t = t + dt
   end do
-  
+
   close(unit=100)
-  
+
 end program main

@@ -133,6 +133,7 @@ program main
                     jtest = j
                     !roadWeight(1) = exp(k0*phi(itest,jtest))
                     roadWeight(1) = exp(phi(itest,jtest))
+                    !roadWeight(1) = 0.0
                     itest = i-1
                     jtest = j
                     if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &

@@ -23,6 +23,8 @@ module setting
   real, allocatable ::  phi_old(:,:)
   real, allocatable :: p(:,:)
   real, allocatable :: a(:,:)
+  real, allocatable :: fb_lambda(:,:)
+  real, allocatable :: lambda_filed(:,:)  
   
 contains
   subroutine read_xdata()
@@ -71,8 +73,8 @@ contains
   
   subroutine init_cell_pool()
     implicit none
-    real u
-    integer i, j
+    real u1, u2
+    integer i, j, ishift, jshift
     integer curb
     
     write(*, *), 'Initialize...'
@@ -80,14 +82,18 @@ contains
     allocate(phi(1:Lbox, 1:Lbox))
     allocate(p(1:Lbox,1:Lbox))
     allocate(a(1:Lbox,1:Lbox))
+    allocate(fb_lambda(1:Lbox,1:Lbox))
+    allocate(lambda_filed(1:Lbox,1:Lbox))
     allocate(phi_old(1:Lbox,1:Lbox))
-
+    
     do i = 1, Lbox
        do j = 1, Lbox
           cmat(i,j)%type = 0 ! No cell everywhere
           phi(i,j) = 1.0
           p(i,j) = 0.0
           a(i,j) = 0.0
+          fb_lambda(i,j) = 0.0
+          lambda_filed(i,j) = lambda
        end do
     end do
 
@@ -95,8 +101,25 @@ contains
     ! randomly distribute M cells
     do i = curb, Lbox-curb, 4
        do j = curb, Lbox-curb, 4
-          call random_number(u)
-             cmat(i,j)%type = 1
+          call random_number(u1)
+          call random_number(u2)
+          u1 = u1 - 0.5
+          u2 = u2 - 0.5
+          if ( u1>0.25 ) then
+             ishift = i + 1
+          else if ( u1<-0.25 ) then
+             ishift = i - 1
+          else
+             ishift = i
+          end if
+          if ( u2>0.25 ) then
+             jshift = j + 1
+          else if ( u2<-0.25 ) then
+             jshift = j - 1
+          else
+             jshift = j
+          end if
+          cmat(ishift,jshift)%type = 1
        end do
     end do
   end subroutine init_cell_pool
@@ -110,7 +133,7 @@ contains
 
     WRITE(filename,'(A7,I5.5,A4)') './out/c', index, '.dat'
     open (unit = 11, file=filename, action="write")
-    WRITE(filename,'(A7,I5.5,A4)') './out/p', index, '.dat'
+    WRITE(filename,'(A12,I5.5,A4)') './out/lambda', index, '.dat'
     open (unit = 21, file=filename, action="write")
     WRITE(filename,'(A9,I5.5,A4)') './out/phi', index, '.dat'
     open (unit = 31, file=filename, action="write")
@@ -119,11 +142,11 @@ contains
     do i = 1, Lbox
        do j = 1, Lbox-1
           write(11, '(I5, A2)', advance="no"), cmat(i,j)%type, ', '
-          write(21, '(F8.4, A2)', advance="no"), p(i,j), ', '
+          write(21, '(F8.4, A2)', advance="no"), fb_lambda(i,j), ', '
           write(31, '(F8.4, A2)', advance="no"), phi(i,j), ', '
        end do
        write(11, '(I5)'), cmat(i,Lbox)%type
-       write(21, '(F8.4)'), p(i,j)
+       write(21, '(F8.4)'), fb_lambda(i,j)
        write(31, '(F8.4)'), phi(i,j)
     end do
     close(11)
@@ -149,6 +172,27 @@ contains
        end do
     end do    
   end subroutine update_rate
+
+  subroutine update_lambda()
+    implicit none
+    integer i, j, isub, jsub
+    fb_lambda = 0.0
+    do i = 1, Lbox
+       do j = 1, Lbox
+          if ( cmat(i,j)%type == 3 ) then
+              do isub = i-1, i+1
+                 if (isub > 0 .and. isub <= Lbox) then
+                    do jsub = j-1, j+1
+                       if (jsub > 0 .and. jsub <= Lbox) then
+                          fb_lambda(isub,jsub) = lambda_filed(isub, jsub)
+                       end if
+                    end do
+                 end if
+              end do
+           end if
+        end do
+     end do
+  end subroutine update_lambda
   
   subroutine update_phi()
     implicit none
@@ -158,9 +202,7 @@ contains
     ! source
     do i = 1, Lbox
        do j = 1, Lbox
-          if ( cmat(i,j)%type .eq. 3 ) then
-             phi(i,j) = phi(i,j) + lambda*dt
-          end if
+          phi(i,j) = phi(i,j) + fb_lambda(i,j)*dt
        end do
     end do
     ! Neumann boundary condition (sort of)
@@ -201,6 +243,7 @@ contains
        do j = 1, Lbox
           p(i, j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0)))
           !p(i, j) = exp(k0*phi(i, j))
+          !p(i, j) = 1.0
           A = A + p(i, j)
        end do
     end do

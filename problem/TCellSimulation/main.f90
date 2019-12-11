@@ -157,16 +157,17 @@ program main
                        roadWeight(5) = exp(k0*phi(itest,jtest))
                     end if
                     if ( sum(roadWeight) < 1e-8 ) then
-                       print *, 'something wrong here'
+                       !print *, 'something wrong here'
+                    else
+                       call random_number(u)
+                       u = u*sum(roadWeight)
+                       do moveDirection = 1, 5
+                          u = u - roadWeight(moveDirection)
+                          if ( u < 0 ) then
+                             exit
+                          end if
+                       end do
                     end if
-                    call random_number(u)
-                    u = u*sum(roadWeight)
-                    do moveDirection = 1, 5
-                       u = u - roadWeight(moveDirection)
-                       if ( u < 0 ) then
-                          exit
-                       end if
-                    end do
                     !print *, t, moveDirection, roadWeight
                     if ( moveDirection == 1 ) then
                        ! does not move
@@ -204,6 +205,7 @@ program main
         end do
      end do
 
+     call update_lambda()
      call update_phi()
      call update_rate()
      t = t + dt

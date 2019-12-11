@@ -17,6 +17,7 @@ out/
 
 # Build directory
 build/
+case*/
 
 # Sublime project 
 *.sublime-workspace

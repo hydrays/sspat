@@ -137,6 +137,8 @@ contains
     open (unit = 21, file=filename, action="write")
     WRITE(filename,'(A9,I5.5,A4)') './out/phi', index, '.dat'
     open (unit = 31, file=filename, action="write")
+    WRITE(filename,'(A7,I5.5,A4)') './out/p', index, '.dat'
+    open (unit = 41, file=filename, action="write")
 
     
     do i = 1, Lbox
@@ -144,14 +146,17 @@ contains
           write(11, '(I5, A2)', advance="no"), cmat(i,j)%type, ', '
           write(21, '(F8.4, A2)', advance="no"), fb_lambda(i,j), ', '
           write(31, '(F8.4, A2)', advance="no"), phi(i,j), ', '
+          write(41, '(F8.4, A2)', advance="no"), p(i,j), ', '
        end do
        write(11, '(I5)'), cmat(i,Lbox)%type
        write(21, '(F8.4)'), fb_lambda(i,j)
        write(31, '(F8.4)'), phi(i,j)
+       write(41, '(F8.4)'), p(i,j)
     end do
     close(11)
     close(21)
     close(31)
+    close(41)
   end subroutine output_to_file
 
   subroutine cell_event(i, j)
@@ -197,7 +202,7 @@ contains
   subroutine update_phi()
     implicit none
     integer i, j
-    real A
+    real A, TP
 
     ! source
     do i = 1, Lbox
@@ -239,19 +244,29 @@ contains
     end do
     
     A = 0.0
+    TP = 0.0
     do i = 1, Lbox
        do j = 1, Lbox
-          p(i, j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0)))
+          !p(i, j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0)))
           !p(i, j) = exp(k0*phi(i, j))
           !p(i, j) = 1.0
-          A = A + p(i, j)
+          if ( phi(i,j) > phi0 ) then
+             p(i,j) = 0.1 + 1.0/(1.0+exp(-k0*(phi(i, j) - phi0))) !phi(i,j)
+             A = A + 1.0
+             TP = TP + p(i, j)
+          else
+             p(i,j) = 1.0
+          end if
        end do
     end do
 
-    A = A/(Lbox*Lbox)
+    !A = A/(Lbox*Lbox)
+    A = A/TP
     do i = 1, Lbox
        do j = 1, Lbox
-          p(i, j) = p(i, j)/A
+          if ( phi(i,j) > phi0 ) then
+             p(i,j) = A*p(i,j)
+          end if
        end do
     end do
     

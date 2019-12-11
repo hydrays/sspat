@@ -131,30 +131,35 @@ program main
                     roadWeight(:) = 0.0
                     itest = i
                     jtest = j
-                    roadWeight(1) = exp(k0*phi(itest,jtest))
+                    !roadWeight(1) = exp(k0*phi(itest,jtest))
+                    roadWeight(1) = exp(phi(itest,jtest))
                     itest = i-1
                     jtest = j
                     if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
                          .and. (cmat(itest, jtest)%type == 0) ) then
-                       roadWeight(2) = exp(k0*phi(itest,jtest))
+                       !roadWeight(2) = exp(k0*phi(itest,jtest))
+                       roadWeight(2) = exp(phi(itest,jtest))
                     end if
                     itest = i+1
                     jtest = j
                     if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
                          .and. (cmat(itest, jtest)%type == 0) ) then
-                       roadWeight(3) = exp(k0*phi(itest,jtest))
+                       !roadWeight(3) = exp(k0*phi(itest,jtest))
+                       roadWeight(3) = exp(phi(itest,jtest))
                     end if
                     itest = i
                     jtest = j-1
                     if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
                          .and. (cmat(itest, jtest)%type == 0) ) then
-                       roadWeight(4) = exp(k0*phi(itest,jtest))
+                       !roadWeight(4) = exp(k0*phi(itest,jtest))
+                       roadWeight(4) = exp(phi(itest,jtest))
                     end if
                     itest = i
                     jtest = j+1
                     if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
                          .and. (cmat(itest, jtest)%type == 0) ) then
-                       roadWeight(5) = exp(k0*phi(itest,jtest))
+                       !roadWeight(5) = exp(k0*phi(itest,jtest))
+                       roadWeight(5) = exp(phi(itest,jtest))
                     end if
                     if ( sum(roadWeight) < 1e-8 ) then
                        !print *, 'something wrong here'

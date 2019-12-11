@@ -251,9 +251,11 @@ contains
           !p(i, j) = exp(k0*phi(i, j))
           !p(i, j) = 1.0
           if ( phi(i,j) > phi0 ) then
-             p(i,j) = 0.1 + 1.0/(1.0+exp(-k0*(phi(i, j) - phi0))) !phi(i,j)
+             p(i,j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0))) !phi(i,j)
              A = A + 1.0
-             TP = TP + p(i, j)
+             if ( cmat(i,j)%type == 0 ) then
+                TP = TP + p(i, j)
+             end if
           else
              p(i,j) = 1.0
           end if

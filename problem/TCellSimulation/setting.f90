@@ -6,7 +6,7 @@ module setting
   real :: moblty, k0, phi0
   integer :: R1, nc
   real :: diff, lambda, gamma
-  
+
   namelist /xdata/ Lbox, tend, dt, alpha, diff, &
        iseed, tpinc, R1, beta, nc, k0, &
        phi0, lambda, gamma, moblty
@@ -25,7 +25,7 @@ module setting
   real, allocatable :: a(:,:)
   real, allocatable :: fb_lambda(:,:)
   real, allocatable :: lambda_filed(:,:)  
-  
+
 contains
   subroutine read_xdata()
     implicit none
@@ -48,7 +48,7 @@ contains
     write(*, '(a20, f10.2)'), 'lambda = ', lambda
     write(*, '(a20, f10.2)'), 'gamma = ', gamma
     write(*, '(a20, i10)'), 'nc = ', nc
-    
+
     open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
     write(9, '(a20, i10)'), 'Lbox,', Lbox
@@ -66,17 +66,17 @@ contains
     write(9, '(a20, f10.2)'), 'lambda,', lambda
     write(9, '(a20, f10.2)'), 'gamma,', gamma
     write(9, '(a20, i10)'), 'nc,', nc
-    
+
     close(8)
     close(9)
   end subroutine read_xdata
-  
+
   subroutine init_cell_pool()
     implicit none
     real u1, u2
     integer i, j, ishift, jshift
     integer curb
-    
+
     write(*, *), 'Initialize...'
     allocate(cmat(1:Lbox,1:Lbox))
     allocate(phi(1:Lbox, 1:Lbox))
@@ -85,7 +85,7 @@ contains
     allocate(fb_lambda(1:Lbox,1:Lbox))
     allocate(lambda_filed(1:Lbox,1:Lbox))
     allocate(phi_old(1:Lbox,1:Lbox))
-    
+
     do i = 1, Lbox
        do j = 1, Lbox
           cmat(i,j)%type = 0 ! No cell everywhere
@@ -140,7 +140,7 @@ contains
     WRITE(filename,'(A7,I5.5,A4)') './out/p', index, '.dat'
     open (unit = 41, file=filename, action="write")
 
-    
+
     do i = 1, Lbox
        do j = 1, Lbox-1
           write(11, '(I5, A2)', advance="no"), cmat(i,j)%type, ', '
@@ -175,7 +175,7 @@ contains
        do j = 1, Lbox
           a(i,j) = alpha*p(i, j)
        end do
-    end do    
+    end do
   end subroutine update_rate
 
   subroutine update_lambda()
@@ -185,64 +185,66 @@ contains
     do i = 1, Lbox
        do j = 1, Lbox
           if ( cmat(i,j)%type == 3 ) then
-              do isub = i-1, i+1
-                 if (isub > 0 .and. isub <= Lbox) then
-                    do jsub = j-1, j+1
-                       if (jsub > 0 .and. jsub <= Lbox) then
-                          fb_lambda(isub,jsub) = lambda_filed(isub, jsub)
-                       end if
-                    end do
-                 end if
-              end do
-           end if
-        end do
-     end do
+             do isub = i-1, i+1
+                if (isub > 0 .and. isub <= Lbox) then
+                   do jsub = j-1, j+1
+                      if (jsub > 0 .and. jsub <= Lbox) then
+                         fb_lambda(isub,jsub) = lambda_filed(isub, jsub)
+                      end if
+                   end do
+                end if
+             end do
+          end if
+       end do
+    end do
   end subroutine update_lambda
-  
-  subroutine update_phi()
+
+  subroutine update_phi(march_time)
     implicit none
+    real, intent(in) :: march_time
     integer i, j
+    real dt_small
+    integer istep, nstep
+    nstep = 1
+    
+    dt_small = march_time/nstep
+    do istep = 1, nstep
+       ! source
+       do i = 1, Lbox
+          do j = 1, Lbox
+             phi(i,j) = phi(i,j) + fb_lambda(i,j)*dt_small
+          end do
+       end do
+       ! Neumann boundary condition (sort of)
+       ! i = 1 or Lbox
+       do j = 1, Lbox
+          phi(1,j) = phi(2,j)
+          phi(Lbox,j) = phi(Lbox-1,j)
+       end do
+       ! j = 1 or Lbox
+       do i = 1, Lbox
+          phi(i,1) = phi(i,2)
+          phi(i,Lbox) = phi(i,Lbox-1)
+       end do
+
+       ! diffuse
+       phi_old = phi
+       do i = 2, Lbox-1
+          do j = 2, Lbox-1
+             phi(i, j) = phi_old(i,j) &
+                  + dt_small*diff*(phi_old(i-1,j)+phi_old(i+1,j)+phi_old(i,j-1)+phi_old(i,j+1)-4.0*phi_old(i,j))
+          end do
+       end do
+
+       ! decay
+       phi = phi - dt_small*gamma*phi
+    end do
+  end subroutine update_phi
+
+  subroutine update_p()
+    implicit none
+    integer i, j, isub, jsub
     real A, TP
-
-    ! source
-    do i = 1, Lbox
-       do j = 1, Lbox
-          phi(i,j) = phi(i,j) + fb_lambda(i,j)*dt
-       end do
-    end do
-    ! Neumann boundary condition (sort of)
-    ! i = 1 or Lbox
-    do j = 1, Lbox
-       phi(1,j) = phi(2,j)
-       phi(Lbox,j) = phi(Lbox-1,j)
-    end do
-    ! j = 1 or Lbox
-    do i = 1, Lbox
-       phi(i,1) = phi(i,2)
-       phi(i,Lbox) = phi(i,Lbox-1)
-    end do
-
-    
-    ! diffuse
-    do i = 1, Lbox
-       do j = 1, Lbox
-          phi_old(i,j) = phi(i, j)
-       end do
-    end do
-    do i = 2, Lbox-1
-       do j = 2, Lbox-1
-          phi(i, j) = phi_old(i,j) &
-               + dt*diff*(phi_old(i-1,j)+phi_old(i+1,j)+phi_old(i,j-1)+phi_old(i,j+1)-4.0*phi_old(i,j))
-       end do
-    end do
-
-    ! decay
-    do i = 1, Lbox
-       do j = 1, Lbox
-          phi(i,j) = phi(i,j) - dt*gamma*phi(i,j)
-       end do
-    end do
-    
     A = 0.0
     TP = 0.0
     do i = 1, Lbox
@@ -271,7 +273,6 @@ contains
           end if
        end do
     end do
-    
-  end subroutine update_phi
+  end subroutine update_p
 
 end module setting

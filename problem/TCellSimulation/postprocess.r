@@ -1,5 +1,5 @@
 require(lattice)
-output_file_prefix <- "newbase61_vv12"
+output_file_prefix <- "ll03"
 
 A = NULL
 B = NULL
@@ -15,6 +15,7 @@ for ( i in seq(length(force)) )
     FolderName <- paste("case_", output_file_prefix, "_", as.character(rep), "/out/", sep='')
 
     runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/plot.r; cd ..")
+    ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/plot_debug.r; cd ..")
     system(runcmd)
 }
 

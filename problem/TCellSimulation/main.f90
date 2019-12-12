@@ -212,7 +212,8 @@ program main
      end do
 
      call update_lambda()
-     call update_phi()
+     call update_phi(dt)
+     call update_p()     
      call update_rate()
      t = t + dt
   end do

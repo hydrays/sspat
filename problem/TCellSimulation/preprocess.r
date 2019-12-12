@@ -5,29 +5,29 @@ cmd1 <- paste("cp control.txt control.old")
 system(cmd1)
 
 ##output_file_prefix <- format(Sys.time(), "%Y%m%d%H%M")
-output_file_prefix <- "basecomp1"
+output_file_prefix <- "ll03"
 output_path = "out"
 rep = 0
 
-Lbox = 256
+Lbox = 512
 tend = 2000.0
-dt = 0.01	
+dt = 0.01
 iseed = 1012
 tpinc = 5.0
 
-alpha = 0.005
+alpha = 0.004
 beta = 0.01
 
-moblty = 5.0
-k0 = 2.0
+moblty = 2.0
+k0 = 0.1
 phi0 = 0.5
 
-diff = 1.0
-lambda = 2.0
+diff = 5.0
+lambda = 10.0
 gamma = 0.1
 
 R1 = 2
-nc = 18
+nc = 17
 
 output_dir = "out"
 cell_position_file = "cellPos.txt"
@@ -35,12 +35,14 @@ cell_position_file = "cellPos.txt"
 ##for ( stretching_force in c(seq(15, 15, length.out=10), seq(10, 10, length.out=10) ))
 ##for ( iseed in seq(1010, 1010+12) )
 ##for ( nc in c(3, 3, 4, 4, 4, 5, 5, 5, 6, 6) )
-##for ( alpha in c(0.003, 0.004, 0.005) )
-##for ( moblty in seq(1, 10, by=2) )
-##for ( lambda in seq(0, 4, by=0.5) )
-for ( gamma in seq(0.1, 5, by=0.5) )
-##for ( k0 in seq(6) )
-##for ( diff in c(0.1, 0.5, 1, 2, 5, 10) )
+##for ( alpha in c(0.002, 0.003, 0.004, 0.005, 0.006, 0.007) )
+##for ( moblty in c(0.0, 0.5, 1) )
+for ( lambda in c(5, 10, 20) )
+##for ( gamma in seq(0.1, 5, by=0.5) )
+##for ( k0 in c(0.05, 0.1, 0.2, 0.3, 0.5, 1) )
+##for ( diff in c(5, 10, 20) )
+##for ( phi0 in c(1, 5, by=1) )
+##for ( i in seq(5) )
 {
     ##stretching_force = 4
     iseed = iseed + rep

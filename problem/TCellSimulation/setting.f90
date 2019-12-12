@@ -3,13 +3,11 @@ module setting
   integer :: iseed
   real :: tend, dt
   real :: alpha, beta
-  real :: moblty, k0, phi0
   integer :: R1, nc
   real :: diff, lambda, gamma
 
   namelist /xdata/ Lbox, tend, dt, alpha, diff, &
-       iseed, tpinc, R1, beta, nc, k0, &
-       phi0, lambda, gamma, moblty
+       iseed, tpinc, R1, beta, nc, lambda, gamma
 
   type cell
      integer type
@@ -42,9 +40,6 @@ contains
     write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
     write(*, '(a20, i10)'), 'R1 = ', R1
     write(*, '(a20, f10.2)'), 'beta = ', beta
-    write(*, '(a20, f10.2)'), 'moblty = ', moblty
-    write(*, '(a20, f10.2)'), 'k0 = ', k0
-    write(*, '(a20, f10.2)'), 'phi0 = ', phi0
     write(*, '(a20, f10.2)'), 'lambda = ', lambda
     write(*, '(a20, f10.2)'), 'gamma = ', gamma
     write(*, '(a20, i10)'), 'nc = ', nc
@@ -60,9 +55,6 @@ contains
     write(9, '(a20, f10.2)'), 'tpinc,', tpinc
     write(9, '(a20, i10)'), 'R1,', R1
     write(9, '(a20, f10.2)'), 'beta,', beta
-    write(9, '(a20, f10.2)'), 'moblty,', moblty
-    write(9, '(a20, f10.2)'), 'k0,', k0
-    write(9, '(a20, f10.2)'), 'phi0,', phi0
     write(9, '(a20, f10.2)'), 'lambda,', lambda
     write(9, '(a20, f10.2)'), 'gamma,', gamma
     write(9, '(a20, i10)'), 'nc,', nc
@@ -244,36 +236,7 @@ contains
   subroutine update_p()
     implicit none
     integer i, j, isub, jsub
-    real A, TP
-    A = 0.0
-    TP = 0.0
-    do i = 1, Lbox
-       do j = 1, Lbox
-          !p(i, j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0)))
-          !p(i, j) = exp(k0*phi(i, j))
-          p(i, j) = 1.0 + phi(i, j)
-          !p(i, j) = 1.0
-          ! if ( phi(i,j) > phi0 ) then
-          !    p(i,j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0))) !phi(i,j)
-          !    A = A + 1.0
-          !    if ( cmat(i,j)%type == 0 ) then
-          !       TP = TP + p(i, j)
-          !    end if
-          ! else
-          !    p(i,j) = 1.0
-          ! end if
-       end do
-    end do
-
-    !A = A/(Lbox*Lbox)
-    ! A = A/TP
-    ! do i = 1, Lbox
-    !    do j = 1, Lbox
-    !       if ( phi(i,j) > phi0 ) then
-    !          p(i,j) = A*p(i,j)
-    !       end if
-    !    end do
-    ! end do
+    p = 1.0 + phi
   end subroutine update_p
 
 end module setting

@@ -5,29 +5,25 @@ cmd1 <- paste("cp control.txt control.old")
 system(cmd1)
 
 ##output_file_prefix <- format(Sys.time(), "%Y%m%d%H%M")
-output_file_prefix <- "ll03"
+output_file_prefix <- "oo13"
 output_path = "out"
 rep = 0
 
-Lbox = 512
+Lbox = 1024
 tend = 2000.0
 dt = 0.01
 iseed = 1012
 tpinc = 5.0
 
-alpha = 0.004
-beta = 0.01
+alpha = 0.006
+beta = 0.02
 
-moblty = 2.0
-k0 = 0.1
-phi0 = 0.5
-
-diff = 5.0
-lambda = 10.0
+diff = 0.5
+lambda = 0.0
 gamma = 0.1
 
 R1 = 2
-nc = 17
+nc = 15
 
 output_dir = "out"
 cell_position_file = "cellPos.txt"
@@ -35,14 +31,11 @@ cell_position_file = "cellPos.txt"
 ##for ( stretching_force in c(seq(15, 15, length.out=10), seq(10, 10, length.out=10) ))
 ##for ( iseed in seq(1010, 1010+12) )
 ##for ( nc in c(3, 3, 4, 4, 4, 5, 5, 5, 6, 6) )
-##for ( alpha in c(0.002, 0.003, 0.004, 0.005, 0.006, 0.007) )
-##for ( moblty in c(0.0, 0.5, 1) )
-for ( lambda in c(5, 10, 20) )
+##for ( alpha in c(0.002, 0.004, 0.005, 0.007, 0.009) )
+for ( lambda in c(1.5, 2, 5, 10) )
 ##for ( gamma in seq(0.1, 5, by=0.5) )
-##for ( k0 in c(0.05, 0.1, 0.2, 0.3, 0.5, 1) )
-##for ( diff in c(5, 10, 20) )
-##for ( phi0 in c(1, 5, by=1) )
-##for ( i in seq(5) )
+##for ( diff in c(0.1, 0.3, 0.5, 1) )
+##for ( i in seq(3) )
 {
     ##stretching_force = 4
     iseed = iseed + rep
@@ -64,9 +57,6 @@ for ( lambda in c(5, 10, 20) )
     cat(paste("tpinc = ", tpinc, ",\n", sep=''), file=zz, append=T)
     cat(paste("R1 = ", R1, ",\n", sep=''), file=zz, append=T)
     cat(paste("beta = ", beta, ",\n", sep=''), file=zz, append=T)
-    cat(paste("moblty = ", moblty, ",\n", sep=''), file=zz, append=T)
-    cat(paste("k0 = ", k0, ",\n", sep=''), file=zz, append=T)
-    cat(paste("phi0 = ", phi0, ",\n", sep=''), file=zz, append=T)    
     cat(paste("lambda = ", lambda, ",\n", sep=''), file=zz, append=T)
     cat(paste("gamma = ", gamma, ",\n", sep=''), file=zz, append=T)
     cat(paste("nc = ", nc, ",\n", sep=''), file=zz, append=T)            

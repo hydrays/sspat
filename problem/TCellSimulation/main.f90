@@ -89,119 +89,119 @@ program main
               if ( u < beta*dt ) then
                  cmat(i,j)%type = 0
               else
-                 call random_number(u)
-                 if ( u < moblty*dt ) then
-                    ! phi_temp = -1.0
-                    ! itargt = -1
-                    ! jtargt = -1
-                    ! itest = i-1
-                    ! jtest = j
-                    ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                    !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
-                    !    phi_temp = phi(itest,jtest)
-                    !    itargt = itest
-                    !    jtargt = jtest
-                    ! end if
-                    ! itest = i+1
-                    ! jtest = j
-                    ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                    !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
-                    !    phi_temp = phi(itest,jtest)
-                    !    itargt = itest
-                    !    jtargt = jtest
-                    ! end if
-                    ! itest = i
-                    ! jtest = j-1
-                    ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                    !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
-                    !    phi_temp = phi(itest,jtest)
-                    !    itargt = itest
-                    !    jtargt = jtest
-                    ! end if
-                    ! itest = i
-                    ! jtest = j+1
-                    ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                    !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
-                    !    phi_temp = phi(itest,jtest)
-                    !    itargt = itest
-                    !    jtargt = jtest
-                    ! end if
+              !    call random_number(u)
+              !    if ( u < moblty*dt ) then
+              !       ! phi_temp = -1.0
+              !       ! itargt = -1
+              !       ! jtargt = -1
+              !       ! itest = i-1
+              !       ! jtest = j
+              !       ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !       !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
+              !       !    phi_temp = phi(itest,jtest)
+              !       !    itargt = itest
+              !       !    jtargt = jtest
+              !       ! end if
+              !       ! itest = i+1
+              !       ! jtest = j
+              !       ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !       !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
+              !       !    phi_temp = phi(itest,jtest)
+              !       !    itargt = itest
+              !       !    jtargt = jtest
+              !       ! end if
+              !       ! itest = i
+              !       ! jtest = j-1
+              !       ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !       !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
+              !       !    phi_temp = phi(itest,jtest)
+              !       !    itargt = itest
+              !       !    jtargt = jtest
+              !       ! end if
+              !       ! itest = i
+              !       ! jtest = j+1
+              !       ! if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !       !      .and. (cmat(itest, jtest)%type == 0) .and. (phi(itest,jtest) > phi_temp) ) then
+              !       !    phi_temp = phi(itest,jtest)
+              !       !    itargt = itest
+              !       !    jtargt = jtest
+              !       ! end if
 
-                    ! another method to move the cells
-                    roadWeight(:) = 0.0
-                    itest = i
-                    jtest = j
-                    !roadWeight(1) = exp(k0*phi(itest,jtest))
-                    roadWeight(1) = exp(phi(itest,jtest))
-                    !roadWeight(1) = 0.0
-                    itest = i-1
-                    jtest = j
-                    if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                         .and. (cmat(itest, jtest)%type == 0) ) then
-                       !roadWeight(2) = exp(k0*phi(itest,jtest))
-                       roadWeight(2) = exp(phi(itest,jtest))
-                    end if
-                    itest = i+1
-                    jtest = j
-                    if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                         .and. (cmat(itest, jtest)%type == 0) ) then
-                       !roadWeight(3) = exp(k0*phi(itest,jtest))
-                       roadWeight(3) = exp(phi(itest,jtest))
-                    end if
-                    itest = i
-                    jtest = j-1
-                    if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                         .and. (cmat(itest, jtest)%type == 0) ) then
-                       !roadWeight(4) = exp(k0*phi(itest,jtest))
-                       roadWeight(4) = exp(phi(itest,jtest))
-                    end if
-                    itest = i
-                    jtest = j+1
-                    if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
-                         .and. (cmat(itest, jtest)%type == 0) ) then
-                       !roadWeight(5) = exp(k0*phi(itest,jtest))
-                       roadWeight(5) = exp(phi(itest,jtest))
-                    end if
-                    if ( sum(roadWeight) < 1e-8 ) then
-                       !print *, 'something wrong here'
-                    else
-                       call random_number(u)
-                       u = u*sum(roadWeight)
-                       do moveDirection = 1, 5
-                          u = u - roadWeight(moveDirection)
-                          if ( u < 0 ) then
-                             exit
-                          end if
-                       end do
-                    end if
-                    !print *, t, moveDirection, roadWeight
-                    if ( moveDirection == 1 ) then
-                       ! does not move
-                       itargt = -1
-                       jtargt = -1
-                    end if
-                    if ( moveDirection == 2 ) then
-                       itargt = i - 1
-                       jtargt = j
-                    end if
-                    if ( moveDirection == 3 ) then
-                       itargt = i + 1
-                       jtargt = j
-                    end if
-                    if ( moveDirection == 4 ) then
-                       itargt = i
-                       jtargt = j - 1
-                    end if
-                    if ( moveDirection == 5 ) then
-                       itargt = i
-                       jtargt = j + 1
-                    end if
-                    if ( (itargt > 0) .and. (jtargt > 0) ) then
-                       ! finish the move
-                       cmat(itargt, jtargt)%type = cmat(i,j)%type
-                       cmat(i,j)%type = 0
-                    end if
-                 end if
+              !       ! another method to move the cells
+              !       roadWeight(:) = 0.0
+              !       itest = i
+              !       jtest = j
+              !       !roadWeight(1) = exp(k0*phi(itest,jtest))
+              !       roadWeight(1) = exp(phi(itest,jtest))
+              !       !roadWeight(1) = 0.0
+              !       itest = i-1
+              !       jtest = j
+              !       if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !            .and. (cmat(itest, jtest)%type == 0) ) then
+              !          !roadWeight(2) = exp(k0*phi(itest,jtest))
+              !          roadWeight(2) = exp(phi(itest,jtest))
+              !       end if
+              !       itest = i+1
+              !       jtest = j
+              !       if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !            .and. (cmat(itest, jtest)%type == 0) ) then
+              !          !roadWeight(3) = exp(k0*phi(itest,jtest))
+              !          roadWeight(3) = exp(phi(itest,jtest))
+              !       end if
+              !       itest = i
+              !       jtest = j-1
+              !       if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !            .and. (cmat(itest, jtest)%type == 0) ) then
+              !          !roadWeight(4) = exp(k0*phi(itest,jtest))
+              !          roadWeight(4) = exp(phi(itest,jtest))
+              !       end if
+              !       itest = i
+              !       jtest = j+1
+              !       if ( (itest > 0) .and. (itest <= Lbox) .and. (jtest > 0) .and. (jtest <= Lbox) &
+              !            .and. (cmat(itest, jtest)%type == 0) ) then
+              !          !roadWeight(5) = exp(k0*phi(itest,jtest))
+              !          roadWeight(5) = exp(phi(itest,jtest))
+              !       end if
+              !       if ( sum(roadWeight) < 1e-8 ) then
+              !          !print *, 'something wrong here'
+              !       else
+              !          call random_number(u)
+              !          u = u*sum(roadWeight)
+              !          do moveDirection = 1, 5
+              !             u = u - roadWeight(moveDirection)
+              !             if ( u < 0 ) then
+              !                exit
+              !             end if
+              !          end do
+              !       end if
+              !       !print *, t, moveDirection, roadWeight
+              !       if ( moveDirection == 1 ) then
+              !          ! does not move
+              !          itargt = -1
+              !          jtargt = -1
+              !       end if
+              !       if ( moveDirection == 2 ) then
+              !          itargt = i - 1
+              !          jtargt = j
+              !       end if
+              !       if ( moveDirection == 3 ) then
+              !          itargt = i + 1
+              !          jtargt = j
+              !       end if
+              !       if ( moveDirection == 4 ) then
+              !          itargt = i
+              !          jtargt = j - 1
+              !       end if
+              !       if ( moveDirection == 5 ) then
+              !          itargt = i
+              !          jtargt = j + 1
+              !       end if
+              !       if ( (itargt > 0) .and. (jtargt > 0) ) then
+              !          ! finish the move
+              !          cmat(itargt, jtargt)%type = cmat(i,j)%type
+              !          cmat(i,j)%type = 0
+              !       end if
+              !    end if
               end if
            else
               ! not suppose to happen

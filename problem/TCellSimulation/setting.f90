@@ -251,28 +251,29 @@ contains
        do j = 1, Lbox
           !p(i, j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0)))
           !p(i, j) = exp(k0*phi(i, j))
+          p(i, j) = 1.0 + phi(i, j)
           !p(i, j) = 1.0
-          if ( phi(i,j) > phi0 ) then
-             p(i,j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0))) !phi(i,j)
-             A = A + 1.0
-             if ( cmat(i,j)%type == 0 ) then
-                TP = TP + p(i, j)
-             end if
-          else
-             p(i,j) = 1.0
-          end if
+          ! if ( phi(i,j) > phi0 ) then
+          !    p(i,j) = 1.0/(1.0+exp(-k0*(phi(i, j) - phi0))) !phi(i,j)
+          !    A = A + 1.0
+          !    if ( cmat(i,j)%type == 0 ) then
+          !       TP = TP + p(i, j)
+          !    end if
+          ! else
+          !    p(i,j) = 1.0
+          ! end if
        end do
     end do
 
     !A = A/(Lbox*Lbox)
-    A = A/TP
-    do i = 1, Lbox
-       do j = 1, Lbox
-          if ( phi(i,j) > phi0 ) then
-             p(i,j) = A*p(i,j)
-          end if
-       end do
-    end do
+    ! A = A/TP
+    ! do i = 1, Lbox
+    !    do j = 1, Lbox
+    !       if ( phi(i,j) > phi0 ) then
+    !          p(i,j) = A*p(i,j)
+    !       end if
+    !    end do
+    ! end do
   end subroutine update_p
 
 end module setting

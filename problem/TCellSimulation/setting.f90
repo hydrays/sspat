@@ -5,8 +5,9 @@ module setting
   real :: alpha, beta
   integer :: R1, nc
   real :: diff, lambda, gamma
-
-  namelist /xdata/ Lbox, tend, dt, alpha, diff, &
+  real :: k_lambda
+  
+  namelist /xdata/ Lbox, tend, dt, alpha, diff, k_lambda, &
        iseed, tpinc, R1, beta, nc, lambda, gamma
 
   type cell
@@ -22,7 +23,7 @@ module setting
   real, allocatable :: p(:,:)
   real, allocatable :: a(:,:)
   real, allocatable :: fb_lambda(:,:)
-  real, allocatable :: lambda_filed(:,:)  
+  real, allocatable :: lambda_field(:,:)  
 
 contains
   subroutine read_xdata()
@@ -42,6 +43,7 @@ contains
     write(*, '(a20, f10.2)'), 'beta = ', beta
     write(*, '(a20, f10.2)'), 'lambda = ', lambda
     write(*, '(a20, f10.2)'), 'gamma = ', gamma
+    write(*, '(a20, f10.2)'), 'k_lambda = ', k_lambda    
     write(*, '(a20, i10)'), 'nc = ', nc
 
     open(9, file="out/control.csv")
@@ -57,6 +59,7 @@ contains
     write(9, '(a20, f10.2)'), 'beta,', beta
     write(9, '(a20, f10.2)'), 'lambda,', lambda
     write(9, '(a20, f10.2)'), 'gamma,', gamma
+    write(9, '(a20, f10.2)'), 'k_lambda,', k_lambda    
     write(9, '(a20, i10)'), 'nc,', nc
 
     close(8)
@@ -75,9 +78,21 @@ contains
     allocate(p(1:Lbox,1:Lbox))
     allocate(a(1:Lbox,1:Lbox))
     allocate(fb_lambda(1:Lbox,1:Lbox))
-    allocate(lambda_filed(1:Lbox,1:Lbox))
+    allocate(lambda_field(1:Lbox,1:Lbox))
     allocate(phi_old(1:Lbox,1:Lbox))
 
+    ! read lambda_field
+    open (unit = 81, file="matrix.txt", action="read")
+    !read(81, *) lambda_field
+    !READ( 3, '(5F4.1)') V 
+    do i = 1, Lbox
+       !do j = 1, Lbox
+       read(81, *), lambda_field(i,:)
+       !pause
+       !end do
+    end do
+    close(81)
+    
     do i = 1, Lbox
        do j = 1, Lbox
           cmat(i,j)%type = 0 ! No cell everywhere
@@ -85,9 +100,22 @@ contains
           p(i,j) = 0.0
           a(i,j) = 0.0
           fb_lambda(i,j) = 0.0
-          lambda_filed(i,j) = lambda
+          lambda_field(i,j) = k_lambda*lambda_field(i,j)
        end do
     end do
+    ! ! for 1024
+    ! cmat(340:360, 502:522)%type = 3
+    ! cmat(640:660, 502:522)%type = 3
+    ! cmat(940:960, 502:522)%type = 3
+
+    ! ! for 512 central line
+    ! cmat(170:180, 251:261)%type = 3
+    ! cmat(320:330, 251:261)%type = 3
+    ! cmat(470:480, 251:261)%type = 3
+
+    ! ! for 512 two side
+    ! cmat(320:330, 51:61)%type = 3
+    ! cmat(320:330, 451:461)%type = 3    
 
     curb = 10
     ! randomly distribute M cells
@@ -123,6 +151,18 @@ contains
     character(30) filename
     integer i, j
 
+    if ( index==0 ) then
+       WRITE(filename,'(A7,I5.5,A4)') './out/f', index, '.dat'
+       open (unit = 8, file=filename, action="write")
+       do i = 1, Lbox
+          do j = 1, Lbox-1
+             write(8, '(F8.4, A2)', advance="no"), lambda_field(i,j), ', '
+          end do
+          write(8, '(F8.4, A2)'), lambda_field(i,j)
+       end do
+       close(8)
+    end if
+    
     WRITE(filename,'(A7,I5.5,A4)') './out/c', index, '.dat'
     open (unit = 11, file=filename, action="write")
     WRITE(filename,'(A12,I5.5,A4)') './out/lambda', index, '.dat'
@@ -181,7 +221,7 @@ contains
                 if (isub > 0 .and. isub <= Lbox) then
                    do jsub = j-1, j+1
                       if (jsub > 0 .and. jsub <= Lbox) then
-                         fb_lambda(isub,jsub) = lambda_filed(isub, jsub)
+                         fb_lambda(isub,jsub) = lambda_field(isub, jsub)
                       end if
                    end do
                 end if

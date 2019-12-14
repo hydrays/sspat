@@ -6,9 +6,11 @@ module setting
   integer :: R1, nc
   real :: diff, lambda, gamma
   real :: k_lambda
+  integer :: model_type, read_lambda_from_file
   
   namelist /xdata/ Lbox, tend, dt, alpha, diff, k_lambda, &
-       iseed, tpinc, R1, beta, nc, lambda, gamma
+       iseed, tpinc, R1, beta, nc, lambda, gamma, model_type, &
+       read_lambda_from_file
 
   type cell
      integer type
@@ -43,8 +45,10 @@ contains
     write(*, '(a20, f10.2)'), 'beta = ', beta
     write(*, '(a20, f10.2)'), 'lambda = ', lambda
     write(*, '(a20, f10.2)'), 'gamma = ', gamma
-    write(*, '(a20, f10.2)'), 'k_lambda = ', k_lambda    
+    write(*, '(a20, f10.2)'), 'k_lambda = ', k_lambda
     write(*, '(a20, i10)'), 'nc = ', nc
+    write(*, '(a20, i10)'), 'model_type = ', model_type
+    write(*, '(a20, i10)'), 'read_lambda_from_file = ', read_lambda_from_file
 
     open(9, file="out/control.csv")
     write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
@@ -61,6 +65,8 @@ contains
     write(9, '(a20, f10.2)'), 'gamma,', gamma
     write(9, '(a20, f10.2)'), 'k_lambda,', k_lambda    
     write(9, '(a20, i10)'), 'nc,', nc
+    write(9, '(a20, i10)'), 'model_type,', model_type
+    write(9, '(a20, i10)'), 'read_lambda_from_file,', read_lambda_from_file
 
     close(8)
     close(9)
@@ -72,7 +78,7 @@ contains
     integer i, j, ishift, jshift
     integer curb
 
-    write(*, *), 'Initialize...'
+    write(*, '(A)', advance='no'), 'Initialize...'
     allocate(cmat(1:Lbox,1:Lbox))
     allocate(phi(1:Lbox, 1:Lbox))
     allocate(p(1:Lbox,1:Lbox))
@@ -81,17 +87,20 @@ contains
     allocate(lambda_field(1:Lbox,1:Lbox))
     allocate(phi_old(1:Lbox,1:Lbox))
 
-    ! read lambda_field
-    open (unit = 81, file="matrix.txt", action="read")
-    !read(81, *) lambda_field
-    !READ( 3, '(5F4.1)') V 
-    do i = 1, Lbox
-       !do j = 1, Lbox
-       read(81, *), lambda_field(i,:)
-       !pause
-       !end do
-    end do
-    close(81)
+    if ( read_lambda_from_file == 1 ) then
+       ! read lambda_field
+       open (unit = 81, file="matrix.txt", action="read")
+       do i = 1, Lbox
+          read(81, *), lambda_field(i,:)
+          !pause
+       end do
+       close(81)
+       lambda_field(i,j) = k_lambda*lambda_field(i,j)
+    else if ( read_lambda_from_file == 0 ) then
+       lambda_field = lambda
+    else
+       print *, "Parameter error: read_lambda_from_file can only be 0 or 1."
+    end if
     
     do i = 1, Lbox
        do j = 1, Lbox
@@ -100,23 +109,31 @@ contains
           p(i,j) = 0.0
           a(i,j) = 0.0
           fb_lambda(i,j) = 0.0
-          lambda_field(i,j) = k_lambda*lambda_field(i,j)
        end do
     end do
-    ! ! for 1024
-    ! cmat(340:360, 502:522)%type = 3
-    ! cmat(640:660, 502:522)%type = 3
-    ! cmat(940:960, 502:522)%type = 3
 
-    ! ! for 512 central line
+    select case (model_type)
+    case (1) ! central line
+       cmat( (Lbox/4 - 5) : (Lbox/4 + 5), (Lbox/2 - 5) : (Lbox/2 + 5) )%type = 3
+       cmat( (2*Lbox/4 - 5) : (2*Lbox/4 + 5), (Lbox/2 - 5) : (Lbox/2 + 5) )%type = 3
+       cmat( (3*Lbox/4 - 5) : (3*Lbox/4 + 5), (Lbox/2 - 5) : (Lbox/2 + 5) )%type = 3          
+       
+    case (2) ! central line
+       cmat( (Lbox/3 - 5) : (Lbox/3 + 5), (Lbox/8 - 5) : (Lbox/8 + 5) )%type = 3
+       cmat( (Lbox/3 - 5) : (Lbox/3 + 5), (7*Lbox/8 - 5) : (7*Lbox/8 + 5) )%type = 3
+       
+    case (3) ! random
+       
+    end select
+
     ! cmat(170:180, 251:261)%type = 3
     ! cmat(320:330, 251:261)%type = 3
     ! cmat(470:480, 251:261)%type = 3
-
+    
     ! ! for 512 two side
     ! cmat(320:330, 51:61)%type = 3
     ! cmat(320:330, 451:461)%type = 3    
-
+    
     curb = 10
     ! randomly distribute M cells
     do i = curb, Lbox-curb, 4
@@ -142,6 +159,7 @@ contains
           cmat(ishift,jshift)%type = 1
        end do
     end do
+    write(*, *), 'Done.'
   end subroutine init_cell_pool
 
   subroutine output_to_file(index)

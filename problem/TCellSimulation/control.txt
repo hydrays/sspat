@@ -12,5 +12,7 @@
 	gamma = 0.1,
 	k_lambda = 1.0,	
 	R1 = 2,
-	nc = 15
+	nc = 15,
+	model_type = 3,
+	read_lambda_from_file = 0
 /

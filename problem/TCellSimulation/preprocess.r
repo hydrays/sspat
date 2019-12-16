@@ -5,24 +5,27 @@ cmd1 <- paste("cp control.txt control.old")
 system(cmd1)
 
 ##output_file_prefix <- format(Sys.time(), "%Y%m%d%H%M")
-output_file_prefix <- "qq16"
+output_file_prefix <- "ww01"
 output_path = "out"
 rep = 0
 
-Lbox = 512
-tend = 1500.0
+Lbox = 1024
+tend = 8000.0
 dt = 0.01
 iseed = 1012
 tpinc = 5.0
 
-alpha = 0.005
+alpha = 0.006
 beta = 0.02
+alpha_max = 0.9
 
 diff = 0.5
-lambda = 0.0
+lambda = 2.0
 gamma = 0.1
 
-k_lambda = 20.0
+k_lambda = 1.0
+model_type = 3
+read_lambda_from_file = 1
 
 R1 = 2
 nc = 15
@@ -33,13 +36,14 @@ cell_position_file = "cellPos.txt"
 ##for ( stretching_force in c(seq(15, 15, length.out=10), seq(10, 10, length.out=10) ))
 ##for ( iseed in seq(1010, 1010+12) )
 ##for ( nc in c(3, 3, 4, 4, 4, 5, 5, 5, 6, 6) )
-for ( alpha in c(0.0045, 0.005, 0.0055, 0.006) )
-##for ( lambda in c(1.5, 2, 5, 10) )
+for ( alpha in c(0.0055, 0.006) )
+##for ( lambda in c(2, 10) )
 ##for ( gamma in seq(0.1, 5, by=0.5) )
-##for ( diff in c(0.5, 1) )
+##for ( diff in c(0.01, 0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 1) )
 ##for ( i in seq(3) )
-##for ( k_lambda in c(1, 2, 5, 10, 20) )
-##for ( k_lambda in c(5, 10, 20) )
+##for ( k_lambda in c(5, 10) )
+for ( alpha_max in c(0.8, 0.9, 1) )
+##for ( model_type in c(1, 2, 3) )
 {
     ##stretching_force = 4
     iseed = iseed + rep
@@ -56,6 +60,7 @@ for ( alpha in c(0.0045, 0.005, 0.0055, 0.006) )
     cat(paste("tend = ", tend, ",\n", sep=''), file=zz, append=T)
     cat(paste("dt = ", dt, ",\n", sep=''), file=zz, append=T)
     cat(paste("alpha = ", alpha, ",\n", sep=''), file=zz, append=T)
+    cat(paste("alpha_max = ", alpha_max, ",\n", sep=''), file=zz, append=T)
     cat(paste("diff = ", diff, ",\n", sep=''), file=zz, append=T)
     cat(paste("iseed = ", iseed, ",\n", sep=''), file=zz, append=T)
     cat(paste("tpinc = ", tpinc, ",\n", sep=''), file=zz, append=T)
@@ -64,7 +69,9 @@ for ( alpha in c(0.0045, 0.005, 0.0055, 0.006) )
     cat(paste("lambda = ", lambda, ",\n", sep=''), file=zz, append=T)
     cat(paste("k_lambda = ", k_lambda, ",\n", sep=''), file=zz, append=T)
     cat(paste("gamma = ", gamma, ",\n", sep=''), file=zz, append=T)
-    cat(paste("nc = ", nc, ",\n", sep=''), file=zz, append=T)            
+    cat(paste("nc = ", nc, ",\n", sep=''), file=zz, append=T)
+    cat(paste("model_type = ", model_type, ",\n", sep=''), file=zz, append=T)
+    cat(paste("read_lambda_from_file = ", read_lambda_from_file, ",\n", sep=''), file=zz, append=T)            
     cat("/\n", file=zz, append=T)
 
     ## Copy the seqfile.txt into folder

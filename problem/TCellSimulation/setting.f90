@@ -2,14 +2,14 @@ module setting
   integer Lbox
   integer :: iseed
   real :: tend, dt
-  real :: alpha, beta
+  real :: alpha, beta, alpha_max
   integer :: R1, nc
   real :: diff, lambda, gamma
   real :: k_lambda
   integer :: model_type, read_lambda_from_file
-  
-  namelist /xdata/ Lbox, tend, dt, alpha, diff, k_lambda, &
-       iseed, tpinc, R1, beta, nc, lambda, gamma, model_type, &
+
+  namelist /xdata/ Lbox, tend, dt, alpha, beta, alpha_max, diff, k_lambda, &
+       iseed, tpinc, R1, nc, lambda, gamma, model_type, &
        read_lambda_from_file
 
   type cell
@@ -39,10 +39,11 @@ contains
     write(*, '(a20, f10.2)'), 'tend = ', tend
     write(*, '(a20, f10.2)'), 'dt = ', dt
     write(*, '(a20, f10.2)'), 'alpha = ', alpha
+    write(*, '(a20, f10.2)'), 'beta = ', beta
+    write(*, '(a20, f10.2)'), 'alpha_max = ', alpha_max    
     write(*, '(a20, f10.2)'), 'diff = ', diff
     write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
     write(*, '(a20, i10)'), 'R1 = ', R1
-    write(*, '(a20, f10.2)'), 'beta = ', beta
     write(*, '(a20, f10.2)'), 'lambda = ', lambda
     write(*, '(a20, f10.2)'), 'gamma = ', gamma
     write(*, '(a20, f10.2)'), 'k_lambda = ', k_lambda
@@ -57,10 +58,11 @@ contains
     write(9, '(a20, f10.2)'), 'tend,', tend
     write(9, '(a20, f10.2)'), 'dt,', dt
     write(9, '(a20, f10.2)'), 'alpha,', alpha
+    write(9, '(a20, f10.2)'), 'beta,', beta
+    write(9, '(a20, f10.2)'), 'alpha_max,', alpha_max    
     write(9, '(a20, f10.2)'), 'diff,', diff
     write(9, '(a20, f10.2)'), 'tpinc,', tpinc
     write(9, '(a20, i10)'), 'R1,', R1
-    write(9, '(a20, f10.2)'), 'beta,', beta
     write(9, '(a20, f10.2)'), 'lambda,', lambda
     write(9, '(a20, f10.2)'), 'gamma,', gamma
     write(9, '(a20, f10.2)'), 'k_lambda,', k_lambda    
@@ -101,11 +103,14 @@ contains
     else
        print *, "Parameter error: read_lambda_from_file can only be 0 or 1."
     end if
+
+    ! maximum total amount of T cell is limited by alpha_max
+    alpha_max = alpha_max * Lbox * Lbox * alpha
     
     do i = 1, Lbox
        do j = 1, Lbox
           cmat(i,j)%type = 0 ! No cell everywhere
-          phi(i,j) = 1.0
+          phi(i,j) = 0.0
           p(i,j) = 0.0
           a(i,j) = 0.0
           fb_lambda(i,j) = 0.0
@@ -187,7 +192,7 @@ contains
     open (unit = 21, file=filename, action="write")
     WRITE(filename,'(A9,I5.5,A4)') './out/phi', index, '.dat'
     open (unit = 31, file=filename, action="write")
-    WRITE(filename,'(A7,I5.5,A4)') './out/p', index, '.dat'
+    WRITE(filename,'(A7,I5.5,A4)') './out/a', index, '.dat'
     open (unit = 41, file=filename, action="write")
 
 
@@ -196,12 +201,12 @@ contains
           write(11, '(I5, A2)', advance="no"), cmat(i,j)%type, ', '
           write(21, '(F8.4, A2)', advance="no"), fb_lambda(i,j), ', '
           write(31, '(F8.4, A2)', advance="no"), phi(i,j), ', '
-          write(41, '(F8.4, A2)', advance="no"), p(i,j), ', '
+          write(41, '(F8.4, A2)', advance="no"), a(i,j), ', '
        end do
        write(11, '(I5)'), cmat(i,Lbox)%type
        write(21, '(F8.4)'), fb_lambda(i,j)
        write(31, '(F8.4)'), phi(i,j)
-       write(41, '(F8.4)'), p(i,j)
+       write(41, '(F8.4)'), a(i,j)
     end do
     close(11)
     close(21)
@@ -221,11 +226,28 @@ contains
   subroutine update_rate()
     implicit none
     integer i, j
+    real temp
+    real coeff
+    temp = 0.0
     do i = 1, Lbox
        do j = 1, Lbox
           a(i,j) = alpha*p(i, j)
+          if ( cmat(i,j)%type == 0 ) then
+             temp = temp + a(i, j)
+          end if
        end do
-    end do
+    end do    
+
+    !print *, temp, alpha_max
+    if ( temp > alpha_max ) then
+       !print *, 'come here'
+       coeff = alpha_max / temp
+       do i = 1, Lbox
+          do j = 1, Lbox
+             a(i,j) = coeff*a(i,j)
+          end do
+       end do
+    end if
   end subroutine update_rate
 
   subroutine update_lambda()

@@ -10,7 +10,9 @@ chemokine.cols <- colorRampPalette(c('white', '#F8766D'))(n=100)
 fb.col <- "red"
 tcell.col <- "#1F78B4"
 
-L  <- 512
+##L  <- 2048
+L  <- 1024
+##L  <- 512
 ##L  <- 256
 #L  <- 128
 colors <- c("#A7A7A7",
@@ -28,7 +30,6 @@ for( i in seq(0, 2000, by=10) )
     padded_i <- sprintf("%05d", i)
     png(paste("config_", padded_i, ".png", sep=''), height=600, width=1200)
     A <- matrix(unlist(read.csv(paste('c', padded_i, '.dat', sep=''), header=F)), nrow=L)
-    A[A==2] <- 0
     z1 = raster(A, xmn=0, xmx=L, ymn=0, ymx=L)
     zz1 = raster(pic, xmn=0, xmx=L, ymn=0, ymx=L)
     p1  <- levelplot(zz1, col.regions = gray.cols, margin=FALSE,
@@ -39,20 +40,15 @@ for( i in seq(0, 2000, by=10) )
     ##p1 <- as.layer(pp1) + p1
 
     ##B <- matrix(unlist(read.csv(paste('phi', padded_i, '.dat', sep=''), header=F)), nrow=L)
-    B <- matrix(unlist(read.csv(paste('phi', padded_i, '.dat', sep=''), header=F)), nrow=L)
+    ##B <- matrix(unlist(read.csv(paste('phi', padded_i, '.dat', sep=''), header=F)), nrow=L)
     ##coords <- xyFromCell(z, which(z[]==3))
-    z2 = raster(B, xmn=0, xmx=L, ymn=0, ymx=L)
-    p2 <- levelplot(z2, col.regions = coul, margin=FALSE,
-                    panel=function(..., at, contour, region) {
-                        panel.levelplot(..., contour = FALSE)
-                        panel.contourplot(..., at=c(1), contour = TRUE, col="white", lty=2, region = FALSE)
-                    }
-                    )
-    ## C <- matrix(unlist(read.csv(paste('lambda', padded_i, '.dat', sep=''), header=F)), nrow=L)
-    ## z3 = raster(C, xmn=0, xmx=256, ymn=0, ymx=256)    
-    ## coords <- xyFromCell(z3, which(z3[]>1e-2))
-    ## p3 <- xyplot(coords[,2]~coords[,1], lwd=0.5, pch=1, cex=0.5, col="red")
-    ## p4 <- p2 + as.layer(p3)
+    #z2 = raster(B, xmn=0, xmx=L, ymn=0, ymx=L)
+    z1[z1==2] <- 0
+    z1[z1==3] <- 0
+    p2 <- levelplot(z1, col.regions = c("white"), margin=FALSE)
+    coords <- xyFromCell(z1, which(z1[]==1))
+    pp2 <- xyplot(coords[,2]~coords[,1], lwd=1, cex=0.5, col="black")    
+    p2 <- p2 + as.layer(pp2)
 
     ##C <- matrix(unlist(read.csv(paste('phi', padded_i, '.dat', sep=''), header=F)), nrow=L)
     C <- matrix(unlist(read.csv(paste('lambda', padded_i, '.dat', sep=''), header=F)), nrow=L)

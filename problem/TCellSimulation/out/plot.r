@@ -30,8 +30,8 @@ tcell.col <- "#1F78B4"
 ## tcell.col <- "#F8766D"
 
 
-L <- 1024
-##L  <- 512
+##L <- 1024
+L  <- 512
 ##L  <- 256
 #L  <- 128
 colors <- c("#A7A7A7",
@@ -46,6 +46,7 @@ for( i in seq(0, 2000, by=10) )
     cat(i, '\n')
     padded_i <- sprintf("%05d", i)
     png(paste("config_", padded_i, ".png", sep=''), height=600, width=1200)
+    ##pdf(paste("config_", padded_i, ".pdf", sep=''), height=6, width=12)
     A <- matrix(unlist(read.csv(paste('c', padded_i, '.dat', sep=''), header=F)), nrow=L)
     ##A[A==2] <- sample(c(0,2), length(A[A==2]), replace = TRUE, prob=c(0.9, 0.1))
     A[A==2] <- 0

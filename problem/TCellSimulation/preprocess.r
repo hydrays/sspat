@@ -5,7 +5,7 @@ cmd1 <- paste("cp control.txt control.old")
 system(cmd1)
 
 ##output_file_prefix <- format(Sys.time(), "%Y%m%d%H%M")
-output_file_prefix <- "ww01"
+output_file_prefix <- "xx03"
 output_path = "out"
 rep = 0
 

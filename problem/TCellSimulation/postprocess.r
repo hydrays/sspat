@@ -1,5 +1,5 @@
 require(lattice)
-output_file_prefix <- "ss07_1024"
+output_file_prefix <- "ww01"
 
 A = NULL
 B = NULL
@@ -15,9 +15,10 @@ for ( i in seq(length(force)) )
     FolderName <- paste("case_", output_file_prefix, "_", as.character(rep), "/out/", sep='')
 
     ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/plot.r; cd ..")
-    runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/symplot.r; cd ..")
+    ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/symplot.r; cd ..")
     ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/plot_debug.r; cd ..")
-    ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/symplot_debug.r; cd ..")
+    runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/symplot_debug.r; cd ..")
+    ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/paraview_plot.r; cd ..")
     system(runcmd)
 }
 

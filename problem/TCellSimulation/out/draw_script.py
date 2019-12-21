@@ -4,7 +4,8 @@ from paraview.simple import *
 #### disable automatic camera reset on 'Show'
 paraview.simple._DisableFirstRenderCameraReset()
 
-#baseDIR = '/home/hydra/work/Research/Tcell/sspat/problem/TCellSimulation/out/'
+#baseDIR = '/home/hydra/work/Research/Tcell/sspat/problem/TCellSimulation/case_yy02_2/out/'
+
 baseDIR = sys.argv[1]
 
 # create a new 'CSV Reader'
@@ -43,19 +44,14 @@ delaunay2D1Display.GlyphType = 'Arrow'
 # reset view to fit data
 renderView1.ResetCamera()
 
+# [[[**huhu**]]]
 # change solid color
-# normal signal
-#delaunay2D1Display.DiffuseColor = [0.6862745098039216, 0.8627450980392157, 0.9098039215686274]
-#delaunay2D1Display.DiffuseColor = [0.7843137254901961, 0.9215686274509803, 0.9607843137254902]
-#delaunay2D1Display.DiffuseColor = [0.803921568627451, 0.9411764705882353, 0.9803921568627451]
-
+# strong signal
+delaunay2D1Display.DiffuseColor = [0.7058823529411765, 0.8823529411764706, 1.0]
 # weak signal
-#delaunay2D1Display.DiffuseColor = [0.9215686274509803, 0.9607843137254902, 1.0]
-#delaunay2D1Display.DiffuseColor = [0.9372549019607843, 0.9764705882352941, 1.0]
- 
+#delaunay2D1Display.DiffuseColor = [0.8627450980392157, 1.0, 0.9411764705882353]
 # no signal
-#delaunay2D1Display.DiffuseColor = [0.9607843137254902, 0.9607843137254902, 0.9607843137254902]
-delaunay2D1Display.DiffuseColor = [0.9803921568627451, 0.9803921568627451, 0.9803921568627451]
+#delaunay2D1Display.DiffuseColor = [0.9803921568627451, 0.9803921568627451, 0.9803921568627451]
 
 # get color transfer function/color map for 'z'
 #zLUT = GetColorTransferFunction('z')
@@ -86,18 +82,18 @@ tableToPoints2Display.ColorArrayName = [None, '']
 tableToPoints2Display.GlyphType = 'Arrow'
 
 # set scalar coloring
-ColorBy(tableToPoints2Display, ('POINTS', 't'))
+#ColorBy(tableToPoints2Display, ('POINTS', 't'))
 
-renderView1.ResetCamera()
+#renderView1.ResetCamera()
 
 # rescale color and/or opacity maps used to include current data range
-tableToPoints2Display.RescaleTransferFunctionToDataRange(True)
+#tableToPoints2Display.RescaleTransferFunctionToDataRange(True)
 
 # show color bar/color legend
 #tableToPoints2Display.SetScalarBarVisibility(renderView1, False)
 
 # get color transfer function/color map for 't'
-tLUT = GetColorTransferFunction('t')
+#tLUT = GetColorTransferFunction('t')
 
 # get opacity transfer function/opacity map for 't'
 #tPWF = GetOpacityTransferFunction('t')
@@ -115,8 +111,23 @@ tLUT = GetColorTransferFunction('t')
 #tableToPoints2Display.ColorArrayName = [None, '']
 #tableToPoints2Display.GlyphType = 'Arrow'
 
+# [[[**huhu**]]]
 ## change solid color
+# strong signal
+tableToPoints2Display.DiffuseColor = [0.12156862745098039, 0.47058823529411764, 0.7137254901960784]
+# change solid color
+# weak signal
 #tableToPoints2Display.DiffuseColor = [0.12156862745098039, 0.47058823529411764, 0.7137254901960784]
+# change solid color
+# no signal
+#tableToPoints2Display.DiffuseColor = [0.27450980392156865, 0.6980392156862745, 0.5137254901960784]
+#tableToPoints2Display.DiffuseColor = [0.06666666666666667, 0.4980392156862745, 0.30196078431372547]
+#tableToPoints2Display.DiffuseColor = [0.07450980392156863, 0.5686274509803921, 0.3568627450980392]
+#tableToPoints2Display.DiffuseColor = [0.12156862745098039, 0.7137254901960784, 0.47058823529411764]
+
+# change solid color
+#tableToPoints2Display.DiffuseColor = [0.5019607843137255, 0.5019607843137255, 0.5019607843137255]
+
 
 # create a new 'CSV Reader'
 domaincsv = CSVReader(FileName=[baseDIR + 'domain.csv'])
@@ -219,5 +230,5 @@ renderView1.OrientationAxesVisibility = 0
 SaveScreenshot(baseDIR + 'pvoutput.png', magnification=1, quality=100, view=renderView1)
 
 #### uncomment the following to render all views
-# RenderAllViews()
+RenderAllViews()
 # alternatively, if you want to write images, you can use SaveScreenshot(...).

@@ -105,15 +105,15 @@ contains
     end if
 
     ! maximum total amount of T cell is limited by alpha_max
-    alpha_max = alpha_max * Lbox * Lbox * alpha
+    alpha_max = alpha_max * Lbox * Lbox * alpha * 0.01
     
     do i = 1, Lbox
        do j = 1, Lbox
           cmat(i,j)%type = 0 ! No cell everywhere
           phi(i,j) = 0.0
-          p(i,j) = 0.0
-          a(i,j) = 0.0
-          fb_lambda(i,j) = 0.0
+          !p(i,j) = 0.0
+          !a(i,j) = 0.0
+          !fb_lambda(i,j) = 0.0
        end do
     end do
 
@@ -164,6 +164,10 @@ contains
           cmat(ishift,jshift)%type = 1
        end do
     end do
+ 
+    call update_lambda()   
+    call update_p()
+    call update_rate()    
     write(*, *), 'Done.'
   end subroutine init_cell_pool
 
@@ -316,7 +320,7 @@ contains
   subroutine update_p()
     implicit none
     integer i, j, isub, jsub
-    p = 1.0 + phi
+    p = 0.01 + phi
   end subroutine update_p
 
 end module setting

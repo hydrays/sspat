@@ -236,9 +236,9 @@ contains
     do i = 1, Lbox
        do j = 1, Lbox
           a(i,j) = alpha*p(i, j)
-          if ( cmat(i,j)%type == 0 ) then
-             temp = temp + a(i, j)
-          end if
+          !if ( cmat(i,j)%type == 0 ) then
+          temp = temp + a(i, j)
+          !end if
        end do
     end do    
 

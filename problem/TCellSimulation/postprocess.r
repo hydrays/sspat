@@ -1,12 +1,13 @@
 require(lattice)
-output_file_prefix <- "ww01"
+##output_file_prefix <- "testold"
+output_file_prefix <- "sample01"
 
 A = NULL
 B = NULL
 rep <- 0
 ##force <- c(1, 3, 7, 10, 14, 16)
 ##force <- seq(0, 16, by=2)
-force <- seq(12)
+force <- seq(20)
 for ( i in seq(length(force)) )
 ##for ( i in seq(20) )
 {
@@ -16,8 +17,8 @@ for ( i in seq(length(force)) )
 
     ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/plot.r; cd ..")
     ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/symplot.r; cd ..")
-    ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/plot_debug.r; cd ..")
-    runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/symplot_debug.r; cd ..")
+    runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/plot_debug.r; cd ..")
+    ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/symplot_debug.r; cd ..")
     ##runcmd <- paste("cd", FolderName, "; screen -d -m Rscript ../../out/paraview_plot.r; cd ..")
     system(runcmd)
 }

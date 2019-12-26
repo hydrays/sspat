@@ -29,8 +29,10 @@ for( i in seq(0, 2000, by=10) )
     C <- matrix(unlist(read.csv(paste('a', padded_i, '.dat', sep=''), header=F)), nrow=L)
 
     tf <- 10*2/24
-    totalRate <- sum( (A==0)*C )
-    totalDemand <- sum( (A==0)*(0.01+B)*C0/0.01 )
+    ##totalRate <- sum( (A==0)*C )
+    ##totalDemand <- sum( (A==0)*(0.01+B)*C0/0.01 )
+    totalRate <- sum( C )
+    totalDemand <- sum( (0.01+B)*C0/0.01 )
     ##totalDemand <- sum( (A==0)*(0.01+B)*C0/0.01)
     totalRateList <- c(totalRateList, totalRate)
     totalDemandList <- c(totalDemandList, totalDemand)    

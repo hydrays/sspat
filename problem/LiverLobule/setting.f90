@@ -15,17 +15,21 @@ module setting
   type cell
      integer type
      ! type == 0 : empty splot
-     ! type == 1 : M cell
-     ! type == 2 : T cell
-     ! type == 3 : activated T cell
+     ! type == 1 : blood_vessel
+     ! type == 2 : liver cell
+     ! type == 5 : source (artery)
+     ! type == 6 : sink (vein)       
+     integer n
+     ! number of blood cells in the grid
+     real z
+     ! size of the vessel
+     real phi
+     ! direction of the vessel
   end type cell
+
   type(cell), allocatable :: cmat(:,:)
-  real, allocatable ::  phi(:,:)
-  real, allocatable ::  phi_old(:,:)
   real, allocatable :: p(:,:)
   real, allocatable :: a(:,:)
-  real, allocatable :: fb_lambda(:,:)
-  real, allocatable :: lambda_field(:,:)  
 
 contains
   subroutine read_xdata()
@@ -33,42 +37,42 @@ contains
     open(8, file="control.txt", status='OLD', recl=80, delim='APOSTROPHE')
     read(8, nml=xdata)
 
-    write(*, *), 'Control parameters...'
-    write(*, '(a20, i10)'), 'Lbox = ', Lbox
-    write(*, '(a20, i10)'), 'iseed = ', iseed
-    write(*, '(a20, f10.2)'), 'tend = ', tend
-    write(*, '(a20, f10.2)'), 'dt = ', dt
-    write(*, '(a20, f10.2)'), 'alpha = ', alpha
-    write(*, '(a20, f10.2)'), 'beta = ', beta
-    write(*, '(a20, f10.2)'), 'alpha_max = ', alpha_max    
-    write(*, '(a20, f10.2)'), 'diff = ', diff
-    write(*, '(a20, f10.2)'), 'tpinc = ', tpinc
-    write(*, '(a20, i10)'), 'R1 = ', R1
-    write(*, '(a20, f10.2)'), 'lambda = ', lambda
-    write(*, '(a20, f10.2)'), 'gamma = ', gamma
-    write(*, '(a20, f10.2)'), 'k_lambda = ', k_lambda
-    write(*, '(a20, i10)'), 'nc = ', nc
-    write(*, '(a20, i10)'), 'model_type = ', model_type
-    write(*, '(a20, i10)'), 'read_lambda_from_file = ', read_lambda_from_file
+    write(*, *) 'Control parameters...'
+    write(*, '(a20, i10)') 'Lbox = ', Lbox
+    write(*, '(a20, i10)') 'iseed = ', iseed
+    write(*, '(a20, f10.2)') 'tend = ', tend
+    write(*, '(a20, f10.2)') 'dt = ', dt
+    write(*, '(a20, f10.2)') 'alpha = ', alpha
+    write(*, '(a20, f10.2)') 'beta = ', beta
+    write(*, '(a20, f10.2)') 'alpha_max = ', alpha_max
+    write(*, '(a20, f10.2)') 'diff = ', diff
+    write(*, '(a20, f10.2)') 'tpinc = ', tpinc
+    write(*, '(a20, i10)') 'R1 = ', R1
+    write(*, '(a20, f10.2)') 'lambda = ', lambda
+    write(*, '(a20, f10.2)') 'gamma = ', gamma
+    write(*, '(a20, f10.2)') 'k_lambda = ', k_lambda
+    write(*, '(a20, i10)') 'nc = ', nc
+    write(*, '(a20, i10)') 'model_type = ', model_type
+    write(*, '(a20, i10)') 'read_lambda_from_file = ', read_lambda_from_file
 
     open(9, file="out/control.csv")
-    write(9, '(a20, a10)'), 'PARAMETER,', 'VALUE'
-    write(9, '(a20, i10)'), 'Lbox,', Lbox
-    write(9, '(a20, i10)'), 'iseed,', iseed
-    write(9, '(a20, f10.2)'), 'tend,', tend
-    write(9, '(a20, f10.2)'), 'dt,', dt
-    write(9, '(a20, f10.2)'), 'alpha,', alpha
-    write(9, '(a20, f10.2)'), 'beta,', beta
-    write(9, '(a20, f10.2)'), 'alpha_max,', alpha_max    
-    write(9, '(a20, f10.2)'), 'diff,', diff
-    write(9, '(a20, f10.2)'), 'tpinc,', tpinc
-    write(9, '(a20, i10)'), 'R1,', R1
-    write(9, '(a20, f10.2)'), 'lambda,', lambda
-    write(9, '(a20, f10.2)'), 'gamma,', gamma
-    write(9, '(a20, f10.2)'), 'k_lambda,', k_lambda    
-    write(9, '(a20, i10)'), 'nc,', nc
-    write(9, '(a20, i10)'), 'model_type,', model_type
-    write(9, '(a20, i10)'), 'read_lambda_from_file,', read_lambda_from_file
+    write(9, '(a20, a10)') 'PARAMETER,', 'VALUE'
+    write(9, '(a20, i10)') 'Lbox,', Lbox
+    write(9, '(a20, i10)') 'iseed,', iseed
+    write(9, '(a20, f10.2)') 'tend,', tend
+    write(9, '(a20, f10.2)') 'dt,', dt
+    write(9, '(a20, f10.2)') 'alpha,', alpha
+    write(9, '(a20, f10.2)') 'beta,', beta
+    write(9, '(a20, f10.2)') 'alpha_max,', alpha_max
+    write(9, '(a20, f10.2)') 'diff,', diff
+    write(9, '(a20, f10.2)') 'tpinc,', tpinc
+    write(9, '(a20, i10)') 'R1,', R1
+    write(9, '(a20, f10.2)') 'lambda,', lambda
+    write(9, '(a20, f10.2)') 'gamma,', gamma
+    write(9, '(a20, f10.2)') 'k_lambda,', k_lambda
+    write(9, '(a20, i10)') 'nc,', nc
+    write(9, '(a20, i10)') 'model_type,', model_type
+    write(9, '(a20, i10)') 'read_lambda_from_file,', read_lambda_from_file
 
     close(8)
     close(9)
@@ -76,99 +80,39 @@ contains
 
   subroutine init_cell_pool()
     implicit none
+    real x, y
     real u1, u2
     integer i, j, ishift, jshift
     integer curb
 
-    write(*, '(A)', advance='no'), 'Initialize...'
+    write(*, '(A)', advance='no') 'Initialize...'
     allocate(cmat(1:Lbox,1:Lbox))
-    allocate(phi(1:Lbox, 1:Lbox))
     allocate(p(1:Lbox,1:Lbox))
     allocate(a(1:Lbox,1:Lbox))
-    allocate(fb_lambda(1:Lbox,1:Lbox))
-    allocate(lambda_field(1:Lbox,1:Lbox))
-    allocate(phi_old(1:Lbox,1:Lbox))
 
-    if ( read_lambda_from_file == 1 ) then
-       ! read lambda_field
-       open (unit = 81, file="matrix.txt", action="read")
-       do i = 1, Lbox
-          read(81, *), lambda_field(i,:)
-          !pause
-       end do
-       close(81)
-       lambda_field(i,j) = k_lambda*lambda_field(i,j)
-    else if ( read_lambda_from_file == 0 ) then
-       lambda_field = lambda
-    else
-       print *, "Parameter error: read_lambda_from_file can only be 0 or 1."
-    end if
-
-    ! maximum total amount of T cell is limited by alpha_max
-    alpha_max = alpha_max * Lbox * Lbox * alpha * 0.01
-    
     do i = 1, Lbox
-       do j = 1, Lbox
-          cmat(i,j)%type = 0 ! No cell everywhere
-          phi(i,j) = 0.0
-          !p(i,j) = 0.0
-          !a(i,j) = 0.0
-          !fb_lambda(i,j) = 0.0
-       end do
+      y = i - Lbox/2      
+      do j = 1, Lbox
+         x = j - Lbox/2
+         cmat(i,j)%type = 1
+         cmat(i,j)%phi = atan2(x, y)
+         cmat(i,j)%z = abs(x-y)
+         cmat(i,j)%n = 0
+      end do
     end do
 
-    select case (model_type)
-    case (1) ! central line
-       cmat( (Lbox/4 - 5) : (Lbox/4 + 5), (Lbox/2 - 5) : (Lbox/2 + 5) )%type = 3
-       cmat( (2*Lbox/4 - 5) : (2*Lbox/4 + 5), (Lbox/2 - 5) : (Lbox/2 + 5) )%type = 3
-       cmat( (3*Lbox/4 - 5) : (3*Lbox/4 + 5), (Lbox/2 - 5) : (Lbox/2 + 5) )%type = 3          
-       
-    case (2) ! central line
-       cmat( (Lbox/3 - 5) : (Lbox/3 + 5), (Lbox/8 - 5) : (Lbox/8 + 5) )%type = 3
-       cmat( (Lbox/3 - 5) : (Lbox/3 + 5), (7*Lbox/8 - 5) : (7*Lbox/8 + 5) )%type = 3
-       
-    case (3) ! random
-       
-    end select
+    cmat(Lbox/2, Lbox/2)%type = 5
+    cmat(Lbox-10, Lbox-10)%type = 6
+    cmat(1+10, 1+10)%type = 6
+    cmat(1+10, Lbox-10)%type = 6
+    cmat(Lbox-10, 1+10)%type = 6
+    cmat(1, 1:Lbox)%type = 6
+    cmat(Lbox, 1:Lbox)%type = 6
+    cmat(1:Lbox, 1)%type = 6
+    cmat(1:Lbox, Lbox)%type = 6
 
-    ! cmat(170:180, 251:261)%type = 3
-    ! cmat(320:330, 251:261)%type = 3
-    ! cmat(470:480, 251:261)%type = 3
-    
-    ! ! for 512 two side
-    ! cmat(320:330, 51:61)%type = 3
-    ! cmat(320:330, 451:461)%type = 3    
-    
-    curb = 10
-    ! randomly distribute M cells
-    do i = curb, Lbox-curb, 4
-       do j = curb, Lbox-curb, 4
-          call random_number(u1)
-          call random_number(u2)
-          u1 = u1 - 0.5
-          u2 = u2 - 0.5
-          if ( u1>0.25 ) then
-             ishift = i + 1
-          else if ( u1<-0.25 ) then
-             ishift = i - 1
-          else
-             ishift = i
-          end if
-          if ( u2>0.25 ) then
-             jshift = j + 1
-          else if ( u2<-0.25 ) then
-             jshift = j - 1
-          else
-             jshift = j
-          end if
-          cmat(ishift,jshift)%type = 1
-       end do
-    end do
- 
-    call update_lambda()   
-    call update_p()
-    call update_rate()    
-    write(*, *), 'Done.'
+    call update_n()
+    write(*, *) 'Done.'
   end subroutine init_cell_pool
 
   subroutine output_to_file(index)
@@ -177,45 +121,24 @@ contains
     integer, intent(in) :: index
     character(30) filename
     integer i, j
+    real x, y
 
-    if ( index==0 ) then
-       WRITE(filename,'(A7,I5.5,A4)') './out/f', index, '.dat'
-       open (unit = 8, file=filename, action="write")
-       do i = 1, Lbox
-          do j = 1, Lbox-1
-             write(8, '(F8.4, A2)', advance="no"), lambda_field(i,j), ', '
-          end do
-          write(8, '(F8.4, A2)'), lambda_field(i,j)
-       end do
-       close(8)
-    end if
-    
-    WRITE(filename,'(A7,I5.5,A4)') './out/c', index, '.dat'
-    open (unit = 11, file=filename, action="write")
-    WRITE(filename,'(A12,I5.5,A4)') './out/lambda', index, '.dat'
-    open (unit = 21, file=filename, action="write")
-    WRITE(filename,'(A9,I5.5,A4)') './out/phi', index, '.dat'
-    open (unit = 31, file=filename, action="write")
     WRITE(filename,'(A7,I5.5,A4)') './out/a', index, '.dat'
-    open (unit = 41, file=filename, action="write")
-
+    open (unit = 11, file=filename, action="write")
+    write(11, '(A4, A2, A4, A2, A4, A2, A4, A2, A4, A2, A4)') &
+    'x', ', ', 'y', ', ', 'type', ', ', &
+    'z', ', ', 'phi', ', ', 'n'
 
     do i = 1, Lbox
-       do j = 1, Lbox-1
-          write(11, '(I5, A2)', advance="no"), cmat(i,j)%type, ', '
-          write(21, '(F8.4, A2)', advance="no"), fb_lambda(i,j), ', '
-          write(31, '(F8.4, A2)', advance="no"), phi(i,j), ', '
-          write(41, '(F8.4, A2)', advance="no"), a(i,j), ', '
+       y = i - Lbox/2      
+       do j = 1, Lbox
+          x = j - Lbox/2
+          write(11, '(F12.4, A2, F12.4, A2, I5, A2, F12.4, A2, F12.4, A2, I12)') &
+            x, ', ', y, ', ', cmat(i,j)%type, ', ', &
+            cmat(i,j)%z, ', ', cmat(i,j)%phi, ', ', cmat(i,j)%n
        end do
-       write(11, '(I5)'), cmat(i,Lbox)%type
-       write(21, '(F8.4)'), fb_lambda(i,j)
-       write(31, '(F8.4)'), phi(i,j)
-       write(41, '(F8.4)'), a(i,j)
     end do
     close(11)
-    close(21)
-    close(31)
-    close(41)
   end subroutine output_to_file
 
   subroutine cell_event(i, j)
@@ -227,100 +150,396 @@ contains
     implicit none
   end subroutine cell_stat
 
-  subroutine update_rate()
+  subroutine update_n()
     implicit none
     integer i, j
-    real temp
-    real coeff
-    temp = 0.0
+    real p(9)
+    integer ntot
+    integer ix(9)
+    real ptot, prob
+    integer icat
     do i = 1, Lbox
        do j = 1, Lbox
-          a(i,j) = alpha*p(i, j)
-          !if ( cmat(i,j)%type == 0 ) then
-          temp = temp + a(i, j)
-          !end if
-       end do
-    end do    
-
-    !print *, temp, alpha_max
-    if ( temp > alpha_max ) then
-       !print *, 'come here'
-       coeff = alpha_max / temp
-       do i = 1, Lbox
-          do j = 1, Lbox
-             a(i,j) = coeff*a(i,j)
-          end do
-       end do
-    end if
-  end subroutine update_rate
-
-  subroutine update_lambda()
-    implicit none
-    integer i, j, isub, jsub
-    fb_lambda = 0.0
-    do i = 1, Lbox
-       do j = 1, Lbox
-          if ( cmat(i,j)%type == 3 ) then
-             do isub = i-1, i+1
-                if (isub > 0 .and. isub <= Lbox) then
-                   do jsub = j-1, j+1
-                      if (jsub > 0 .and. jsub <= Lbox) then
-                         fb_lambda(isub,jsub) = lambda_field(isub, jsub)
-                      end if
-                   end do
-                end if
-             end do
-          end if
+          if (cmat(i, j)%type == 5) then
+             cmat(i, j)%n = cmat(i, j)%n + 100
+          else if (cmat(i, j)%type == 6) then
+             cmat(i, j)%n = cmat(i, j)%n - min(100, cmat(i, j)%n)
+          endif
        end do
     end do
-  end subroutine update_lambda
-
-  subroutine update_phi(march_time)
-    implicit none
-    real, intent(in) :: march_time
-    integer i, j
-    real dt_small
-    integer istep, nstep
-    nstep = 1
     
-    dt_small = march_time/nstep
-    do istep = 1, nstep
-       ! source
-       do i = 1, Lbox
-          do j = 1, Lbox
-             phi(i,j) = phi(i,j) + fb_lambda(i,j)*dt_small
-          end do
-       end do
-       ! Neumann boundary condition (sort of)
-       ! i = 1 or Lbox
-       do j = 1, Lbox
-          phi(1,j) = phi(2,j)
-          phi(Lbox,j) = phi(Lbox-1,j)
-       end do
-       ! j = 1 or Lbox
-       do i = 1, Lbox
-          phi(i,1) = phi(i,2)
-          phi(i,Lbox) = phi(i,Lbox-1)
-       end do
+    do i = 2, Lbox-1
+      do j = 2, Lbox-1
+        if (cmat(i, j)%n > 0) then
+            call get_p(p)
+            !
+            !  Initialize variables.
+            !
+            ntot = cmat(i, j)%n
+            ptot = 1.0
+            do icat = 1, 9
+               ix(icat) = 0
+            end do
+            !
+            !  Generate the observation.
+            !
+            do icat = 1, 8
+               prob = p(icat) / ptot
+               ix(icat) = ignbin ( ntot, prob )
+               ntot = ntot - ix(icat)
+               if ( ntot <= 0 ) then
+                  exit
+               end if
+               ptot = ptot - p(icat)
+            end do
+            if (ntot > 0) then
+               ix(9) = ntot
+            endif
+            ! check multinomial distribution
+            if ( sum(ix) .ne. cmat(i, j)%n ) then
+               print *, 'multinomial wrong'
+               exit
+            endif
+            if ( ntot < 0 ) then
+               print *, 'multinomial wrong'
+               exit
+            endif
+            cmat(i, j)%n = ix(1)
+            cmat(i, j+1)%n = cmat(i, j+1)%n + ix(2)
+            cmat(i+1, j+1)%n = cmat(i+1, j+1)%n + ix(3)
+            cmat(i+1, j)%n = cmat(i+1, j)%n + ix(4)
+            cmat(i+1, j-1)%n = cmat(i+1, j-1)%n + ix(5)
+            cmat(i, j-1)%n = cmat(i, j-1)%n + ix(6)
+            cmat(i-1, j-1)%n = cmat(i-1, j-1)%n + ix(7)
+            cmat(i-1, j)%n = cmat(i-1, j)%n + ix(8)
+            cmat(i-1, j+1)%n = cmat(i-1, j+1)%n + ix(9)
+         end if
+      end do
+   end do    
+  end subroutine update_n
 
-       ! diffuse
-       phi_old = phi
-       do i = 2, Lbox-1
-          do j = 2, Lbox-1
-             phi(i, j) = phi_old(i,j) &
-                  + dt_small*diff*(phi_old(i-1,j)+phi_old(i+1,j)+phi_old(i,j-1)+phi_old(i,j+1)-4.0*phi_old(i,j))
-          end do
-       end do
-
-       ! decay
-       phi = phi - dt_small*gamma*phi
-    end do
-  end subroutine update_phi
-
-  subroutine update_p()
+  subroutine get_p(i, j, p)
     implicit none
-    integer i, j, isub, jsub
-    p = 0.01 + phi
-  end subroutine update_p
+    integer, intent(in) :: i, j
+    real, intent(out) :: p(9)
+    real s0 = 1.0
+    p(1) = s0 + cmat(i, j)%z * cmat(i, j)%z
+    p(2) = s0 + cmat(i, j)%z * cmat(i, j+1)%z   * cos(cmat(i, j)%phi - cmat(i, j+1)%phi)
+    p(3) = s0 + cmat(i, j)%z * cmat(i+1, j+1)%z * cos(cmat(i, j)%phi - cmat(i+1, j+1)%phi)
+    p(4) = s0 + cmat(i, j)%z * cmat(i+1, j)%z   * cos(cmat(i, j)%phi - cmat(i+1, j)%phi)
+    p(5) = s0 + cmat(i, j)%z * cmat(i+1, j-1)%z * cos(cmat(i, j)%phi - cmat(i+1, j-1)%phi)
+    p(6) = s0 + cmat(i, j)%z * cmat(i, j-1)%z   * cos(cmat(i, j)%phi - cmat(i, j-1)%phi)
+    p(7) = s0 + cmat(i, j)%z * cmat(i-1, j-1)%z * cos(cmat(i, j)%phi - cmat(i-1, j-1)%phi)
+    p(8) = s0 + cmat(i, j)%z * cmat(i-1, j)%z   * cos(cmat(i, j)%phi - cmat(i-1, j)%phi)
+    p(9) = s0 + cmat(i, j)%z * cmat(i-1, j+1)%z * cos(cmat(i, j)%phi - cmat(i-1, j+1)%phi)
+
+    cmat(i, j+1)%n = cmat(i, j+1)%n + ix(2)
+    cmat(i+1, j+1)%n = cmat(i+1, j+1)%n + ix(3)
+    cmat(i+1, j)%n = cmat(i+1, j)%n + ix(4)
+    cmat(i+1, j-1)%n = cmat(i+1, j-1)%n + ix(5)
+    cmat(i, j-1)%n = cmat(i, j-1)%n + ix(6)
+    cmat(i-1, j-1)%n = cmat(i-1, j-1)%n + ix(7)
+    cmat(i-1, j)%n = cmat(i-1, j)%n + ix(8)
+    cmat(i-1, j+1)%n = cmat(i-1, j+1)%n + ix(9)
+    if ( abs(sum(p) - 1) > 1e-12 ) then
+       stop 'wrong probabilites'
+    end if
+  end subroutine get_p
+  
+  function ignbin ( n, pp )
+
+   !*****************************************************************************80
+   !
+   !! IGNBIN generates a binomial random deviate.
+   !
+   !  Discussion:
+   !
+   !    This procedure generates a single random deviate from a binomial
+   !    distribution whose number of trials is N and whose
+   !    probability of an event in each trial is P.
+   !
+   !    The previous version of this program relied on the assumption that
+   !    local memory would be preserved between calls.  It set up data
+   !    one time to be preserved for use over multiple calls.  In the
+   !    interests of portability, this assumption has been removed, and
+   !    the "setup" data is recomputed on every call.
+   !
+   !  Licensing:
+   !
+   !    This code is distributed under the GNU LGPL license.
+   !
+   !  Modified:
+   !
+   !    31 March 2013
+   !
+   !  Author:
+   !
+   !    Original FORTRAN77 version by Barry Brown, James Lovato.
+   !    FORTRAN90 version by John Burkardt.
+   !
+   !  Reference:
+   !
+   !    Voratas Kachitvichyanukul, Bruce Schmeiser,
+   !    Binomial Random Variate Generation,
+   !    Communications of the ACM,
+   !    Volume 31, Number 2, February 1988, pages 216-222.
+   !
+   !  Parameters:
+   !
+   !    Input, integer N, the number of binomial trials, from which a
+   !    random deviate will be generated.
+   !    0 < N.
+   !
+   !    Input, real PP, the probability of an event in each trial of
+   !    the binomial distribution from which a random deviate is to be generated.
+   !    0.0 < PP < 1.0.
+   !
+   !    Output, integer IGNBIN, a random deviate from the
+   !    distribution.
+   !
+     implicit none
+   
+     real al
+     real alv
+     real amaxp
+     real c
+     real f
+     real f1
+     real f2
+     real ffm
+     real fm
+     real g
+     integer i
+     integer ignbin
+     integer ix
+     integer ix1
+     integer k
+     integer m
+     integer mp
+     real pp
+     integer n
+     real p
+     real p1
+     real p2
+     real p3
+     real p4
+     real q
+     real qn
+     real r
+     real r4_uni_01
+     real t
+     real u
+     real v
+     real w
+     real w2
+     real x
+     real x1
+     real x2
+     real xl
+     real xll
+     real xlr
+     real xm
+     real xnp
+     real xnpq
+     real xr
+     real ynorm
+     real z
+     real z2
+   
+     if ( pp <= 0.0E+00 .or. 1.0E+00 <= pp ) then
+       write ( *, '(a)' ) ' '
+       write ( *, '(a)' ) 'IGNBIN - Fatal error!'
+       write ( *, '(a)' ) '  PP is out of range.'
+       stop 1
+     end if
+   
+     p = min ( pp, 1.0E+00 - pp )
+     q = 1.0E+00 - p
+     xnp = real ( n, kind = 4 ) * p
+   
+     if ( xnp < 30.0E+00 ) then
+   
+       qn = q ** n
+       r = p / q
+       g = r * real ( n + 1, kind = 4 )
+   
+       do
+   
+         ix = 0
+         f = qn
+         call random_number(u)
+   
+         do
+   
+           if ( u < f ) then
+             if ( 0.5E+00 < pp ) then
+               ix = n - ix
+             end if
+             ignbin = ix
+             return
+           end if
+   
+           if ( 110 < ix ) then
+             exit
+           end if
+   
+           u = u - f
+           ix = ix + 1
+           f = f * ( g / real ( ix, kind = 4 ) - r )
+   
+         end do
+   
+       end do
+   
+     end if
+   
+     ffm = xnp + p
+     m = int ( ffm )
+     fm = m
+     xnpq = xnp * q
+     p1 = int ( 2.195E+00 * sqrt ( xnpq ) - 4.6E+00 * q ) + 0.5E+00
+     xm = fm + 0.5E+00
+     xl = xm - p1
+     xr = xm + p1
+     c = 0.134E+00 + 20.5E+00 / ( 15.3E+00 + fm )
+     al = ( ffm - xl ) / ( ffm - xl * p )
+     xll = al * ( 1.0E+00 + 0.5E+00 * al )
+     al = ( xr - ffm ) / ( xr * q )
+     xlr = al * ( 1.0E+00 + 0.5E+00 * al )
+     p2 = p1 * ( 1.0E+00 + c + c )
+     p3 = p2 + c / xll
+     p4 = p3 + c / xlr
+   !
+   !  Generate a variate.
+   !
+     do
+   
+       call random_number(u)
+       u = u * p4
+       call random_number(v)
+   !
+   !  Triangle
+   !
+       if ( u < p1 ) then
+         ix = int ( xm - p1 * v + u )
+         if ( 0.5E+00 < pp ) then
+           ix = n - ix
+         end if
+         ignbin = ix
+         return
+       end if
+   !
+   !  Parallelogram
+   !
+       if ( u <= p2 ) then
+   
+         x = xl + ( u - p1 ) / c
+         v = v * c + 1.0E+00 - abs ( xm - x ) / p1
+   
+         if ( v <= 0.0E+00 .or. 1.0E+00 < v ) then
+           cycle
+         end if
+   
+         ix = int ( x )
+   
+       else if ( u <= p3 ) then
+   
+         ix = int ( xl + log ( v ) / xll )
+         if ( ix < 0 ) then
+           cycle
+         end if
+         v = v * ( u - p2 ) * xll
+   
+       else
+   
+         ix = int ( xr - log ( v ) / xlr )
+         if ( n < ix ) then
+           cycle
+         end if
+         v = v * ( u - p3 ) * xlr
+   
+       end if
+   
+       k = abs ( ix - m )
+   
+       if ( k <= 20 .or. xnpq / 2.0 - 1.0 <= k ) then
+   
+         f = 1.0E+00
+         r = p / q
+         g = ( n + 1 ) * r
+   
+         if ( m < ix ) then
+           mp = m + 1
+           do i = m + 1, ix
+             f = f * ( g / i - r )
+           end do
+         else if ( ix < m ) then
+           ix1 = ix + 1
+           do i = ix + 1, m
+             f = f / ( g / real ( i, kind = 4 ) - r )
+           end do
+         end if
+   
+         if ( v <= f ) then
+           if ( 0.5E+00 < pp ) then
+             ix = n - ix
+           end if
+           ignbin = ix
+           return
+         end if
+   
+       else
+   
+         amaxp = ( k / xnpq ) * ( ( k * ( k / 3.0E+00 &
+           + 0.625E+00 ) + 0.1666666666666E+00 ) / xnpq + 0.5E+00 )
+         ynorm = - real ( k * k, kind = 4 ) / ( 2.0E+00 * xnpq )
+         alv = log ( v )
+   
+         if ( alv < ynorm - amaxp ) then
+           if ( 0.5E+00 < pp ) then
+             ix = n - ix
+           end if
+           ignbin = ix
+           return
+         end if
+   
+         if ( ynorm + amaxp < alv ) then
+           cycle
+         end if
+   
+         x1 = real ( ix + 1, kind = 4 )
+         f1 = fm + 1.0E+00
+         z = real ( n + 1, kind = 4 ) - fm
+         w = real ( n - ix + 1, kind = 4 )
+         z2 = z * z
+         x2 = x1 * x1
+         f2 = f1 * f1
+         w2 = w * w
+   
+         t = xm * log ( f1 / x1 ) + ( n - m + 0.5E+00 ) * log ( z / w ) &
+           + real ( ix - m, kind = 4 ) * log ( w * p / ( x1 * q ) ) &
+           + ( 13860.0E+00 - ( 462.0E+00 - ( 132.0E+00 - ( 99.0E+00 - 140.0E+00 &
+           / f2 ) / f2 ) / f2 ) / f2 ) / f1 / 166320.0E+00 &
+           + ( 13860.0E+00 - ( 462.0E+00 - ( 132.0E+00 - ( 99.0E+00 - 140.0E+00 &
+           / z2 ) / z2 ) / z2 ) / z2 ) / z / 166320.0E+00 &
+           + ( 13860.0E+00 - ( 462.0E+00 - ( 132.0E+00 - ( 99.0E+00 - 140.0E+00 &
+           / x2 ) / x2 ) / x2 ) / x2 ) / x1 / 166320.0E+00 &
+           + ( 13860.0E+00 - ( 462.0E+00 - ( 132.0E+00 - ( 99.0E+00 - 140.0E+00 &
+           / w2 ) / w2 ) / w2 ) / w2 ) / w / 166320.0E+00
+   
+         if ( alv <= t ) then
+           if ( 0.5E+00 < pp ) then
+             ix = n - ix
+           end if
+           ignbin = ix
+           return
+         end if
+   
+       end if
+   
+     end do
+   
+     return
+   end function
 
 end module setting

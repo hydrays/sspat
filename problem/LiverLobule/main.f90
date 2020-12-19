@@ -34,7 +34,13 @@ program main
         print *, tp
      end if
 
-     call update_n()     
+     !call update_n()
+     call update_grid()
+     call update_vessel_z()
+     call update_vessel_phi()
+     call update_liver_units_size()
+     call update_liver_units_position()
+     call liver_unit_division()     
      t = t + dt
   end do
 

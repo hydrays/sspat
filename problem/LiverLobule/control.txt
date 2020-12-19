@@ -1,7 +1,7 @@
 ! Control parameters
 &xdata
 	Lbox = 128,
-	tend = 1000.0,
+	tend = 300.0,
 	dt = 0.01,	
 	tpinc = 1.0,
 	iseed = 1012,  
